@@ -1,15 +1,18 @@
+import scipy.io as sio
 import tensorflow as tf
+import os
 import numpy as np
-import random
-from collections import deque
+import math
 
 """
 train the home team and away team together, use a feature to represent it.
 """
 feature_num = 7
 GAMMA = 0.99  # decay rate of past observations
-BATCH = 32  # size of minibatch
+BATCH_SIZE = 32  # size of minibatch
 SPORT = "NHL"
+DATA_STORE = "/home/gla68/Documents/Hockey-data/Hockey-Training-All"
+DIR_GAMES_ALL = os.listdir(DATA_STORE)
 
 
 def create_network():
@@ -18,45 +21,67 @@ def create_network():
     :return: network output
     """
     # network weights
-    with tf.name_scope("Dense_Layer_first"):
-        x = tf.placeholder(tf.float32, [None, feature_num], name="x")
-        with tf.name_scope('weights'):
-            W1 = tf.Variable(tf.zeros([feature_num, 1000]), name="W")
-        with tf.name_scope('biases'):
-            b1 = tf.Variable(tf.zeros([1000]), name="b")
-        with tf.name_scope('Wx_plus_b'):
-            y1 = tf.matmul(x, W1) + b1
-        activations = tf.nn.relu(y1, name='activation')
-        tf.histogram_summary('activations', activations)
+    # with tf.name_scope("Dense_Layer_first"):
+    #     x = tf.placeholder(tf.float32, [None, feature_num], name="x")
+    #     with tf.name_scope('weights'):
+    #         W1 = tf.Variable(tf.zeros([feature_num, 1000]), name="W")
+    #     with tf.name_scope('biases'):
+    #         b1 = tf.Variable(tf.zeros([1000]), name="b")
+    #     with tf.name_scope('Wx_plus_b'):
+    #         y1 = tf.matmul(x, W1) + b1
+    #     activations = tf.nn.relu(y1, name='activation')
+    #     tf.summary.histogram('activations', activations)
+    #
+    # with tf.name_scope("Dense_Layer_second"):
+    #     with tf.name_scope('weights'):
+    #         W2 = tf.Variable(tf.zeros([1000, 1]), name="W")
+    #     with tf.name_scope('biases'):
+    #         b2 = tf.Variable(tf.zeros([1]), name="b")
+    #     with tf.name_scope('Wx_plus_b'):
+    #         read_out = tf.matmul(activations, W2) + b2
 
-    with tf.name_scope("Dense_Layer_second"):
-        with tf.name_scope('weights'):
-            W2 = tf.Variable(tf.zeros([1000, 1]), name="W")
-        with tf.name_scope('biases'):
-            b2 = tf.Variable(tf.zeros([1]), name="b")
-        with tf.name_scope('Wx_plus_b'):
-            read_out = tf.matmul(activations, W2) + b2
+    # 7 is the num of units is layer 1
+    # 1000 is the num of units in layer 2
+    # 1 is the num of unit in layer 3
+
+    num_layer_1 = feature_num
+    num_layer_2 = 1000
+    num_layer_3 = 1
+    max_sigmoid_1 = -4 * math.sqrt(float(6) / (num_layer_1 + num_layer_2))
+    min_sigmoid_1 = 4 * math.sqrt(float(6) / (num_layer_1 + num_layer_2))
+    max_sigmoid_2 = -4 * math.sqrt(float(6) / (num_layer_2 + num_layer_3))
+    min_sigmoid_2 = 4 * math.sqrt(float(6) / (num_layer_2 + num_layer_3))
+
+    x = tf.placeholder(tf.float32, [None, num_layer_1], name="x")
+    W1 = tf.Variable(tf.zeros([num_layer_1, num_layer_2]), name="W")
+    b1 = tf.Variable(tf.zeros([num_layer_2]), name="b")
+    y1 = tf.matmul(x, W1) + b1
+    activations = tf.nn.sigmoid(y1, name='activation')
+
+    # to debug the network
+    W1_print = tf.Print(W1, [W1], message="W1 is:", summarize=40)
+    y1_print = tf.Print(y1, [y1], message="y1 is:", summarize=40)
+    b1_print = tf.Print(b1, [b1], message="b1 is:", summarize=40)
+
+    W2 = tf.Variable(tf.zeros([num_layer_2, num_layer_3]), name="W")
+    b2 = tf.Variable(tf.zeros([num_layer_3]), name="b")
+    read_out = tf.matmul(activations, W2) + b2
+
+    # to debug the network
+    W2_print = tf.Print(W2, [W2], message="W2 is:", summarize=40)
+    y2_print = tf.Print(read_out, [read_out], message="y2 is:", summarize=40)
+    b2_print = tf.Print(b2, [b2], message="b2 is:", summarize=40)
 
     # define the cost function
     y = tf.placeholder("float", [None])
 
-    readout_action = tf.reduce_sum(read_out, reduction_indices=1)  # Computes the sum of elements across dimensions of a tensor.
+    readout_action = tf.reduce_sum(read_out,
+                                   reduction_indices=1)  # Computes the sum of elements across dimensions of a tensor.
     cost = tf.reduce_mean(tf.square(y - readout_action))  # square means
     train_step = tf.train.AdamOptimizer(1e-6).minimize(cost)
     # train_step = tf.train.AdadeltaOptimizer().minimize(cost)
 
-    return x, read_out, y, train_step
-
-
-def get_next_train_event():
-    """
-    retrieve next event from sport data
-    :return:
-    """
-    state = []
-    reward = 0
-    terminal = 0
-    return state, reward, terminal
+    return x, read_out, y, train_step, cost, W1_print, y1_print, b1_print, W2_print, y2_print, b2_print
 
 
 def get_next_test_event():
@@ -70,90 +95,152 @@ def get_next_test_event():
     return state, reward, terminal
 
 
-def get_training_batch(s_t0, t):
+def get_training_batch(s_t0, state, reward, train_number, train_len):
     """
     combine training data to a batch
     :return: [last_state_of_batch, batch, time_series]
     """
     batch_return = []
     current_batch_length = 0
-    while current_batch_length < 32:
-        s_t1, r_t1, terminal = get_next_train_event()
-        batch_return.append((s_t0, r_t1, s_t1, terminal))
+    while current_batch_length < BATCH_SIZE:
+        s_t1 = state[train_number]
+        # r_t1 = reward[train_number]
+        r_t0 = reward[train_number - 1]
+        train_number += 1
+        if train_number + 1 == train_len:
+            # batch_return.append((s_t0, r_t1, s_t1, 1))
+            batch_return.append((s_t0, r_t0, s_t1, 1))
+            break
+        # batch_return.append((s_t0, r_t1, s_t1, 0))
+        batch_return.append((s_t0, r_t0, s_t1, 0))
         current_batch_length += 1
-        t += 1
         s_t0 = s_t1
-    return s_t0, batch_return, t
+
+    return s_t0, batch_return, train_number
 
 
-def train_network():
+def build_training_batch(state, reward):
     """
-    train the network
-    :param x: network input placeholder
-    :param readout: network output placeholder
-    :param sess:
+    build batches
+    :param state:
+    :param reward:
     :return:
     """
+    batch_return = []
+    batch_number = len(state)
+    s_t0 = state[0]
+    for num in range(1, batch_number):
+        s_t1 = state[num]
+        r_t1 = reward[num]
+        if num == batch_number - 1:
+            terminal = 1
+        else:
+            terminal = 0
+        batch_return.append({'state_0': s_t0, 'reward': r_t1, 'state_1': s_t1, 'terminal': terminal})
+        s_t0 = s_t1
+    return batch_return
 
-    sess = tf.InteractiveSession()
 
-    x, read_out, y, train_step = create_network()
+def train_network(sess, x, read_out, y, train_step, cost, W1_print, y1_print, b1_print, W2_print, y2_print, b2_print):
+    """
+    train the network
+    :param x:
+    :param sess:
+    :param cost:
+    :param train_step:
+    :param read_out:
+    :return:
+    """
+    game_number = 0
+
+    # loading network
     saver = tf.train.Saver()
-    sess.run(tf.initialize_all_variables())
-
-    checkpoint = tf.train.get_checkpoint_state("saved_networks")
+    sess.run(tf.global_variables_initializer())
+    checkpoint = tf.train.get_checkpoint_state("./saved_networks/")
     if checkpoint and checkpoint.model_checkpoint_path:
         saver.restore(sess, checkpoint.model_checkpoint_path)
         print("Successfully loaded:", checkpoint.model_checkpoint_path)
     else:
         print("Could not find old network weights")
 
-    # start training
-    t = 0
-    s_t0, r_t0, _ = get_next_train_event()
+    # iterate over the training data
+    for dir_game in DIR_GAMES_ALL:
+        game_number += 1
+        game_files = os.listdir(DATA_STORE + "/" + dir_game)
+        for filename in game_files:
+            if filename.startswith("reward"):
+                reward_name = filename
+            elif filename.startswith("state"):
+                state_name = filename
 
-    while 1:
+        reward = sio.loadmat(DATA_STORE + "/" + dir_game + "/" + reward_name)
+        reward = (reward['reward'][0]).tolist()
+        reward_count = sum(reward)
+        state = sio.loadmat(DATA_STORE + "/" + dir_game + "/" + state_name)
+        state = state['state']
+        print ("load file" + str(dir_game) + " success")
+        print ("reward number" + str(reward_count))
+        if len(state) != len(reward):
+            raise Exception('state length does not equal to reward length')
 
-        s_tl, batch, t = get_training_batch(s_t0, t)
-        print ("starting training at step" + str(t))
-        # get the batch variables
-        s_t_batch = [d[0] for d in batch]
-        r_t_batch = [d[1] for d in batch]
-        s_t1_batch = [d[2] for d in batch]
+        train_len = len(state)
+        train_number = 0
 
-        y_batch = []
-        readout_t1_batch = read_out.eval(feed_dict={x: s_t1_batch})  # get value of s
+        # start training
+        s_t0 = state[0]
+        r_t0 = reward[0]
+        train_number += 1
 
-        for i in range(0, len(batch)):
-            terminal = batch[i][5]
-            # if terminal, only equals reward
+        while True:
+
+            s_tl, batch, train_number = get_training_batch(s_t0, state, reward, train_number, train_len)
+            # get the batch variables
+            s_t_batch = [d[0] for d in batch]
+            r_t_batch = [d[1] for d in batch]
+            s_t1_batch = [d[2] for d in batch]
+
+            y_batch = []
+
+            s_t1_batch = []
+            for i in range(0, 32):
+                temp = [i] * 7
+                s_t1_batch.append(np.asarray(temp))
+            s_t1_batch = np.asarray(s_t1_batch)
+
+            # debug network with W1_print, y1_print, b1_print, W2_print, y2_print, b2_print
+            sess.run(W1_print, feed_dict={x: s_t1_batch})
+            sess.run(y1_print, feed_dict={x: s_t1_batch})
+            sess.run(b1_print, feed_dict={x: s_t1_batch})
+            sess.run(W2_print, feed_dict={x: s_t1_batch})
+            sess.run(y2_print, feed_dict={x: s_t1_batch})
+            sess.run(b2_print, feed_dict={x: s_t1_batch})
+
+            readout_t1_batch = read_out.eval(feed_dict={x: s_t1_batch})  # get value of s
+            print(str((max(readout_t1_batch)[0], min(readout_t1_batch)[0])))
+
+            for i in range(0, len(batch)):
+                terminal = batch[i][3]
+                # if terminal, only equals reward
+                if terminal:
+                    y_batch.append(float(r_t_batch[i]))
+                    break
+                else:
+                    y_batch.append(r_t_batch[i] + GAMMA * ((readout_t1_batch[i]).tolist())[0])
+
+            # perform gradient step
+            sess.run(train_step, feed_dict={y: y_batch, x: s_t_batch})
+
+            # update the old values
+            s_t0 = s_tl
+
+            # print info
+            if terminal or ((train_number - 1) / BATCH_SIZE) % 5 == 1:
+                print ("TIMESTEP:", train_number, "Game:", game_number)
+
             if terminal:
-                y_batch.append(r_t_batch[i])
+                # save progress after a game
+                saver.save(sess, './saved_networks/' + SPORT + '-game-', global_step=game_number)
                 break
-            else:
-                y_batch.append(r_t_batch[i] + GAMMA * readout_t1_batch[i])
-
-        # perform gradient step
-        sess.run(train_step, feed_dict={y: y_batch, x: s_t_batch})
-        # train_step.run(feed_dict={
-        #     y: y_batch,
-        #     x: s_t_batch}
-        # )
-
-        # update the old values
-        s_t0 = s_tl
-        t += 1
-
-        # save progress every 10000 iterations
-        if t % 10000 == 0:
-            saver.save(sess, 'saved_networks/' + SPORT + '-dqn', global_step=t)
-
-        # print info
-        state = "train"
-        print("TIMESTEP:", t, "\t STATE:", state)
-
-        if terminal:
-            break
 
 
 # def compute_state_q(x, readout):
@@ -172,8 +259,11 @@ def train_network():
 #         print ("time", t, "\tstate:", s_t, "\t q_value:", q_t)
 
 
-def sport_start():
-    train_network()
+def train_start():
+    sess = tf.InteractiveSession()
+    x, read_out, y, train_step, cost, W1_print, y1_print, b1_print, W2_print, y2_print, b2_print = create_network()
+    train_network(sess, x, read_out, y, train_step, cost, W1_print, y1_print, b1_print, W2_print, y2_print, b2_print)
+
 
 if __name__ == '__main__':
-    sport_start()
+    train_start()

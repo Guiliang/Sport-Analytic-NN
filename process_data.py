@@ -3,6 +3,7 @@ import gameInfo_until
 import numpy as np
 import math
 import os
+import scipy.io as sio
 from sklearn import preprocessing
 
 NEGATIVE_REWARD_FLAG = False
@@ -43,15 +44,29 @@ def print_general_data(game_dir):
     gameInfo = []
 
     for j in range(events.size):  # the number of event
+        record_flag = True  # indicate whether to record the data
         eve = events[0, j]
         teamId = (((eve['teamId'])[0])[0])[0]
         home_boolean = gameInfo_until.judge_home(gameId, teamId)
         event_array = {}
         # print("event number:"+str(j)+" name:"+str(eve['name'][0][0][0]) + " frame_num:" + str(eve['frame'][0][0][0][0]) + " gameTime:" + str(eve['gameTime'][0][0][0][0])+ " period:" + str(eve['period'][0][0][0][0]))
         for feature in features_want:
-            info_record = eve[feature][0][0][0]
+            try:
+                info_record = eve[feature][0][0][0]
+            except:
+                try:
+                    info_record = eve[feature][0][0]
+                except:
+                    print ("No exist feature detected:" + str(feature))
+                    record_flag = False
+                    break
             if isinstance(info_record, np.ndarray):
-                info_record = info_record[0]
+                try:
+                    info_record = info_record[0]
+                except:
+                    print ("empty data detected:" + str(feature)+"= "+str(info_record))
+                    record_flag = False
+                    break
             # if feature == 'manpowerSituation':
             #     info_record = str(info_record)
             #     print (info_record)
@@ -59,8 +74,11 @@ def print_general_data(game_dir):
                 info_record = str(info_record)
             else:
                 info_record = float(info_record)
-
             event_array.update({feature: info_record})
+
+        if not record_flag:  # abandon the error events
+            continue
+
         if home_boolean:
             event_array.update({"home": 1})
         else:
@@ -154,6 +172,7 @@ def compute_time_duration(gameInfo_dict):
         gametime = event_array['gameTime']
         time_duration = gametime - prev_gametime
         event_array.update({'duration': time_duration})
+        prev_gametime = gametime
     return gameInfo_dict
 
 
@@ -200,23 +219,26 @@ def select_train_features(gameInfo_dict):
 def reward_add(gameInfo_dict):
     reward = np.zeros(len(gameInfo_dict))
     for event_num in range(0, len(gameInfo_dict)):
+        temp_r = 0
         event_name = (gameInfo_dict[event_num])['name']
         if event_name == 'goal':
             if NEGATIVE_REWARD_FLAG:
                 if (gameInfo_dict[event_num])['home'] == 1:
-                    reward[event_num] = 1
+                    temp_r = 1
                 else:
-                    reward[event_num] = -1
+                    temp_r = -1
             else:
                 if (gameInfo_dict[event_num])['home'] == 1:
-                    reward[event_num] = 1
+                    temp_r = 1
                     # print gameInfo_dict[event_num - 1]
                     # print gameInfo_dict[event_num]
                     # print gameInfo_dict[event_num + 1]
                     # print gameInfo_dict[event_num + 2]
                     # print ("\n")
+        reward[event_num] = temp_r
+        (gameInfo_dict[event_num]).update({'reward': temp_r})
 
-    return reward
+    return [gameInfo_dict, reward]
 
 
 def deal_al_data():
@@ -227,25 +249,26 @@ def deal_al_data():
             gameInfo = compute_puck_velocity(gameInfo)
             gameInfo = compute_time_remained(gameInfo)
             gameInfo = compute_time_duration(gameInfo)
-            reward = reward_add(gameInfo)
+            gameInfo, reward = reward_add(gameInfo)
             training_data = select_train_features(gameInfo)
             training_data_scale = preprocessing.scale(training_data)
             game_dir = data_store+"/"+directory[:-4]
             os.makedirs(game_dir)
-            gameInfo_until.write_pickle(game_dir+"/"+"reward_"+directory[:-4]+".pickle", reward)
-            gameInfo_until.write_pickle(game_dir+"/"+"general_"+directory[:-4]+".pickle", gameInfo)
-            gameInfo_until.write_pickle(game_dir+"/"+"state_"+directory[:-4]+".pickle", training_data_scale)
+            sio.savemat(game_dir + "/" + "reward_" + directory[:-4] + ".mat", {'reward': reward})
+            sio.savemat(game_dir + "/" + "general_" + directory[:-4] + ".mat", {'general': gameInfo})
+            sio.savemat(game_dir + "/" + "state_" + directory[:-4] + ".mat", {'state': training_data_scale})
+                # gameInfo_until.write_pickle(game_dir+"/"+"reward_"+directory[:-4]+".pickle", reward)
+                # gameInfo_until.write_pickle(game_dir+"/"+"general_"+directory[:-4]+".pickle", gameInfo)
+                # gameInfo_until.write_pickle(game_dir+"/"+"state_"+directory[:-4]+".pickle", training_data_scale)
         except:
             print ("problem with game"+str(directory))
-            problem_message.append("problem with game: "+str(directory))
+            problem_message.append(str(directory))
             continue
     print problem_message
 
 if __name__ == "__main__":
     deal_al_data()
-    # print(dir[0])
-    # draw_puck_trajectories(dir[0])
-    # gameInfo = print_general_data("game000340.mat")
+    # gameInfo = print_general_data("game000429.mat")
     # gameInfo = compute_puck_velocity(gameInfo)
     # gameInfo = compute_time_remained(gameInfo)
     # gameInfo = compute_time_duration(gameInfo)
