@@ -49,23 +49,38 @@ def create_network():
     num_layer_3 = 1
     max_sigmoid_1 = -4 * math.sqrt(float(6) / (num_layer_1 + num_layer_2))
     min_sigmoid_1 = 4 * math.sqrt(float(6) / (num_layer_1 + num_layer_2))
+    var_sigmoid_1 = float(1) / (num_layer_1 + num_layer_2)
     max_sigmoid_2 = -4 * math.sqrt(float(6) / (num_layer_2 + num_layer_3))
     min_sigmoid_2 = 4 * math.sqrt(float(6) / (num_layer_2 + num_layer_3))
+    var_sigmoid_2 = float(1) / (num_layer_2 + num_layer_3)
 
-    x = tf.placeholder(tf.float32, [None, num_layer_1], name="x")
-    W1 = tf.Variable(tf.zeros([num_layer_1, num_layer_2]), name="W")
-    b1 = tf.Variable(tf.zeros([num_layer_2]), name="b")
-    y1 = tf.matmul(x, W1) + b1
-    activations = tf.nn.sigmoid(y1, name='activation')
+    with tf.name_scope("Dense_Layer_first"):
+        x = tf.placeholder(tf.float32, [None, num_layer_1], name="x_1")
+        with tf.name_scope("Weight_1"):
+            W1 = tf.Variable(tf.random_uniform([num_layer_1, num_layer_2], minval=min_sigmoid_1, maxval=max_sigmoid_1),
+                             name="W_1")
+        with tf.name_scope("Biases_1"):
+            b1 = tf.Variable(tf.zeros([num_layer_2]), name="b_1")
+        with tf.name_scope("Output_1"):
+            y1 = tf.matmul(x, W1) + b1
+        with tf.name_scope("Activation_1"):
+            activations = tf.nn.sigmoid(y1, name='activation')
+            tf.summary.histogram('activation_1', activations)
 
     # to debug the network
     W1_print = tf.Print(W1, [W1], message="W1 is:", summarize=40)
     y1_print = tf.Print(y1, [y1], message="y1 is:", summarize=40)
     b1_print = tf.Print(b1, [b1], message="b1 is:", summarize=40)
 
-    W2 = tf.Variable(tf.zeros([num_layer_2, num_layer_3]), name="W")
-    b2 = tf.Variable(tf.zeros([num_layer_3]), name="b")
-    read_out = tf.matmul(activations, W2) + b2
+    with tf.name_scope("Dense_Layer_second"):
+        with tf.name_scope("Weight_2"):
+            W2 = tf.Variable(tf.random_uniform([num_layer_2, num_layer_3], minval=min_sigmoid_2, maxval=max_sigmoid_2),
+                             name="W_2")
+        with tf.name_scope("Biases_1"):
+            b2 = tf.Variable(tf.zeros([num_layer_3]), name="b_2")
+        with tf.name_scope("Output_2"):
+            read_out = tf.matmul(activations, W2) + b2
+            tf.summary.histogram('output_2', activations)
 
     # to debug the network
     W2_print = tf.Print(W2, [W2], message="W2 is:", summarize=40)
@@ -75,10 +90,14 @@ def create_network():
     # define the cost function
     y = tf.placeholder("float", [None])
 
-    readout_action = tf.reduce_sum(read_out,
-                                   reduction_indices=1)  # Computes the sum of elements across dimensions of a tensor.
-    cost = tf.reduce_mean(tf.square(y - readout_action))  # square means
-    train_step = tf.train.AdamOptimizer(1e-6).minimize(cost)
+    with tf.name_scope("cost"):
+        readout_action = tf.reduce_sum(read_out,
+                                       reduction_indices=1)  # Computes the sum of elements across dimensions of a tensor.
+        cost = tf.reduce_mean(tf.square(y - readout_action))  # square means
+    tf.summary.histogram('cost', cost)
+
+    with tf.name_scope("train"):
+        train_step = tf.train.AdamOptimizer(1e-6).minimize(cost)
     # train_step = tf.train.AdadeltaOptimizer().minimize(cost)
 
     return x, read_out, y, train_step, cost, W1_print, y1_print, b1_print, W2_print, y2_print, b2_print
@@ -141,7 +160,8 @@ def build_training_batch(state, reward):
     return batch_return
 
 
-def train_network(sess, x, read_out, y, train_step, cost, W1_print, y1_print, b1_print, W2_print, y2_print, b2_print):
+def train_network(sess, x, read_out, y, train_step, cost, W1_print, y1_print, b1_print, W2_print, y2_print, b2_print,
+                  print_parameters=False):
     """
     train the network
     :param x:
@@ -152,9 +172,12 @@ def train_network(sess, x, read_out, y, train_step, cost, W1_print, y1_print, b1
     :return:
     """
     game_number = 0
+    global_counter = 0
 
     # loading network
     saver = tf.train.Saver()
+    merge = tf.merge_all_summaries()
+    train_writer = tf.train.SummaryWriter("/home/gla68/PycharmProjects/Sport-Analytic-NN/log_train", sess.graph)
     sess.run(tf.global_variables_initializer())
     checkpoint = tf.train.get_checkpoint_state("./saved_networks/")
     if checkpoint and checkpoint.model_checkpoint_path:
@@ -178,7 +201,7 @@ def train_network(sess, x, read_out, y, train_step, cost, W1_print, y1_print, b1
         reward_count = sum(reward)
         state = sio.loadmat(DATA_STORE + "/" + dir_game + "/" + state_name)
         state = state['state']
-        print ("load file" + str(dir_game) + " success")
+        print ("\n load file" + str(dir_game) + " success")
         print ("reward number" + str(reward_count))
         if len(state) != len(reward):
             raise Exception('state length does not equal to reward length')
@@ -201,22 +224,16 @@ def train_network(sess, x, read_out, y, train_step, cost, W1_print, y1_print, b1
 
             y_batch = []
 
-            s_t1_batch = []
-            for i in range(0, 32):
-                temp = [i] * 7
-                s_t1_batch.append(np.asarray(temp))
-            s_t1_batch = np.asarray(s_t1_batch)
-
             # debug network with W1_print, y1_print, b1_print, W2_print, y2_print, b2_print
-            sess.run(W1_print, feed_dict={x: s_t1_batch})
-            sess.run(y1_print, feed_dict={x: s_t1_batch})
-            sess.run(b1_print, feed_dict={x: s_t1_batch})
-            sess.run(W2_print, feed_dict={x: s_t1_batch})
-            sess.run(y2_print, feed_dict={x: s_t1_batch})
-            sess.run(b2_print, feed_dict={x: s_t1_batch})
+            if print_parameters:
+                sess.run(W1_print, feed_dict={x: s_t1_batch})
+                sess.run(y1_print, feed_dict={x: s_t1_batch})
+                sess.run(b1_print, feed_dict={x: s_t1_batch})
+                sess.run(W2_print, feed_dict={x: s_t1_batch})
+                sess.run(y2_print, feed_dict={x: s_t1_batch})
+                sess.run(b2_print, feed_dict={x: s_t1_batch})
 
             readout_t1_batch = read_out.eval(feed_dict={x: s_t1_batch})  # get value of s
-            print(str((max(readout_t1_batch)[0], min(readout_t1_batch)[0])))
 
             for i in range(0, len(batch)):
                 terminal = batch[i][3]
@@ -228,19 +245,24 @@ def train_network(sess, x, read_out, y, train_step, cost, W1_print, y1_print, b1
                     y_batch.append(r_t_batch[i] + GAMMA * ((readout_t1_batch[i]).tolist())[0])
 
             # perform gradient step
-            sess.run(train_step, feed_dict={y: y_batch, x: s_t_batch})
-
+            [cost_out, summary_train, _] = sess.run([cost, merge, train_step], feed_dict={y: y_batch, x: s_t_batch})
+            global_counter += 1
+            train_writer.add_summary(summary_train, global_step=global_counter)
             # update the old values
             s_t0 = s_tl
 
             # print info
             if terminal or ((train_number - 1) / BATCH_SIZE) % 5 == 1:
                 print ("TIMESTEP:", train_number, "Game:", game_number)
+                print(str((max(readout_t1_batch)[0], min(readout_t1_batch)[0])))
+                print ("cost of the network is" + str(cost_out))
 
             if terminal:
                 # save progress after a game
                 saver.save(sess, './saved_networks/' + SPORT + '-game-', global_step=game_number)
                 break
+
+    train_writer.close()
 
 
 # def compute_state_q(x, readout):
