@@ -1,0 +1,5 @@
+model_checkpoint_path: "NHL-game--4"
+all_model_checkpoint_paths: "NHL-game--1"
+all_model_checkpoint_paths: "NHL-game--2"
+all_model_checkpoint_paths: "NHL-game--3"
+all_model_checkpoint_paths: "NHL-game--4"
