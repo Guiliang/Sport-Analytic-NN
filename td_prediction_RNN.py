@@ -7,10 +7,11 @@ FEATURE_NUMBER = 7
 H_SIZE = 512  # size of hidden layer
 BATCH_SIZE = 8
 TRACE_LENGTH = 10
-DROPOUT_KEEP_PROB = 0.7
+DROPOUT_KEEP_PROB = 1
 RNN_LAYER = 2
 GAMMA = 0.99
-DATA_DIRECTORY = "/Users/liu/Desktop/sport-analytic/Data/rnn_all_match_feature"
+# DATA_DIRECTORY = "/Users/liu/Desktop/sport-analytic/Data/rnn_all_match_feature"
+DATA_DIRECTORY = "/home/gla68/Documents/Hockey-data/RNN-Hockey-Training-All"
 DIR_GAMES_ALL = os.listdir(DATA_DIRECTORY)
 SPORT = "NHL"
 
@@ -85,7 +86,7 @@ def create_network_RNN_type2(rnn_type='bp_last_step', use_state=False):
         if use_state:
             rnn_last = rnn_state
         else:
-            rnn_output_trans = tf.transpose(rnn_output, [1, 0, 2])  # [trace_length, batch_length, ]
+            rnn_output_trans = tf.transpose(rnn_output, [1, 0, 2])  # [trace_length, batch_size, hidden_size]
             rnn_last = rnn_output_trans[-1]
 
     num_layer_1 = H_SIZE
@@ -159,91 +160,92 @@ def train_network(sess, x, read_out, y, train_step, cost, W1_print, y1_print, b1
     # train_writer = tf.train.SummaryWriter("./log_rnn_train", sess.graph)
     train_writer = tf.summary.FileWriter("./log_rnn_train", sess.graph)
     sess.run(tf.global_variables_initializer())
-    checkpoint = tf.train.get_checkpoint_state("./saved_rnn_networks/")
-    if checkpoint and checkpoint.model_checkpoint_path:
-        saver.restore(sess, checkpoint.model_checkpoint_path)
-        print("Successfully loaded:", checkpoint.model_checkpoint_path)
-    else:
-        print("Could not find old network weights")
+    # checkpoint = tf.train.get_checkpoint_state("./saved_rnn_networks/")
+    # if checkpoint and checkpoint.model_checkpoint_path:
+    #     saver.restore(sess, checkpoint.model_checkpoint_path)
+    #     print("Successfully loaded:", checkpoint.model_checkpoint_path)
+    # else:
+    #     print("Could not find old network weights")
 
     # iterate over the training data
-    for dir_game in DIR_GAMES_ALL:
-        if dir_game.startswith("."):  # ignore the hidden file
-            continue
+    for i in range(0, 3):
+        for dir_game in DIR_GAMES_ALL:
+            if dir_game.startswith("."):  # ignore the hidden file
+                continue
 
-        game_number += 1
-        game_files = os.listdir(DATA_DIRECTORY + "/" + dir_game)
-        for filename in game_files:
-            if filename.startswith("reward"):
-                reward_name = filename
-            elif filename.startswith("state"):
-                state_name = filename
+            game_number += 1
+            game_files = os.listdir(DATA_DIRECTORY + "/" + dir_game)
+            for filename in game_files:
+                if filename.startswith("reward"):
+                    reward_name = filename
+                elif filename.startswith("state"):
+                    state_name = filename
 
-        reward = sio.loadmat(DATA_DIRECTORY + "/" + dir_game + "/" + reward_name)
-        reward = reward['rnn_eward']
-        reward_count = sum(reward)
-        state = sio.loadmat(DATA_DIRECTORY + "/" + dir_game + "/" + state_name)
-        state = state['rnn_state']
-        print ("\n load file" + str(dir_game) + " success")
-        print ("reward number for all trace is" + str(reward_count)) + "respectively"
-        if len(state) != len(reward):
-            raise Exception('state length does not equal to reward length')
+            reward = sio.loadmat(DATA_DIRECTORY + "/" + dir_game + "/" + reward_name)
+            reward = reward['rnn_eward']
+            reward_count = sum(reward)
+            state = sio.loadmat(DATA_DIRECTORY + "/" + dir_game + "/" + state_name)
+            state = state['rnn_state']
+            print ("\n load file" + str(dir_game) + " success")
+            print ("reward number for all trace is" + str(reward_count)) + "respectively"
+            if len(state) != len(reward):
+                raise Exception('state length does not equal to reward length')
 
-        train_len = len(state)
-        train_number = 0
+            train_len = len(state)
+            train_number = 0
 
-        # start training
-        s_t0 = state[0]
-        r_t0 = reward[0]
-        train_number += 1
+            # start training
+            s_t0 = state[0]
+            r_t0 = reward[0]
+            train_number += 1
 
-        while True:
+            while True:
 
-            s_tl, batch, train_number = get_training_batch(s_t0, state, reward, train_number, train_len)
-            # get the batch variables
-            s_t_batch = [d[0] for d in batch]
-            r_t_batch = [d[1] for d in batch]
-            s_t1_batch = [d[2] for d in batch]
+                s_tl, batch, train_number = get_training_batch(s_t0, state, reward, train_number, train_len)
+                # get the batch variables
+                s_t_batch = [d[0] for d in batch]
+                r_t_batch = [d[1] for d in batch]
+                s_t1_batch = [d[2] for d in batch]
 
-            y_batch = []
+                y_batch = []
 
-            # debug network with W1_print, y1_print, b1_print, W2_print, y2_print, b2_print
-            if print_parameters:
-                sess.run(W1_print, feed_dict={x: s_t1_batch})
-                sess.run(y1_print, feed_dict={x: s_t1_batch})
-                sess.run(b1_print, feed_dict={x: s_t1_batch})
-                sess.run(W2_print, feed_dict={x: s_t1_batch})
-                sess.run(y2_print, feed_dict={x: s_t1_batch})
-                sess.run(b2_print, feed_dict={x: s_t1_batch})
+                # debug network with W1_print, y1_print, b1_print, W2_print, y2_print, b2_print
+                if print_parameters:
+                    sess.run(W1_print, feed_dict={x: s_t1_batch})
+                    sess.run(y1_print, feed_dict={x: s_t1_batch})
+                    sess.run(b1_print, feed_dict={x: s_t1_batch})
+                    sess.run(W2_print, feed_dict={x: s_t1_batch})
+                    sess.run(y2_print, feed_dict={x: s_t1_batch})
+                    sess.run(b2_print, feed_dict={x: s_t1_batch})
 
-            readout_t1_batch = read_out.eval(feed_dict={x: s_t1_batch})  # get value of s
+                readout_t1_batch = read_out.eval(feed_dict={x: s_t1_batch})  # get value of s
 
-            for i in range(0, len(batch)):
-                terminal = batch[i][3]
-                # if terminal, only equals reward
+                for i in range(0, len(batch)):
+                    terminal = batch[i][3]
+                    # if terminal, only equals reward
+                    if terminal:
+                        y_batch.append(float(r_t_batch[i][-1]))
+                        break
+                    else:
+                        y_batch.append(r_t_batch[i][-1] + GAMMA * ((readout_t1_batch[i]).tolist())[0])
+
+                # perform gradient step
+                [cost_out, summary_train, _] = sess.run([cost, merge, train_step], feed_dict={y: y_batch, x: s_t_batch})
+                global_counter += 1
+                train_writer.add_summary(summary_train, global_step=global_counter)
+                # update the old values
+                s_t0 = s_tl
+
+                # print info
+                if terminal or ((train_number - 1) / BATCH_SIZE) % 5 == 1:
+                    print ("TIMESTEP:", train_number, "Game:", game_number)
+                    print(str((max(readout_t1_batch)[0], min(readout_t1_batch)[0])))
+                    print ("cost of the network is" + str(cost_out))
+
                 if terminal:
-                    y_batch.append(float(r_t_batch[i][-1]))
+                    # save progress after a game
+                    saver.save(sess, './saved_rnn_networks/' + SPORT + '-game-', global_step=game_number)
                     break
-                else:
-                    y_batch.append(r_t_batch[i][-1] + GAMMA * ((readout_t1_batch[i]).tolist())[0])
-
-            # perform gradient step
-            [cost_out, summary_train,_] = sess.run([cost, merge, train_step], feed_dict={y: y_batch, x: s_t_batch})
-            global_counter += 1
-            train_writer.add_summary(summary_train, global_step=global_counter)
-            # update the old values
-            s_t0 = s_tl
-
-            # print info
-            if terminal or ((train_number - 1) / BATCH_SIZE) % 5 == 1:
-                print ("TIMESTEP:", train_number, "Game:", game_number)
-                print(str((max(readout_t1_batch)[0], min(readout_t1_batch)[0])))
-                print ("cost of the network is" + str(cost_out))
-
-            if terminal:
-                # save progress after a game
-                saver.save(sess, './saved_rnn_networks/' + SPORT + '-game-', global_step=game_number)
-                break
 
     train_writer.close()
 

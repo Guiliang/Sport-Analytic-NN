@@ -179,12 +179,12 @@ def train_network(sess, x, read_out, y, train_step, cost, W1_print, y1_print, b1
     merge = tf.merge_all_summaries()
     train_writer = tf.train.SummaryWriter("/home/gla68/PycharmProjects/Sport-Analytic-NN/log_train", sess.graph)
     sess.run(tf.global_variables_initializer())
-    checkpoint = tf.train.get_checkpoint_state("./saved_networks/")
-    if checkpoint and checkpoint.model_checkpoint_path:
-        saver.restore(sess, checkpoint.model_checkpoint_path)
-        print("Successfully loaded:", checkpoint.model_checkpoint_path)
-    else:
-        print("Could not find old network weights")
+    # checkpoint = tf.train.get_checkpoint_state("./saved_networks/")
+    # if checkpoint and checkpoint.model_checkpoint_path:
+    #     saver.restore(sess, checkpoint.model_checkpoint_path)
+    #     print("Successfully loaded:", checkpoint.model_checkpoint_path)
+    # else:
+    #     print("Could not find old network weights")
 
     # iterate over the training data
     for dir_game in DIR_GAMES_ALL:
