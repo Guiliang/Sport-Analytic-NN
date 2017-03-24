@@ -6,18 +6,19 @@ import scipy.io as sio
 FEATURE_NUMBER = 12
 H_SIZE = 512  # size of hidden layer
 BATCH_SIZE = 8
-TRACE_LENGTH = 10
+TRACE_LENGTH = 2
 DROPOUT_KEEP_PROB = 1
 RNN_LAYER = 2
 GAMMA = 0.99
 # DATA_DIRECTORY = "/Users/liu/Desktop/sport-analytic/Data/rnn_all_match_feature"
-DATA_DIRECTORY = "/home/gla68/Documents/Hockey-data/RNN-Hockey-Training-All-feature2-scale-length-3"
+DATA_DIRECTORY = "/home/gla68/Documents/Hockey-data/RNN-Hockey-Training-All-feature2-scale-length-2"
 # DATA_DIRECTORY = "/home/gla68/Documents/Hockey-data/RNN-Hockey-Training-All"
 
 DIR_GAMES_ALL = os.listdir(DATA_DIRECTORY)
 SPORT = "NHL"
-RNN_LOG_DIR = "./log_rnn_train_feature2_len10"
-RNN_SAVED_NETWORK = "./saved_rnn_networks_feature2_len10"
+RNN_LOG_DIR = "./log_rnn_train_feature2_len2_hidden_State"
+RNN_SAVED_NETWORK = "./saved_rnn_networks_feature2_len2_hidden_State"
+USE_HIDDEN_STATE = True
 
 
 # Download Data
@@ -66,7 +67,7 @@ def create_network_RNN_type1(rnn_type='bp_every_step'):
     return rnn_input, read_out, y, train_step, cost
 
 
-def create_network_RNN_type2(rnn_type='bp_last_step', use_state=False):
+def create_network_RNN_type2( rnn_type='bp_last_step'):
     """
     define the neural network
     :return: network output
@@ -87,8 +88,8 @@ def create_network_RNN_type2(rnn_type='bp_last_step', use_state=False):
         rnn_output, rnn_state = tf.nn.dynamic_rnn(  # while loop dynamic learning rnn
             inputs=rnn_input, cell=cell, dtype=tf.float32, scope=rnn_type + '_rnn')
 
-        if use_state:
-            rnn_last = rnn_state
+        if USE_HIDDEN_STATE:
+            rnn_last = (rnn_state[-1])[0]
         else:
             rnn_output_trans = tf.transpose(rnn_output, [1, 0, 2])  # [trace_length, batch_size, hidden_size]
             rnn_last = rnn_output_trans[-1]

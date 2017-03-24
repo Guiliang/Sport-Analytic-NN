@@ -13,8 +13,9 @@ BATCH_SIZE = 32  # size of minibatch
 SPORT = "NHL"
 DATA_STORE = "/home/gla68/Documents/Hockey-data/Hockey-Training-All-feature2-scale"
 DIR_GAMES_ALL = os.listdir(DATA_STORE)
-LOG_DIR = "./log_train_feature2"
-SAVED_NETWORK = "./saved_networks_feature2"
+LOG_DIR = "./log_train_feature2_FORWARD"
+SAVED_NETWORK = "./saved_networks_feature2_FORWARD"
+FORWARD_REWARD_MODE = False
 
 
 def create_network():
@@ -125,15 +126,19 @@ def get_training_batch(s_t0, state, reward, train_number, train_len):
     current_batch_length = 0
     while current_batch_length < BATCH_SIZE:
         s_t1 = state[train_number]
-        # r_t1 = reward[train_number]
+        r_t1 = reward[train_number]
         r_t0 = reward[train_number - 1]
         train_number += 1
         if train_number + 1 == train_len:
-            # batch_return.append((s_t0, r_t1, s_t1, 1))
-            batch_return.append((s_t0, r_t0, s_t1, 1))
+            if FORWARD_REWARD_MODE:
+                batch_return.append((s_t0, r_t1, s_t1, 1))
+            else:
+                batch_return.append((s_t0, r_t0, s_t1, 1))
             break
-        # batch_return.append((s_t0, r_t1, s_t1, 0))
-        batch_return.append((s_t0, r_t0, s_t1, 0))
+        if FORWARD_REWARD_MODE:
+            batch_return.append((s_t0, r_t1, s_t1, 0))
+        else:
+            batch_return.append((s_t0, r_t0, s_t1, 0))
         current_batch_length += 1
         s_t0 = s_t1
 
