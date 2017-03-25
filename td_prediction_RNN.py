@@ -16,9 +16,9 @@ DATA_DIRECTORY = "/home/gla68/Documents/Hockey-data/RNN-Hockey-Training-All-feat
 
 DIR_GAMES_ALL = os.listdir(DATA_DIRECTORY)
 SPORT = "NHL"
-RNN_LOG_DIR = "./log_rnn_train_feature2_len2_hidden_State"
-RNN_SAVED_NETWORK = "./saved_rnn_networks_feature2_len2_hidden_State"
-USE_HIDDEN_STATE = True
+RNN_LOG_DIR = "./log_rnn_train_feature2_len2"
+RNN_SAVED_NETWORK = "./saved_rnn_networks_feature2"
+USE_HIDDEN_STATE = False
 
 
 # Download Data
@@ -33,18 +33,21 @@ def create_network_RNN_type1(rnn_type='bp_every_step'):
     """
     rnn_input = tf.placeholder(tf.float32, [BATCH_SIZE, TRACE_LENGTH, FEATURE_NUMBER], name="x_1")
 
-    lstm_cell = tf.nn.rnn_cell.LSTMCell(num_units=H_SIZE, state_is_tuple=True,
-                                        initializer=tf.random_uniform_initializer(-1.0, 1.0))
+    lstm_cell = tf.contrib.rnn_cell.LSTMCell(num_units=H_SIZE, state_is_tuple=True,
+                                             initializer=tf.random_uniform_initializer(-1.0, 1.0))
 
-    single_cell = tf.nn.rnn_cell.DropoutWrapper(lstm_cell, input_keep_prob=DROPOUT_KEEP_PROB,
+    single_cell = tf.contrib.rnn.DropoutWrapper(lstm_cell, input_keep_prob=DROPOUT_KEEP_PROB,
                                                 output_keep_prob=DROPOUT_KEEP_PROB)
 
-    cell = tf.nn.rnn_cell.MultiRNNCell([single_cell] * RNN_LAYER, state_is_tuple=True)
-
-    state_in = single_cell.zero_state(BATCH_SIZE, tf.float32)
+    cell = tf.contrib.rnn.MultiRNNCell([single_cell] * RNN_LAYER, state_is_tuple=True)
 
     rnn_output, rnn_state = tf.nn.dynamic_rnn(  # while loop dynamic learning rnn
         inputs=rnn_input, cell=cell, dtype=tf.float32, scope=rnn_type + '_rnn')
+
+    # state_in = single_cell.zero_state(BATCH_SIZE, tf.float32)
+    # rnn_output, rnn_state = tf.contrib.rnn.static_rnn(inputs=rnn_input, cell=cell, dtype=tf.float32, scope=rnn_type + '_rnn')
+
+    # tf.contrib.rnn.BasicLSTMCell()  # LSTM with rectifier, don't need dropout wrapper?
 
     rnn = tf.reshape(rnn_output, shape=[BATCH_SIZE, -1])
 
@@ -67,7 +70,7 @@ def create_network_RNN_type1(rnn_type='bp_every_step'):
     return rnn_input, read_out, y, train_step, cost
 
 
-def create_network_RNN_type2( rnn_type='bp_last_step'):
+def create_network_RNN_type2(rnn_type='bp_last_step'):
     """
     define the neural network
     :return: network output
@@ -75,18 +78,21 @@ def create_network_RNN_type2( rnn_type='bp_last_step'):
     with tf.name_scope("LSTM_layer"):
         rnn_input = tf.placeholder(tf.float32, [None, TRACE_LENGTH, FEATURE_NUMBER], name="x_1")
 
-        lstm_cell = tf.nn.rnn_cell.LSTMCell(num_units=H_SIZE, state_is_tuple=True,
+        lstm_cell = tf.contrib.rnn.LSTMCell(num_units=H_SIZE, state_is_tuple=True,
                                             initializer=tf.random_uniform_initializer(-1.0, 1.0))
 
-        single_cell = tf.nn.rnn_cell.DropoutWrapper(lstm_cell, input_keep_prob=DROPOUT_KEEP_PROB,
+        single_cell = tf.contrib.rnn.DropoutWrapper(lstm_cell, input_keep_prob=DROPOUT_KEEP_PROB,
                                                     output_keep_prob=DROPOUT_KEEP_PROB)
 
-        cell = tf.nn.rnn_cell.MultiRNNCell([single_cell] * RNN_LAYER, state_is_tuple=True)
-
-        state_in = single_cell.zero_state(BATCH_SIZE, tf.float32)
+        cell = tf.contrib.rnn.MultiRNNCell([single_cell] * RNN_LAYER, state_is_tuple=True)
 
         rnn_output, rnn_state = tf.nn.dynamic_rnn(  # while loop dynamic learning rnn
             inputs=rnn_input, cell=cell, dtype=tf.float32, scope=rnn_type + '_rnn')
+
+        # state_in = single_cell.zero_state(BATCH_SIZE, tf.float32)
+        # rnn_output, rnn_state = tf.contrib.rnn.static_rnn(inputs=rnn_input, cell=cell, dtype=tf.float32, scope=rnn_type + '_rnn')
+
+        # tf.contrib.rnn.BasicLSTMCell()  # LSTM with rectifier, don't need dropout wrapper?
 
         if USE_HIDDEN_STATE:
             rnn_last = (rnn_state[-1])[0]
@@ -251,7 +257,7 @@ def train_network(sess, x, read_out, y, train_step, cost, W1_print, y1_print, b1
 
                 if terminal:
                     # save progress after a game
-                    saver.save(sess, RNN_SAVED_NETWORK+'/' + SPORT + '-game-', global_step=game_number)
+                    saver.save(sess, RNN_SAVED_NETWORK + '/' + SPORT + '-game-', global_step=game_number)
 
                     break
 
