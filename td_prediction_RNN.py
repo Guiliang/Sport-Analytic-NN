@@ -17,7 +17,7 @@ DATA_DIRECTORY = "/home/gla68/Documents/Hockey-data/RNN-Hockey-Training-All-feat
 DIR_GAMES_ALL = os.listdir(DATA_DIRECTORY)
 SPORT = "NHL"
 RNN_LOG_DIR = "./log_rnn_train_feature2_len2"
-RNN_SAVED_NETWORK = "./saved_rnn_networks_feature2"
+RNN_SAVED_NETWORK = "./saved_rnn_networks_feature2_len2"
 USE_HIDDEN_STATE = False
 
 
