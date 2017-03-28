@@ -1,3 +1,8 @@
 log*
 saved_*
 nohup*
+.idea/inspectionProfiles/
+.idea/misc.xml
+.idea/modules.xml
+.idea/sport-analytic-NN.iml
+.idea/workspace.xml
