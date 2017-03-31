@@ -7,103 +7,105 @@ import math
 """
 train the home team and away team together, use a feature to represent it.
 """
-feature_num = 12
+feature_num = 13
 GAMMA = 0.99  # decay rate of past observations
-BATCH_SIZE = 32  # size of minibatch
+BATCH_SIZE = 16  # size of mini-batch, the size of mini-batch could be tricky, the larger mini-batch, the easier will it be converge, but if our training data is not comprehensive enough and stochastic gradients is not applied, model may converge to other things
 SPORT = "NHL"
-DATA_STORE = "/home/gla68/Documents/Hockey-data/Hockey-Training-All-feature2-scale"
+DATA_STORE = "/home/gla68/Documents/Hockey-data/Hockey-Training-All-feature3-scale"
 DIR_GAMES_ALL = os.listdir(DATA_STORE)
-LOG_DIR = "./log_train_feature2_FORWARD"
-SAVED_NETWORK = "./saved_networks_feature2_FORWARD"
+LOG_DIR = "./log_NN/log_train_feature3_batch" + str(BATCH_SIZE)
+SAVED_NETWORK = "./saved_NN/saved_networks_feature3_batch" + str(BATCH_SIZE)
 FORWARD_REWARD_MODE = False
 
 
-def create_network():
-    """
-    define the neural network
-    :return: network output
-    """
-    # network weights
-    # with tf.name_scope("Dense_Layer_first"):
-    #     x = tf.placeholder(tf.float32, [None, feature_num], name="x")
-    #     with tf.name_scope('weights'):
-    #         W1 = tf.Variable(tf.zeros([feature_num, 1000]), name="W")
-    #     with tf.name_scope('biases'):
-    #         b1 = tf.Variable(tf.zeros([1000]), name="b")
-    #     with tf.name_scope('Wx_plus_b'):
-    #         y1 = tf.matmul(x, W1) + b1
-    #     activations = tf.nn.relu(y1, name='activation')
-    #     tf.summary.histogram('activations', activations)
-    #
-    # with tf.name_scope("Dense_Layer_second"):
-    #     with tf.name_scope('weights'):
-    #         W2 = tf.Variable(tf.zeros([1000, 1]), name="W")
-    #     with tf.name_scope('biases'):
-    #         b2 = tf.Variable(tf.zeros([1]), name="b")
-    #     with tf.name_scope('Wx_plus_b'):
-    #         read_out = tf.matmul(activations, W2) + b2
+class td_prediction_simple(object):
+    def __init__(self):
+        """
+        define the neural network
+        :return: network output
+        """
+        # network weights
+        # with tf.name_scope("Dense_Layer_first"):
+        #     x = tf.placeholder(tf.float32, [None, feature_num], name="x")
+        #     with tf.name_scope('weights'):
+        #         W1 = tf.Variable(tf.zeros([feature_num, 1000]), name="W")
+        #     with tf.name_scope('biases'):
+        #         b1 = tf.Variable(tf.zeros([1000]), name="b")
+        #     with tf.name_scope('Wx_plus_b'):
+        #         y1 = tf.matmul(x, W1) + b1
+        #     activations = tf.nn.relu(y1, name='activation')
+        #     tf.summary.histogram('activations', activations)
+        #
+        # with tf.name_scope("Dense_Layer_second"):
+        #     with tf.name_scope('weights'):
+        #         W2 = tf.Variable(tf.zeros([1000, 1]), name="W")
+        #     with tf.name_scope('biases'):
+        #         b2 = tf.Variable(tf.zeros([1]), name="b")
+        #     with tf.name_scope('Wx_plus_b'):
+        #         read_out = tf.matmul(activations, W2) + b2
 
-    # 7 is the num of units is layer 1
-    # 1000 is the num of units in layer 2
-    # 1 is the num of unit in layer 3
+        # 7 is the num of units is layer 1
+        # 1000 is the num of units in layer 2
+        # 1 is the num of unit in layer 3
 
-    num_layer_1 = feature_num
-    num_layer_2 = 1000
-    num_layer_3 = 1
-    max_sigmoid_1 = -4 * math.sqrt(float(6) / (num_layer_1 + num_layer_2))
-    min_sigmoid_1 = 4 * math.sqrt(float(6) / (num_layer_1 + num_layer_2))
-    var_sigmoid_1 = float(1) / (num_layer_1 + num_layer_2)
-    max_sigmoid_2 = -4 * math.sqrt(float(6) / (num_layer_2 + num_layer_3))
-    min_sigmoid_2 = 4 * math.sqrt(float(6) / (num_layer_2 + num_layer_3))
-    var_sigmoid_2 = float(1) / (num_layer_2 + num_layer_3)
+        num_layer_1 = feature_num
+        num_layer_2 = 1000
+        num_layer_3 = 1
+        max_sigmoid_1 = -4 * math.sqrt(float(6) / (num_layer_1 + num_layer_2))
+        min_sigmoid_1 = 4 * math.sqrt(float(6) / (num_layer_1 + num_layer_2))
+        var_sigmoid_1 = float(1) / (num_layer_1 + num_layer_2)
+        max_sigmoid_2 = -4 * math.sqrt(float(6) / (num_layer_2 + num_layer_3))
+        min_sigmoid_2 = 4 * math.sqrt(float(6) / (num_layer_2 + num_layer_3))
+        var_sigmoid_2 = float(1) / (num_layer_2 + num_layer_3)
 
-    with tf.name_scope("Dense_Layer_first"):
-        x = tf.placeholder(tf.float32, [None, num_layer_1], name="x_1")
-        with tf.name_scope("Weight_1"):
-            W1 = tf.Variable(tf.random_uniform([num_layer_1, num_layer_2], minval=min_sigmoid_1, maxval=max_sigmoid_1),
-                             name="W_1")
-        with tf.name_scope("Biases_1"):
-            b1 = tf.Variable(tf.zeros([num_layer_2]), name="b_1")
-        with tf.name_scope("Output_1"):
-            y1 = tf.matmul(x, W1) + b1
-        with tf.name_scope("Activation_1"):
-            activations = tf.nn.sigmoid(y1, name='activation')
-            tf.summary.histogram('activation_1', activations)
+        with tf.name_scope("Dense_Layer_first"):
+            self.x = tf.placeholder(tf.float32, [None, num_layer_1], name="x_1")
+            with tf.name_scope("Weight_1"):
+                self.W1 = tf.Variable(
+                    tf.random_uniform([num_layer_1, num_layer_2], minval=min_sigmoid_1, maxval=max_sigmoid_1),
+                    name="W_1")
+            with tf.name_scope("Biases_1"):
+                self.b1 = tf.Variable(tf.zeros([num_layer_2]), name="b_1")
+            with tf.name_scope("Output_1"):
+                self.y1 = tf.matmul(self.x, self.W1) + self.b1
+            with tf.name_scope("Activation_1"):
+                self.activations = tf.nn.sigmoid(self.y1, name='activation')
+                tf.summary.histogram('activation_1', self.activations)
 
-    # to debug the network
-    W1_print = tf.Print(W1, [W1], message="W1 is:", summarize=40)
-    y1_print = tf.Print(y1, [y1], message="y1 is:", summarize=40)
-    b1_print = tf.Print(b1, [b1], message="b1 is:", summarize=40)
+        # to debug the network
+        self.W1_print = tf.Print(self.W1, [self.W1], message="W1 is:", summarize=40)
+        self.y1_print = tf.Print(self.y1, [self.y1], message="y1 is:", summarize=40)
+        self.b1_print = tf.Print(self.b1, [self.b1], message="b1 is:", summarize=40)
 
-    with tf.name_scope("Dense_Layer_second"):
-        with tf.name_scope("Weight_2"):
-            W2 = tf.Variable(tf.random_uniform([num_layer_2, num_layer_3], minval=min_sigmoid_2, maxval=max_sigmoid_2),
-                             name="W_2")
-        with tf.name_scope("Biases_1"):
-            b2 = tf.Variable(tf.zeros([num_layer_3]), name="b_2")
-        with tf.name_scope("Output_2"):
-            read_out = tf.matmul(activations, W2) + b2
-            tf.summary.histogram('output_2', activations)
+        with tf.name_scope("Dense_Layer_second"):
+            with tf.name_scope("Weight_2"):
+                self.W2 = tf.Variable(
+                    tf.random_uniform([num_layer_2, num_layer_3], minval=min_sigmoid_2, maxval=max_sigmoid_2),
+                    name="W_2")
+            with tf.name_scope("Biases_1"):
+                self.b2 = tf.Variable(tf.zeros([num_layer_3]), name="b_2")
+            with tf.name_scope("Output_2"):
+                self.read_out = tf.matmul(self.activations, self.W2) + self.b2
+                tf.summary.histogram('output_2', self.activations)
 
-    # to debug the network
-    W2_print = tf.Print(W2, [W2], message="W2 is:", summarize=40)
-    y2_print = tf.Print(read_out, [read_out], message="y2 is:", summarize=40)
-    b2_print = tf.Print(b2, [b2], message="b2 is:", summarize=40)
+        # to debug the network
+        self.W2_print = tf.Print(self.W2, [self.W2], message="W2 is:", summarize=40)
+        self.y2_print = tf.Print(self.read_out, [self.read_out], message="y2 is:", summarize=40)
+        self.b2_print = tf.Print(self.b2, [self.b2], message="b2 is:", summarize=40)
 
-    # define the cost function
-    y = tf.placeholder("float", [None])
+        # define the cost function
+        self.y = tf.placeholder("float", [None])
 
-    with tf.name_scope("cost"):
-        readout_action = tf.reduce_sum(read_out,
-                                       reduction_indices=1)  # Computes the sum of elements across dimensions of a tensor.
-        cost = tf.reduce_mean(tf.square(y - readout_action))  # square means
-    tf.summary.histogram('cost', cost)
+        with tf.name_scope("cost"):
+            self.readout_action = tf.reduce_sum(self.read_out,
+                                                reduction_indices=1)  # Computes the sum of elements across dimensions of a tensor.
+            self.cost = tf.reduce_mean(tf.square(self.y - self.readout_action))  # square means
+        tf.summary.histogram('cost', self.cost)
 
-    with tf.name_scope("train"):
-        train_step = tf.train.AdamOptimizer(1e-6).minimize(cost)
-    # train_step = tf.train.AdadeltaOptimizer().minimize(cost)
-
-    return x, read_out, y, train_step, cost, W1_print, y1_print, b1_print, W2_print, y2_print, b2_print
+        with tf.name_scope("train"):
+            # train_step = tf.train.AdamOptimizer(1e-6).minimize(cost)
+            self.train_step = tf.train.GradientDescentOptimizer(1e-6).minimize(self.cost)
+            # train_step = tf.train.AdadeltaOptimizer().minimize(cost)
 
 
 def get_next_test_event():
@@ -167,15 +169,10 @@ def build_training_batch(state, reward):
     return batch_return
 
 
-def train_network(sess, x, read_out, y, train_step, cost, W1_print, y1_print, b1_print, W2_print, y2_print, b2_print,
-                  print_parameters=False):
+def train_network(sess, model, print_parameters=False):
     """
     train the network
-    :param x:
-    :param sess:
-    :param cost:
-    :param train_step:
-    :param read_out:
+    :param print_parameters:
     :return:
     """
     game_number = 0
@@ -183,8 +180,8 @@ def train_network(sess, x, read_out, y, train_step, cost, W1_print, y1_print, b1
 
     # loading network
     saver = tf.train.Saver()
-    merge = tf.merge_all_summaries()
-    train_writer = tf.train.SummaryWriter(LOG_DIR, sess.graph)
+    merge = tf.summary.merge_all()
+    train_writer = tf.summary.FileWriter(LOG_DIR, sess.graph)
     sess.run(tf.global_variables_initializer())
     # checkpoint = tf.train.get_checkpoint_state("./saved_networks/")
     # if checkpoint and checkpoint.model_checkpoint_path:
@@ -194,7 +191,7 @@ def train_network(sess, x, read_out, y, train_step, cost, W1_print, y1_print, b1
     #     print("Could not find old network weights")
 
     # iterate over the training data
-    for i in range(0, 3):
+    for i in range(0, 2):
         for dir_game in DIR_GAMES_ALL:
             game_number += 1
             game_files = os.listdir(DATA_STORE + "/" + dir_game)
@@ -234,14 +231,14 @@ def train_network(sess, x, read_out, y, train_step, cost, W1_print, y1_print, b1
 
                 # debug network with W1_print, y1_print, b1_print, W2_print, y2_print, b2_print
                 if print_parameters:
-                    sess.run(W1_print, feed_dict={x: s_t1_batch})
-                    sess.run(y1_print, feed_dict={x: s_t1_batch})
-                    sess.run(b1_print, feed_dict={x: s_t1_batch})
-                    sess.run(W2_print, feed_dict={x: s_t1_batch})
-                    sess.run(y2_print, feed_dict={x: s_t1_batch})
-                    sess.run(b2_print, feed_dict={x: s_t1_batch})
+                    sess.run(model.W1_print, feed_dict={model.x: s_t1_batch})
+                    sess.run(model.y1_print, feed_dict={model.x: s_t1_batch})
+                    sess.run(model.b1_print, feed_dict={model.x: s_t1_batch})
+                    sess.run(model.W2_print, feed_dict={model.x: s_t1_batch})
+                    sess.run(model.y2_print, feed_dict={model.x: s_t1_batch})
+                    sess.run(model.b2_print, feed_dict={model.x: s_t1_batch})
 
-                readout_t1_batch = read_out.eval(feed_dict={x: s_t1_batch})  # get value of s
+                readout_t1_batch = model.read_out.eval(feed_dict={model.x: s_t1_batch})  # get value of s
 
                 for i in range(0, len(batch)):
                     terminal = batch[i][3]
@@ -253,7 +250,8 @@ def train_network(sess, x, read_out, y, train_step, cost, W1_print, y1_print, b1
                         y_batch.append(r_t_batch[i] + GAMMA * ((readout_t1_batch[i]).tolist())[0])
 
                 # perform gradient step
-                [cost_out, summary_train, _] = sess.run([cost, merge, train_step], feed_dict={y: y_batch, x: s_t_batch})
+                [cost_out, summary_train, _] = sess.run([model.cost, merge, model.train_step],
+                                                        feed_dict={model.y: y_batch, model.x: s_t_batch})
                 global_counter += 1
                 train_writer.add_summary(summary_train, global_step=global_counter)
                 # update the old values
@@ -296,8 +294,8 @@ def train_start():
         os.mkdir(SAVED_NETWORK)
 
     sess = tf.InteractiveSession()
-    x, read_out, y, train_step, cost, W1_print, y1_print, b1_print, W2_print, y2_print, b2_print = create_network()
-    train_network(sess, x, read_out, y, train_step, cost, W1_print, y1_print, b1_print, W2_print, y2_print, b2_print)
+    nn = td_prediction_simple()
+    train_network(sess, nn)
 
 
 if __name__ == '__main__':

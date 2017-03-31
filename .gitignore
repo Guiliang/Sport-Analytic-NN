@@ -1,3 +1,6 @@
-log*
+log_*
 saved_*
 nohup*
+.idea/
+td_prediction_RNN.pyc
+td_prediction_simple.pyc

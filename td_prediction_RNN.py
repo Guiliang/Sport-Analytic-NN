@@ -6,18 +6,18 @@ import scipy.io as sio
 FEATURE_NUMBER = 12
 H_SIZE = 512  # size of hidden layer
 BATCH_SIZE = 8
-TRACE_LENGTH = 2
+TRACE_LENGTH = 10
 DROPOUT_KEEP_PROB = 1
 RNN_LAYER = 2
 GAMMA = 0.99
 # DATA_DIRECTORY = "/Users/liu/Desktop/sport-analytic/Data/rnn_all_match_feature"
-DATA_DIRECTORY = "/home/gla68/Documents/Hockey-data/RNN-Hockey-Training-All-feature2-scale-length-2"
+DATA_DIRECTORY = "/home/gla68/Documents/Hockey-data/RNN-Hockey-Training-All-feature2-scale"
 # DATA_DIRECTORY = "/home/gla68/Documents/Hockey-data/RNN-Hockey-Training-All"
 
 DIR_GAMES_ALL = os.listdir(DATA_DIRECTORY)
 SPORT = "NHL"
-RNN_LOG_DIR = "./log_rnn_train_feature2_len2"
-RNN_SAVED_NETWORK = "./saved_rnn_networks_feature2_len2"
+RNN_LOG_DIR = "./log_NN/log_rnn_train_feature2_len10"
+RNN_SAVED_NETWORK = "./saved_NN/saved_rnn_networks_feature2_len10"
 USE_HIDDEN_STATE = False
 
 
