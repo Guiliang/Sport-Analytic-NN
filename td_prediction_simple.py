@@ -8,13 +8,16 @@ import math
 train the home team and away team together, use a feature to represent it.
 """
 feature_num = 13
-GAMMA = 0.99  # decay rate of past observations
+FEATURE_TYPE = 3
+ITERATE_NUM = "2Converge"
+REWARD_TYPE = "NEG_REWARD_GAMMA1"
+GAMMA = 1  # decay rate of past observations
 BATCH_SIZE = 16  # size of mini-batch, the size of mini-batch could be tricky, the larger mini-batch, the easier will it be converge, but if our training data is not comprehensive enough and stochastic gradients is not applied, model may converge to other things
 SPORT = "NHL"
-DATA_STORE = "/home/gla68/Documents/Hockey-data/Hockey-Training-All-feature3-scale"
+DATA_STORE = "/home/gla68/Documents/Hockey-data/Hockey-Training-All-feature3-scale-neg_reward"
 DIR_GAMES_ALL = os.listdir(DATA_STORE)
-LOG_DIR = "./log_NN/log_train_feature3_batch" + str(BATCH_SIZE)
-SAVED_NETWORK = "./saved_NN/saved_networks_feature3_batch" + str(BATCH_SIZE)
+LOG_DIR = "./log_NN/log_train_feature"+str(FEATURE_TYPE)+"_batch" + str(BATCH_SIZE) + "_iterate" + str(ITERATE_NUM) + str(REWARD_TYPE)
+SAVED_NETWORK = "./saved_NN/saved_networks_feature"+str(FEATURE_TYPE)+"_batch" + str(BATCH_SIZE) + "_iterate" + str(ITERATE_NUM) + str(REWARD_TYPE)
 FORWARD_REWARD_MODE = False
 
 
@@ -99,12 +102,13 @@ class td_prediction_simple(object):
         with tf.name_scope("cost"):
             self.readout_action = tf.reduce_sum(self.read_out,
                                                 reduction_indices=1)  # Computes the sum of elements across dimensions of a tensor.
+            self.diff_v = tf.reduce_mean(tf.abs(self.y - self.readout_action))
             self.cost = tf.reduce_mean(tf.square(self.y - self.readout_action))  # square means
         tf.summary.histogram('cost', self.cost)
 
         with tf.name_scope("train"):
-            # train_step = tf.train.AdamOptimizer(1e-6).minimize(cost)
-            self.train_step = tf.train.GradientDescentOptimizer(1e-6).minimize(self.cost)
+            self.train_step = tf.train.AdamOptimizer(1e-6).minimize(self.cost)
+            # self.train_step = tf.train.GradientDescentOptimizer(1e-6).minimize(self.cost)
             # train_step = tf.train.AdadeltaOptimizer().minimize(cost)
 
 
@@ -177,6 +181,7 @@ def train_network(sess, model, print_parameters=False):
     """
     game_number = 0
     global_counter = 0
+    converge_flag = False
 
     # loading network
     saver = tf.train.Saver()
@@ -191,7 +196,12 @@ def train_network(sess, model, print_parameters=False):
     #     print("Could not find old network weights")
 
     # iterate over the training data
-    for i in range(0, 2):
+    # for i in range(0, ITERATE_NUM):
+    while True:
+        if converge_flag:
+            break
+        else:
+            converge_flag = True
         for dir_game in DIR_GAMES_ALL:
             game_number += 1
             game_files = os.listdir(DATA_STORE + "/" + dir_game)
@@ -250,8 +260,10 @@ def train_network(sess, model, print_parameters=False):
                         y_batch.append(r_t_batch[i] + GAMMA * ((readout_t1_batch[i]).tolist())[0])
 
                 # perform gradient step
-                [cost_out, summary_train, _] = sess.run([model.cost, merge, model.train_step],
+                [diff_v, cost_out, summary_train, _] = sess.run([model.diff_v, model.cost, merge, model.train_step],
                                                         feed_dict={model.y: y_batch, model.x: s_t_batch})
+                if diff_v > 0.01:
+                    converge_flag = False
                 global_counter += 1
                 train_writer.add_summary(summary_train, global_step=global_counter)
                 # update the old values

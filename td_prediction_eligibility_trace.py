@@ -1,11 +1,20 @@
 import tensorflow as tf
 import os
+import scipy.io as sio
+import numpy as np
 
-FEATURE_NUMBER = 12
+import time
 
-model_path = os.environ.get('MODEL_PATH', 'et_models/')
-summary_path = os.environ.get('SUMMARY_PATH', 'et_summaries/')
-checkpoint_path = os.environ.get('CHECKPOINT_PATH', 'et_checkpoints/')
+FEATURE_NUMBER = 13
+MODEL_DIR = './et_dir/et_models_neg/'
+SUMMARY_DIR = './et_dir/et_summaries_neg/'
+CHECKPOINT_DIR = './et_dir/et_checkpoints_neg/'
+model_path = os.environ.get('MODEL_PATH', MODEL_DIR)
+summary_path = os.environ.get('SUMMARY_PATH', SUMMARY_DIR)
+checkpoint_path = os.environ.get('CHECKPOINT_PATH', CHECKPOINT_DIR)
+DATA_STORE = "/home/gla68/Documents/Hockey-data/Hockey-Training-All-feature4-scale-neg_reward"
+DIR_GAMES_ALL = os.listdir(DATA_STORE)
+ITERATE_NUM = 100
 
 
 # helper to initialize a weight and bias variable
@@ -49,11 +58,11 @@ class Model(object):
         layer_size_output = 1
 
         # placeholders for input and target output
-        self.x = tf.placeholder('float', [1, layer_size_input], name='x')
+        self.s_t0 = tf.placeholder('float', [1, layer_size_input], name='x')
         self.V_next = tf.placeholder('float', [1, layer_size_output], name='V_next')
 
         # build network arch. (just 2 layers with sigmoid activation)
-        prev_y = dense_layer(self.x, [layer_size_input, layer_size_hidden], tf.sigmoid, name='layer1')
+        prev_y = dense_layer(self.s_t0, [layer_size_input, layer_size_hidden], tf.sigmoid, name='layer1')
         self.V = dense_layer(prev_y, [layer_size_hidden, layer_size_output], tf.sigmoid, name='layer2')
 
         # watch the individual value predictions over time
@@ -151,6 +160,8 @@ class Model(object):
             # define single operation to apply all gradient updates
             self.train_op = tf.group(*apply_gradients, name='train')
 
+        tf.summary.histogram('loss_sum', loss_sum)
+
         # merge summaries for TensorBoard
         self.summaries_op = tf.summary.merge_all()
 
@@ -158,14 +169,93 @@ class Model(object):
         self.saver = tf.train.Saver(max_to_keep=1)
 
         # run variable initializers
-        self.sess.run(tf.initialize_all_variables())
+        self.sess.run(tf.global_variables_initializer())
 
         # after training a model, we can restore checkpoints here
         if restore:
             self.restore()
 
+    def restore(self):
+        latest_checkpoint_path = tf.train.latest_checkpoint(self.checkpoint_path)
+        if latest_checkpoint_path:
+            print('Restoring checkpoint: {0}'.format(latest_checkpoint_path))
+            self.saver.restore(self.sess, latest_checkpoint_path)
+
+    def get_output(self, s_t0):
+        return self.sess.run(self.V, feed_dict={self.s_t0: s_t0})
+
+    def train(self):
+        tf.train.write_graph(self.sess.graph_def, self.model_path, 'td_gammon.pb', as_text=False)
+
+        summary_writer = tf.summary.FileWriter(
+            '{0}{1}'.format(self.summary_path, int(time.time()), self.sess.graph_def))
+
+        game_number = 0
+        except_num = 0
+
+        for i in range(0, ITERATE_NUM):
+            for dir_game in DIR_GAMES_ALL:
+                game_number += 1
+                game_files = os.listdir(DATA_STORE + "/" + dir_game)
+                for filename in game_files:
+                    if filename.startswith("reward"):
+                        reward_name = filename
+                    elif filename.startswith("state"):
+                        state_name = filename
+
+                reward = sio.loadmat(DATA_STORE + "/" + dir_game + "/" + reward_name)
+                try:
+                    reward = (reward['reward'][0]).tolist()
+                except:
+                    except_num += 1
+                    print ("error directory" + str(dir_game))
+                    continue
+                state = sio.loadmat(DATA_STORE + "/" + dir_game + "/" + state_name)
+                state = state['state']
+                print ("\nload file" + str(dir_game) + " success, ")
+                if len(state) != len(reward):
+                    raise Exception('state length does not equal to reward length')
+
+                game_step = 0
+                s_t0 = np.array([state[0]])
+                train_len = len(state)
+                while game_step < (train_len - 1):
+                    game_step += 1
+                    s_t1 = np.array([state[game_step]])
+                    V_next = self.get_output(s_t1)
+                    self.sess.run(self.train_op, feed_dict={self.s_t0: s_t0, self.V_next: V_next})
+                    s_t0 = s_t1
+
+                print "reward is:"+str(reward[game_step])
+                if reward[game_step] == 1:
+                    reward_input = 1
+                    winner = "home"
+                elif reward[game_step] == -1:
+                    reward_input = 0
+                    winner = "away"
+                else:
+                    reward_input = 0
+                    winner = "tie"
+                _, global_step, summaries, _ = self.sess.run([
+                    self.train_op,
+                    self.global_step,
+                    self.summaries_op,
+                    self.reset_op
+                ], feed_dict={self.s_t0: s_t0, self.V_next: np.array([[reward_input]], dtype='float')})
+                summary_writer.add_summary(summaries, global_step=global_step)
+
+                print("Iteration %d/%d (Winner: %s) in %d turns" % (i, ITERATE_NUM, winner, game_step))
+                self.saver.save(self.sess, self.checkpoint_path + 'checkpoint', global_step=global_step)
+
+        print ("error data directory is:"+str(except_num))
+        summary_writer.close()
+
+
 if __name__ == '__main__':
+    if not os.path.isdir(CHECKPOINT_DIR):
+        os.mkdir(CHECKPOINT_DIR)
     graph = tf.Graph()
     sess = tf.Session(graph=graph)
     with sess.as_default(), graph.as_default():
         model = Model(sess, model_path, summary_path, checkpoint_path)
+        model.train()
