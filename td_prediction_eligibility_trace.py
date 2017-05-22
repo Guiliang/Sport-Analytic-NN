@@ -6,15 +6,18 @@ import numpy as np
 import time
 
 FEATURE_NUMBER = 13
-MODEL_DIR = './et_dir/et_models_neg/'
-SUMMARY_DIR = './et_dir/et_summaries_neg/'
-CHECKPOINT_DIR = './et_dir/et_checkpoints_neg/'
+# MODEL_DIR = './et_dir/et_models_neg_tieC/'
+# SUMMARY_DIR = './et_dir/et_summaries_neg_tieC/'
+# CHECKPOINT_DIR = './et_dir/et_checkpoints_neg_tieC/'
+MODEL_DIR = './et_dir/et_models_neg_tieC/'
+SUMMARY_DIR = './et_dir/et_summaries_neg_tieC/'
+CHECKPOINT_DIR = './et_dir/et_checkpoints_neg_tieC/'
 model_path = os.environ.get('MODEL_PATH', MODEL_DIR)
 summary_path = os.environ.get('SUMMARY_PATH', SUMMARY_DIR)
 checkpoint_path = os.environ.get('CHECKPOINT_PATH', CHECKPOINT_DIR)
-DATA_STORE = "/home/gla68/Documents/Hockey-data/Hockey-Training-All-feature4-scale-neg_reward"
+DATA_STORE = "/media/gla68/Windows/Hockey-data/Hockey-Training-All-feature4-scale-neg_reward"
 DIR_GAMES_ALL = os.listdir(DATA_STORE)
-ITERATE_NUM = 100
+ITERATE_NUM = 1000
 
 
 # helper to initialize a weight and bias variable
@@ -231,9 +234,10 @@ class Model(object):
                     reward_input = 1
                     winner = "home"
                 elif reward[game_step] == -1:
-                    reward_input = 0
+                    reward_input = -1
                     winner = "away"
                 else:
+                    continue
                     reward_input = 0
                     winner = "tie"
                 _, global_step, summaries, _ = self.sess.run([

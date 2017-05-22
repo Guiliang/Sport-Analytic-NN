@@ -6,22 +6,30 @@ import td_prediction_eligibility_trace as et
 import matplotlib.pyplot as plt
 from scipy.misc import imread
 import numpy as np
+FEATURE_TYPE = 6
 
-ACTION_TYPE = "shot"
-STIMULATE_TYPE = "position"
-ISHOME = True
-FEATURE_TYPE = 3
-if ISHOME:
-    SIMULATION_DATA_PATH = "/home/gla68/Documents/Hockey-data/Simulation-data-feature" + str(
-        FEATURE_TYPE) + "/" + STIMULATE_TYPE + "_simulation/" + STIMULATE_TYPE + "_simulation-" + ACTION_TYPE + "-feature" + str(
-        FEATURE_TYPE) + "-1.mat"
+SIMPLE_SAVED_NETWORK_PATH = "./saved_NN/saved_networks_feature6_batch16_iterate2Converge-NEG_REWARD_GAMMA1_V3"
+
+calibration = True
+
+if calibration:
+    # SIMULATION_DATA_PATH = "/media/gla68/Windows/Hockey-data/Simulation-data-feature7/calibration/calibration-shot-feature7-['Penalty', 'duration', 'scoreDifferential', 'velocity_x', 'velocity_y'][0, 0, 0, 0, 0].mat"
+    SIMULATION_DATA_PATH = "/media/gla68/Windows/Hockey-data/Simulation-data-feature6/calibration/calibration-lpr-feature6-['scoreDifferential', 'time remained', 'Penalty', 'velocity_x', 'velocity_y', 'duration'][0, 2400, 0, 0, 0, 0].mat"
+    # SIMULATION_DATA_PATH = "/media/gla68/Windows/Hockey-data/Simulation-data-feature8/calibration/calibration-shot-feature8-['scoreDifferential', 'period', 'Penalty', 'velocity_x', 'velocity_y', 'duration'][0, 3, 0, 0, 0, 0].mat"
 else:
-    SIMULATION_DATA_PATH = "/home/gla68/Documents/Hockey-data/Simulation-data-feature" + str(
-        FEATURE_TYPE) + "/" + STIMULATE_TYPE + "_simulation/Away_" + STIMULATE_TYPE + "_simulation-" + ACTION_TYPE + "-feature" + str(
-        FEATURE_TYPE) + "-1.mat"
+    ISHOME = True
+    ACTION_TYPE = "shot"
+    STIMULATE_TYPE = "position"
+    if ISHOME:
+        SIMULATION_DATA_PATH = "/media/gla68/Windows/Hockey-data/Simulation-data-feature" + str(
+            FEATURE_TYPE) + "/" + STIMULATE_TYPE + "_simulation/" + STIMULATE_TYPE + "_simulation-" + ACTION_TYPE + "-feature" + str(
+            FEATURE_TYPE) + "-[][].mat"
+    else:
+        SIMULATION_DATA_PATH = "/media/gla68/Windows/Hockey-data/Simulation-data-feature" + str(
+            FEATURE_TYPE) + "/" + STIMULATE_TYPE + "_simulation/Away_" + STIMULATE_TYPE + "_simulation-" + ACTION_TYPE + "-feature" + str(
+            FEATURE_TYPE) + "-[][].mat"
 
-RNN_SAVED_NETWORK_PATH = "./saved_NN/"
-SIMPLE_SAVED_NETWORK_PATH = "./saved_NN/saved_networks_feature3_batch16_iterate2Converge_GAMMA1"
+    RNN_SAVED_NETWORK_PATH = "./saved_NN/"
 
 
 # SIMPLE_SAVED_NETWORK_PATH = "./saved_networks_feature2_FORWARD"
@@ -49,7 +57,7 @@ def rnn_simulation():
 
 def nn_simulation():
     sess_nn = tf.InteractiveSession()
-    model_nn = td_prediction_simple.td_prediction_simple()
+    model_nn = td_prediction_simple.td_prediction_simple_V3()
 
     simulate_data = sio.loadmat(SIMULATION_DATA_PATH)
     simulate_data = (simulate_data['simulate_data'])
@@ -65,6 +73,7 @@ def nn_simulation():
         raise Exception("can't restore network")
 
     readout_t1_batch = model_nn.read_out.eval(feed_dict={model_nn.x: simulate_data})
+    print (readout_t1_batch.tolist())
 
     draw_value_over_position(readout_t1_batch)
 
@@ -111,8 +120,10 @@ def et_simulation():
 
 
 def draw_value_over_position(y):
-    max_data = (max(y))[0]
-    min_data = (min(y))[0]
+    max_data = y.max()
+    min_data = y.min()
+    # max_data = (max(y))[0]
+    # min_data = (min(y))[0]
     scale = float(80) / (max_data - min_data)
     y_list = y.tolist()
     y_deal = []
