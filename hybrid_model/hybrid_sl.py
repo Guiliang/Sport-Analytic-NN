@@ -3,9 +3,10 @@ import math
 import os
 import scipy.io as sio
 import traceback
+import numpy as np
 
-MAX_TRACE_LENGTH = 30
-FEATURE_NUMBER = 26
+MAX_TRACE_LENGTH = 10
+FEATURE_NUMBER = 24
 BATCH_SIZE = 16
 GAMMA = 1
 H_SIZE = 512
@@ -17,10 +18,11 @@ FEATURE_TYPE = 7
 SPORT = "NHL"
 ITERATE_NUM = "2Converge"
 REWARD_TYPE = "NEG_REWARD_GAMMA1_V3"
-DATA_STORE = "/media/gla68/Windows/Hockey-data/Hybrid-RNN-Hockey-Training-All-feature7-scale-neg_reward-length-dynamic-bak"
+DATA_STORE = "/media/gla68/Windows/Hockey-data/Hybrid-RNN-Hockey-Training-All-feature7-scale-neg_reward-length-dynamic"
 LOG_DIR = "./hybrid_sl_log_NN/log_train_feature" + str(FEATURE_TYPE) + "_batch" + str(BATCH_SIZE) + "_iterate" + str(
     ITERATE_NUM)
-SAVED_NETWORK = "./hybrid_sl_saved_NN/saved_networks_feature" + str(FEATURE_TYPE) + "_batch" + str(BATCH_SIZE) + "_iterate" + str(
+SAVED_NETWORK = "./hybrid_sl_saved_NN/saved_networks_feature" + str(FEATURE_TYPE) + "_batch" + str(
+    BATCH_SIZE) + "_iterate" + str(
     ITERATE_NUM)
 DIR_GAMES_ALL = os.listdir(DATA_STORE)
 
@@ -56,11 +58,11 @@ class create_network_hybrid_sl:
             outputs = tf.stack(self.rnn_output)
 
             # Hack to build the indexing and retrieve the right output.
-            batch_size = tf.shape(outputs)[0]
+            self.batch_size = tf.shape(outputs)[0]
             # Start indices for each sample
-            index = tf.range(0, batch_size) * MAX_TRACE_LENGTH + (self.trace_lengths - 1)
+            self.index = tf.range(0, self.batch_size) * MAX_TRACE_LENGTH + (self.trace_lengths - 1)
             # Indexing
-            self.rnn_last = tf.gather(tf.reshape(outputs, [-1, H_SIZE]), index)
+            self.rnn_last = tf.gather(tf.reshape(outputs, [-1, H_SIZE]), self.index)
 
         num_layer_1 = H_SIZE
         num_layer_2 = FEATURE_NUMBER + 1  # feature + reward
@@ -75,10 +77,10 @@ class create_network_hybrid_sl:
             self.y1 = tf.matmul(self.rnn_last, self.w1) + self.b1
             self.read_out = tf.nn.tanh(self.y1, name='activation')
 
-        self.y = tf.placeholder("float", [None])
+        self.y = tf.placeholder("float", [None, num_layer_2])
 
         with tf.name_scope("cost"):
-            self.readout_action = tf.reduce_sum(self.read_out, reduction_indices=1)
+            self.readout_action = self.read_out
             self.cost = tf.reduce_mean(tf.square(self.y - self.readout_action))
         tf.summary.histogram('cost', self.cost)
 
@@ -101,16 +103,19 @@ def get_training_batch(state_input, state_output, reward, train_number, train_le
             continue
         s_output = state_output[train_number]
         s_length = state_trace_length[train_number]
+        if s_length > 10:  # if trace length is too long
+            s_length = 10
         try:
             s_reward = reward[train_number]
         except IndexError:
             raise IndexError("s_reward wrong with index")
         train_number += 1
         if train_number + 1 == train_len:
-            batch_return.append((s_input, s_output, s_reward[s_length-1], 1))
+            trace_length_index = s_length - 1
+            batch_return.append((s_input, s_output, np.asarray([s_reward[trace_length_index]]), s_length, 1))
             break
-
-        batch_return.append((s_input, s_output, s_reward, 0))
+        trace_length_index = s_length - 1
+        batch_return.append((s_input, s_output, np.asarray([s_reward[trace_length_index]]), s_length, 0))
         current_batch_length += 1
 
     return batch_return, train_number
@@ -153,11 +158,11 @@ def train_network(sess, model, print_parameters=False):
                 raise ValueError("reward wrong")
             reward_count = sum(reward)
             state_input = sio.loadmat(DATA_STORE + "/" + dir_game + "/" + state_input_name)
-            state_input = (state_input['hybrid_input_state'])[0]
+            state_input = (state_input['hybrid_input_state'])
             state_output = sio.loadmat(DATA_STORE + "/" + dir_game + "/" + state_output_name)
             state_output = state_output['hybrid_output_state']
             state_trace_length = sio.loadmat(DATA_STORE + "/" + dir_game + "/" + state_trace_length_name)
-            state_trace_length = state_trace_length['hybrid_trace_length']
+            state_trace_length = (state_trace_length['hybrid_trace_length'])[0]
 
             print ("\n load file" + str(dir_game) + " success")
             print ("reward number" + str(reward_count))
@@ -167,24 +172,31 @@ def train_network(sess, model, print_parameters=False):
             train_len = len(state_input)
             train_number = 0
 
+            t_batch_pre = 0
             while True:
                 try:
                     batch, train_number = get_training_batch(state_input, state_output, reward, train_number,
                                                              train_len, state_trace_length)
+
+                    # get the batch variables
+                    s_input_batch = [d[0] for d in batch]
+                    s_output_batch = [d[1] for d in batch]
+                    r_batch = [d[2] for d in batch]
+                    t_batch = [d[3] for d in batch]
+                    terminal = ([d[4] for d in batch])[-1]
+                    y_batch = np.append(np.asarray(s_output_batch), np.asarray(r_batch), axis=1)
+
+                    # perform gradient step
+
+                    [index, cost_out, summary_train, _] = sess.run([model.index, model.cost, merge, model.train_step],
+                                                                   feed_dict={model.y: y_batch,
+                                                                              model.trace_lengths: t_batch,
+                                                                              model.rnn_input: s_input_batch})
                 except:
                     print "\n" + dir_game
+                    raise ValueError("Train network wrong!")
                     traceback.print_exc()
 
-                # get the batch variables
-                s_input_batch = [d[0] for d in batch]
-                s_output_batch = [d[1] for d in batch]
-                r_batch = [d[2] for d in batch]
-                terminal = ([d[3] for d in batch])[-1]
-                y_batch = s_output_batch.append(r_batch)
-
-                # perform gradient step
-                [cost_out, summary_train, _] = sess.run([model.cost, merge, model.train_step],
-                                                        feed_dict={model.y: y_batch, model.rnn_input: s_input_batch})
                 if cost_out > 0.0001:
                     converge_flag = False
                 global_counter += 1
@@ -199,6 +211,8 @@ def train_network(sess, model, print_parameters=False):
                     # save progress after a game
                     saver.save(sess, SAVED_NETWORK + '/' + SPORT + '-game-', global_step=game_number)
                     break
+
+                t_batch_pre = t_batch
 
 
 def train_start():
