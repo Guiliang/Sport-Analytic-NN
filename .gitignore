@@ -5,6 +5,9 @@
 .idea/misc.xml
 .idea/modules.xml
 .idea/workspace.xml
+log_train/
+saved_rnn_networks/
+log_rnn_train/
 et_dir/
 hybrid_model/hybrid_sl_log_NN/
 hybrid_model/hybrid_sl_saved_NN/
