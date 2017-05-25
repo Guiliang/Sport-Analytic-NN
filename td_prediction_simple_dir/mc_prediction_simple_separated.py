@@ -10,9 +10,11 @@ import math
 """
 train the home team and away team together, use a feature to represent it.
 """
+number_of_total_game = 446
 feature_num = 26
 FEATURE_TYPE = 6
 model_train_continue = True
+ITERATE_NUM = 25
 ITERATE_NUM = "2Converge"
 REWARD_TYPE = "NEG_REWARD_GAMMA1_V3"
 Home_model_or_away_model = "Home"
@@ -366,6 +368,8 @@ def train_network(sess, model):
 
     while True:
         if converge_flag:
+            break
+        elif game_number >= number_of_total_game * ITERATE_NUM:
             break
         else:
             converge_flag = True

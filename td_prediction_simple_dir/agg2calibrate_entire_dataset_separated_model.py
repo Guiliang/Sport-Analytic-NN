@@ -10,7 +10,6 @@ check_target = {"GD": 0, "MD": 0, "P": 1}
 
 
 def agg2calibrate_model():
-
     model_predict_value_record = []
     calibration_value_record = []
 
@@ -57,20 +56,21 @@ def agg2calibrate_model():
             else:
                 period = 4.0
 
-            if float(check_target.get("GD")) == float(goal_diff) and float(check_target.get("MD")) == float(manpower_diff) and float(check_target.get("P")) == float(period):
-                if ISHOME and home_identifier[calibrate_name_index]:
+            if float(check_target.get("GD")) == float(goal_diff) and float(check_target.get("MD")) == float(
+                    manpower_diff) and float(check_target.get("P")) == float(period):
+                if ISHOME and home_identifier[calibrate_name_index]:  # TODO delete home_identifier[calibrate_name_index]
                     # print "Found home"
                     model_predict_value_record.append(model_predict_home[calibrate_name_index])
                     calibration_value_record.append(float(summation_goal_home[calibrate_name_index]))
-                elif not ISHOME and not home_identifier[calibrate_name_index]:
+                elif not ISHOME and not home_identifier[calibrate_name_index]:  # TODO delete home_identifier[calibrate_name_index]
                     # print "Found away"
                     model_predict_value_record.append(model_predict_away[calibrate_name_index])
                     calibration_value_record.append(float(summation_goal_away[calibrate_name_index]))
 
-    model_predict_value_average = float(sum(model_predict_value_record))/len(model_predict_value_record)
-    calibration_value_record_average = float(sum(calibration_value_record))/len(calibration_value_record)
+    model_predict_value_average = float(sum(model_predict_value_record)) / len(model_predict_value_record)
+    calibration_value_record_average = float(sum(calibration_value_record)) / len(calibration_value_record)
 
-    print "model_predict_value_average: "+str(model_predict_value_average)
+    print "model_predict_value_average: " + str(model_predict_value_average)
     print "calibration_value_record_average: " + str(calibration_value_record_average)
 
 
