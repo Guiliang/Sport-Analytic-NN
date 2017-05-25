@@ -12,8 +12,8 @@ MOTION_TYPE = "lpr"
 calibration = True
 ISHOME = True
 
-SIMPLE_HOME_SAVED_NETWORK_PATH = "/home/gla68/PycharmProjects/Sport-Analytic-NN/td_prediction_simple_dir/saved_NN/saved_Home_networks_feature"+str(FEATURE_TYPE)+"_batch16_iterate2Converge-NEG_REWARD_GAMMA1_V3-Sequenced_bak"
-SIMPLE_AWAY_SAVED_NETWORK_PATH = "/home/gla68/PycharmProjects/Sport-Analytic-NN/td_prediction_simple_dir/saved_NN/saved_Away_networks_feature"+str(FEATURE_TYPE)+"_batch16_iterate2Converge-NEG_REWARD_GAMMA1_V3-Sequenced_bak"
+SIMPLE_HOME_SAVED_NETWORK_PATH = "/home/gla68/PycharmProjects/Sport-Analytic-NN/td_prediction_simple_dir/saved_NN/saved_Home_networks_feature"+str(FEATURE_TYPE)+"_batch16_iterate2Converge-NEG_REWARD_GAMMA1_V3-Sequenced"
+SIMPLE_AWAY_SAVED_NETWORK_PATH = "/home/gla68/PycharmProjects/Sport-Analytic-NN/td_prediction_simple_dir/saved_NN/saved_Away_networks_feature"+str(FEATURE_TYPE)+"_batch16_iterate2Converge-NEG_REWARD_GAMMA1_V3-Sequenced"
 
 if calibration:
     # SIMULATION_DATA_PATH = ""

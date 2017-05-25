@@ -15,7 +15,7 @@ FEATURE_TYPE = 6
 model_train_continue = True
 ITERATE_NUM = "2Converge"
 REWARD_TYPE = "NEG_REWARD_GAMMA1_V3"
-Home_model_or_away_model = "Home"
+Home_model_or_away_model = "Away"
 TRAIN_or_TEST = ""
 Random_or_Sequenced = "Sequenced"
 
