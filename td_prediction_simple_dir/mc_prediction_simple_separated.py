@@ -17,7 +17,7 @@ model_train_continue = True
 ITERATE_NUM = 25
 ITERATE_NUM = "2Converge"
 REWARD_TYPE = "NEG_REWARD_GAMMA1_V3"
-Home_model_or_away_model = "Home"
+Home_model_or_away_model = "Away"
 TRAIN_or_TEST = ""
 Random_or_Sequenced = "Sequenced"
 
@@ -333,12 +333,12 @@ def build_mc_training_batch(state, target_reward, train_number):
         state_batch = state[train_number:train_number + BATCH_SIZE]
         reward_batch = target_reward[train_number:train_number + BATCH_SIZE]
         train_number += BATCH_SIZE
-        training_batch.append(state_batch, reward_batch, 0)
+        training_batch.append((state_batch, reward_batch, 0))
     else:
         state_batch = state[train_number:len(state)]
         reward_batch = target_reward[train_number:len(state)]
         train_number += BATCH_SIZE
-        training_batch.append(state_batch, reward_batch, 1)
+        training_batch.append((state_batch, reward_batch, 1))
 
     return training_batch, train_number
 
@@ -413,52 +413,50 @@ def train_network(sess, model):
                     if reward == -1:
                         reward_append(-1, target_reward_away_record)
 
-            try:
+            while True:
                 if Home_model:
                     training_batch_home, train_number = build_mc_training_batch(state, target_reward_home_record,
                                                                                 train_number)
                 else:
-                    training_batch_away, train_number = build_mc_training_batch(state, target_reward_home_record,
+                    training_batch_away, train_number = build_mc_training_batch(state, target_reward_away_record,
                                                                                 train_number)
-            except:
-                print "\n game:" + dir_game + " train number:" + str(train_number)
-                raise IndexError("get_training_batch wrong")
+                # except:
+                #     print "\n game:" + dir_game + " train number:" + str(train_number)
+                #     raise IndexError("get_training_batch wrong")
 
-                # get the batch variables
-            if Home_model:
-                s_t_home_batch = [d[0] for d in training_batch_home]
-                r_t_home_batch = [d[1] for d in training_batch_home]
-                terminal = (training_batch_home[-1])[-1]
-                s_t_batch = s_t_home_batch
-                r_t_batch = r_t_home_batch
-            elif not Home_model:
-                s_t_away_batch = [d[0] for d in training_batch_away]
-                r_t_away_batch = [d[1] for d in training_batch_away]
-                terminal = (training_batch_away[-1])[-1]
-                s_t_batch = s_t_away_batch
-                r_t_batch = r_t_away_batch
-            else:
-                raise ValueError("Home or away model can't match")
+                    # get the batch variables
+                if Home_model:
+                    s_t_home_batch = [d[0] for d in training_batch_home]
+                    r_t_home_batch = [d[1] for d in training_batch_home]
+                    terminal = (training_batch_home[-1])[-1]
+                    s_t_batch = s_t_home_batch
+                    r_t_batch = r_t_home_batch
+                elif not Home_model:
+                    s_t_away_batch = [d[0] for d in training_batch_away]
+                    r_t_away_batch = [d[1] for d in training_batch_away]
+                    terminal = (training_batch_away[-1])[-1]
+                    s_t_batch = s_t_away_batch
+                    r_t_batch = r_t_away_batch
+                else:
+                    raise ValueError("Home or away model can't match")
 
-            # perform gradient step
-            [diff_v, cost_out, summary_train, _] = sess.run([model.diff_v, model.cost, merge, model.train_step],
-                                                            feed_dict={model.y: r_t_batch, model.x: s_t_batch})
-            if diff_v > 0.01:
-                converge_flag = False
-            global_counter += 1
-            train_writer.add_summary(summary_train, global_step=global_counter)
+                # perform gradient step
+                [diff_v, cost_out, summary_train, _] = sess.run([model.diff_v, model.cost, merge, model.train_step],
+                                                                feed_dict={model.y: r_t_batch[0], model.x: s_t_batch[0]})
+                if diff_v > 0.01:
+                    converge_flag = False
+                global_counter += 1
+                train_writer.add_summary(summary_train, global_step=global_counter)
 
-            # print info
-            if terminal or ((train_number - 1) / BATCH_SIZE) % 5 == 1:
-                print ("TIMESTEP:", train_number, "Game:", game_number)
-                print ("cost of the network is" + str(cost_out))
+                # print info
+                if terminal or ((train_number - 1) / BATCH_SIZE) % 5 == 1:
+                    print ("TIMESTEP:", train_number, "Game:", game_number)
+                    print ("cost of the network is" + str(cost_out))
 
-            if terminal:
-                # save progress after a game
-                saver.save(sess, SAVED_NETWORK + '/' + SPORT + '-game-', global_step=game_number)
-                break
-            else:
-                raise ValueError("Haven't define for random yet")
+                if terminal:
+                    # save progress after a game
+                    saver.save(sess, SAVED_NETWORK + '/' + SPORT + '-game-', global_step=game_number)
+                    break
 
     train_writer.close()
 

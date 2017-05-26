@@ -6,10 +6,9 @@ import ast
 FEATURE_TYPE = 5
 calibration_store_dir = "/media/gla68/Windows/Hockey-data/calibrate_all_feature_" + str(FEATURE_TYPE)
 ISHOME = True
-check_target = {"GD": 0, "MD": 0, "P": 1}
 
 
-def agg2calibrate_model():
+def agg2calibrate_model(check_target):
     model_predict_value_record = []
     calibration_value_record = []
 
@@ -37,8 +36,11 @@ def agg2calibrate_model():
         model_predict_home = ((sio.loadmat(model_predict_home_name))["model_predict_home"]).tolist()
         model_predict_away = ((sio.loadmat(model_predict_away_name))["model_predict_away"]).tolist()
         home_identifier = (((sio.loadmat(home_identifier_name))["home_identifier"])[0]).tolist()
-        summation_goal_home = ((sio.loadmat(summation_goal_home_name))["summation_goal_home"]).tolist()
-        summation_goal_away = ((sio.loadmat(summation_goal_away_name))["summation_goal_away"]).tolist()
+        summation_goal_home = (((sio.loadmat(summation_goal_home_name))["summation_goal_home"]).tolist())[0]
+        summation_goal_away = (((sio.loadmat(summation_goal_away_name))["summation_goal_away"]).tolist())[0]
+
+        calibration_value_game_record = []
+        model_predict_value_game_record = []
 
         for calibrate_name_index in range(0, len(calibrate_names)):
             calibrate_name = calibrate_names[calibrate_name_index]
@@ -58,21 +60,46 @@ def agg2calibrate_model():
 
             if float(check_target.get("GD")) == float(goal_diff) and float(check_target.get("MD")) == float(
                     manpower_diff) and float(check_target.get("P")) == float(period):
-                if ISHOME and home_identifier[calibrate_name_index]:  # TODO delete home_identifier[calibrate_name_index]
+                # if ISHOME and home_identifier[calibrate_name_index]:  # TODO delete home_identifier[calibrate_name_index]
+                if ISHOME:
                     # print "Found home"
-                    model_predict_value_record.append(model_predict_home[calibrate_name_index])
-                    calibration_value_record.append(float(summation_goal_home[calibrate_name_index]))
-                elif not ISHOME and not home_identifier[calibrate_name_index]:  # TODO delete home_identifier[calibrate_name_index]
+                    model_predict_value_game_record.append((model_predict_home[calibrate_name_index])[0])
+                    calibration_value_game_record.append(float(summation_goal_home[calibrate_name_index]))
+                # elif not ISHOME and not home_identifier[calibrate_name_index]:  # TODO delete home_identifier[calibrate_name_index]
+                elif not ISHOME:
                     # print "Found away"
-                    model_predict_value_record.append(model_predict_away[calibrate_name_index])
-                    calibration_value_record.append(float(summation_goal_away[calibrate_name_index]))
+                    model_predict_value_game_record.append(model_predict_away[calibrate_name_index])
+                    calibration_value_game_record.append(float(summation_goal_away[calibrate_name_index]))
 
+        try:
+            calibration_value_game_average = float(sum(calibration_value_game_record)) / len(
+                calibration_value_game_record)
+        except:
+            calibration_value_game_average = 0.0
+        calibration_value_record.append(calibration_value_game_average)
+        try:
+            model_predict_value_game_average = float(sum(model_predict_value_game_record)) / len(
+                model_predict_value_game_record)
+        except:
+            model_predict_value_game_average = 0.0
+        model_predict_value_record.append(model_predict_value_game_average)
+
+    # model_predict_value_record = [value[0] for value in model_predict_value_record]
+    # calibration_value_record = [value[0] for value in calibration_value_record]
     model_predict_value_average = float(sum(model_predict_value_record)) / len(model_predict_value_record)
     calibration_value_record_average = float(sum(calibration_value_record)) / len(calibration_value_record)
 
-    print "model_predict_value_average: " + str(model_predict_value_average)
-    print "calibration_value_record_average: " + str(calibration_value_record_average)
+    print "model_predict_value_average with " + str(check_target) + " is " + str(model_predict_value_average)
+    print "calibration_value_record_average with " + str(check_target) + " is " + str(calibration_value_record_average)
+
+
+def start_calibration():
+    for goal_diff in [-3, -2, -1, 0, 1, 2, 3]:
+        for manpower in [-1, 0, -1]:
+            for period in [1, 2, 3]:
+                check_target = {"GD": goal_diff, "MD": manpower, "P": period}
+                agg2calibrate_model(check_target=check_target)
 
 
 if __name__ == '__main__':
-    agg2calibrate_model()
+    start_calibration()
