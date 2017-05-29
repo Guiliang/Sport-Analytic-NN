@@ -12,12 +12,12 @@ train the home team and away team together, use a feature to represent it.
 """
 number_of_total_game = 446
 feature_num = 26
-FEATURE_TYPE = 6
+FEATURE_TYPE = 5
 model_train_continue = True
 ITERATE_NUM = 25
-ITERATE_NUM = "2Converge"
+# ITERATE_NUM = "2Converge"
 REWARD_TYPE = "NEG_REWARD_GAMMA1_V3"
-Home_model_or_away_model = "Away"
+Home_model_or_away_model = "Home"
 TRAIN_or_TEST = ""
 Random_or_Sequenced = "Sequenced"
 
@@ -53,10 +53,10 @@ else:
         FEATURE_TYPE) + "-scale-neg_reward"
 
 DIR_GAMES_ALL = os.listdir(DATA_STORE)
-LOG_DIR = "./log_NN/log_" + str(Home_model_or_away_model) + "_train_feature" + str(FEATURE_TYPE) + "_batch" + str(
+LOG_DIR = "./log_NN/mc_log_" + str(Home_model_or_away_model) + "_train_feature" + str(FEATURE_TYPE) + "_batch" + str(
     BATCH_SIZE) + "_iterate" + str(
     ITERATE_NUM) + "-" + str(REWARD_TYPE) + TRAIN_or_TEST + "-" + Random_or_Sequenced
-SAVED_NETWORK = "./saved_NN/saved_" + str(Home_model_or_away_model) + "_networks_feature" + str(
+SAVED_NETWORK = "./saved_NN/mc_saved_" + str(Home_model_or_away_model) + "_networks_feature" + str(
     FEATURE_TYPE) + "_batch" + str(BATCH_SIZE) + "_iterate" + str(
     ITERATE_NUM) + "-" + str(REWARD_TYPE) + TRAIN_or_TEST + "-" + Random_or_Sequenced
 FORWARD_REWARD_MODE = False
@@ -367,6 +367,7 @@ def train_network(sess, model):
             print("Could not find old network weights")
 
     while True:
+        print str(number_of_total_game * ITERATE_NUM)
         if converge_flag:
             break
         elif game_number >= number_of_total_game * ITERATE_NUM:
