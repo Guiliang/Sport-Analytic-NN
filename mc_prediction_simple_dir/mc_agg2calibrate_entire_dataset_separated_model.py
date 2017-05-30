@@ -5,7 +5,7 @@ import unicodedata
 import ast
 
 FEATURE_TYPE = 5
-calibration_store_dir = "/media/gla68/Windows/Hockey-data/calibrate_all_feature_" + str(FEATURE_TYPE)
+calibration_store_dir = "/media/gla68/Windows/Hockey-data/mc_calibrate_all_feature_" + str(FEATURE_TYPE)
 ISHOME = True
 
 
@@ -112,7 +112,7 @@ def start_calibration():
 
 
 def write_csv(data_record):
-    with open('calibration_entire_sum.csv', 'w') as csvfile:
+    with open('mc_calibration_entire_sum.csv', 'w') as csvfile:
         fieldnames = (data_record[0]).keys()
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
 

@@ -62,7 +62,7 @@ SAVED_NETWORK = "./saved_NN/mc_saved_" + str(Home_model_or_away_model) + "_netwo
 FORWARD_REWARD_MODE = False
 
 
-class td_prediction_simple(object):
+class mc_prediction_simple(object):
     def __init__(self):
         """
         define the neural network
@@ -153,7 +153,7 @@ class td_prediction_simple(object):
             # train_step = tf.train.AdadeltaOptimizer().minimize(cost)
 
 
-class td_prediction_simple_V2(object):
+class mc_prediction_simple_V2(object):
     def __init__(self):
         """
         define the neural network
@@ -228,7 +228,7 @@ class td_prediction_simple_V2(object):
             # train_step = tf.train.AdadeltaOptimizer().minimize(cost)
 
 
-class td_prediction_simple_V3(object):
+class mc_prediction_simple_V3(object):
     def __init__(self):
         """
         define the neural network
@@ -383,6 +383,8 @@ def train_network(sess, model):
                     reward_name = filename
                 elif filename.startswith("state"):
                     state_name = filename
+                elif filename.startswith("time"):
+                    time_remain_name = filename
 
             reward = sio.loadmat(DATA_STORE + "/" + dir_game + "/" + reward_name)
             try:
@@ -391,8 +393,12 @@ def train_network(sess, model):
                 print "\n" + dir_game
                 continue
             reward_count = sum(reward)
+
             state = sio.loadmat(DATA_STORE + "/" + dir_game + "/" + state_name)
             state = state['state']
+            time_remain = sio.loadmat(DATA_STORE + "/" + dir_game + "/" + time_remain_name)
+            time_remain = (time_remain['time_remain'])[0]
+
             print ("\n load file" + str(dir_game) + " success")
             print ("reward number" + str(reward_count))
             if len(state) != len(reward):
@@ -414,6 +420,8 @@ def train_network(sess, model):
                     target_reward_away_record.append(0)
                     if reward[reward_index] == -1:
                         reward_append(-1, target_reward_away_record)
+
+
 
             while True:
                 if Home_model:
@@ -470,7 +478,7 @@ def train_start():
         os.mkdir(SAVED_NETWORK)
 
     sess = tf.InteractiveSession()
-    nn = td_prediction_simple_V3()
+    nn = mc_prediction_simple_V3()
     train_network(sess, nn)
 
 

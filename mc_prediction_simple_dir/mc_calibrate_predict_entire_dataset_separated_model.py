@@ -10,10 +10,10 @@ FEATURE_TYPE = 5
 calibration = True
 ISHOME = True
 
-SIMPLE_HOME_SAVED_NETWORK_PATH = "/home/gla68/PycharmProjects/Sport-Analytic-NN/td_prediction_simple_dir/saved_NN/saved_Home_networks_feature" + str(
-    FEATURE_TYPE) + "_batch16_iterate2Converge-NEG_REWARD_GAMMA1_V3-Sequenced"
-SIMPLE_AWAY_SAVED_NETWORK_PATH = "/home/gla68/PycharmProjects/Sport-Analytic-NN/td_prediction_simple_dir/saved_NN/saved_Away_networks_feature" + str(
-    FEATURE_TYPE) + "_batch16_iterate2Converge-NEG_REWARD_GAMMA1_V3-Sequenced"
+SIMPLE_HOME_SAVED_NETWORK_PATH = "/home/gla68/PycharmProjects/Sport-Analytic-NN/mc_prediction_simple_dir/saved_NN/mc_saved_Home_networks_feature" + str(
+    FEATURE_TYPE) + "_batch16_iterate25-NEG_REWARD_GAMMA1_V3-Sequenced"
+SIMPLE_AWAY_SAVED_NETWORK_PATH = "/home/gla68/PycharmProjects/Sport-Analytic-NN/mc_prediction_simple_dir/saved_NN/mc_saved_Away_networks_feature" + str(
+    FEATURE_TYPE) + "_batch16_iterate25-NEG_REWARD_GAMMA1_V3-Sequenced"
 
 calibration_store_dir = "/media/gla68/Windows/Hockey-data/mc_calibrate_all_feature_" + str(FEATURE_TYPE)
 
