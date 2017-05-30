@@ -6,13 +6,15 @@ import matplotlib.pyplot as plt
 from scipy.stats import pearsonr
 
 FEATURE_TYPE = 5
-SIMPLE_HOME_SAVED_NETWORK_PATH = ""
-SIMPLE_AWAY_SAVED_NETWORK_PATH = ""
+SIMPLE_HOME_SAVED_NETWORK_PATH = "/home/gla68/PycharmProjects/Sport-Analytic-NN/td_prediction_simple_dir/saved_NN/saved_Home_networks_feature" + str(
+    FEATURE_TYPE) + "_batch16_iterate2Converge-NEG_REWARD_GAMMA1_V3-Sequenced"
+SIMPLE_AWAY_SAVED_NETWORK_PATH = "/home/gla68/PycharmProjects/Sport-Analytic-NN/td_prediction_simple_dir/saved_NN/saved_Away_networks_feature" + str(
+    FEATURE_TYPE) + "_batch16_iterate2Converge-NEG_REWARD_GAMMA1_V3-Sequenced"
 
 
 def iterate_over_games(model_iter, sess_iter):
     test_dir = "/media/gla68/Windows/Hockey-data/Hockey-Training-All-feature" + str(
-        FEATURE_TYPE) + "-scale-neg_reward_Test"
+        FEATURE_TYPE) + "-scale-neg_reward"
     dir_test_all = os.listdir(test_dir)
     for dir_game in dir_test_all:
         game_files = os.listdir(test_dir + "/" + dir_game)
@@ -30,23 +32,23 @@ def iterate_over_games(model_iter, sess_iter):
         nn_real_game(SIMPLE_HOME_SAVED_NETWORK_PATH, sess_iter)
         readout_t_batch_home = model_iter.read_out.eval(feed_dict={model_iter.x: state})
         readout_record_home = (readout_t_batch_home[:, 0]).tolist()
-        readout_record_home = [value[0] for value in readout_record_home]
+        # readout_record_home = [value[0] for value in readout_record_home]
 
         nn_real_game(SIMPLE_AWAY_SAVED_NETWORK_PATH, sess_iter)
         readout_t_batch_away = model_iter.read_out.eval(feed_dict={model_iter.x: state})
         readout_record_away = (readout_t_batch_away[:, 0]).tolist()
-        readout_record_away = [value[0] for value in readout_record_away]
+        # readout_record_away = [value[0] for value in readout_record_away]
         readout_record_away_abs = map(abs, readout_record_away)
 
-        stimulate_value_rate = [float(c) / float(d) for c, d in zip(readout_record_home, readout_record_away_abs)]
-        draw_game_predict(stimulate_value_rate=stimulate_value_rate, state=state, reward=reward)
+        stimulate_value_rate = [((float(c)-float(d))/(float(c)+float(d))) for c, d in zip(readout_record_home, readout_record_away_abs)]
+        draw_game_predict(stimulate_value_rate=stimulate_value_rate, reward=reward)
 
 
-def draw_game_predict(stimulate_value_rate, state, reward):
+def draw_game_predict(stimulate_value_rate, reward):
     r_pos_index = [i for i in range(0, len(reward)) if reward[i] == 1]
     r_neg_index = [i for i in range(0, len(reward)) if reward[i] == -1]
-    x_axis = range(0, len(state))
-    plt.plot(x_axis, (stimulate_value_rate[:, 0]).tolist(), '-')
+    x_axis = range(0, len(stimulate_value_rate))
+    plt.plot(x_axis, stimulate_value_rate, '-')
     plt.scatter(r_pos_index, [0] * len(r_pos_index), color='b')
     plt.scatter(r_neg_index, [0] * len(r_neg_index), color='r')
     plt.xlabel("events number (time)", fontsize=15)

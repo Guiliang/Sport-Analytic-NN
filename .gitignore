@@ -21,3 +21,5 @@ td_prediction_simple.pyc
 td_prediction_simple_dir/log_NN/
 td_prediction_simple_dir/saved_NN/
 td_prediction_simple_dir/td_prediction_simple_separated.pyc
+mc_prediction_simple_dir/saved_NN
+mc_prediction_simple_dir/log_NN

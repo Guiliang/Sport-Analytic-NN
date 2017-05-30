@@ -1,10 +1,11 @@
+import csv
 import os
 import scipy.io as sio
 import unicodedata
 import ast
 
 FEATURE_TYPE = 5
-calibration_store_dir = "/media/gla68/Windows/Hockey-data/calibrate_all_feature_" + str(FEATURE_TYPE)
+calibration_store_dir = "/media/gla68/Windows/Hockey-data/td_calibrate_all_feature_" + str(FEATURE_TYPE)
 ISHOME = True
 
 
@@ -92,13 +93,32 @@ def agg2calibrate_model(check_target):
     print "model_predict_value_average with " + str(check_target) + " is " + str(model_predict_value_average)
     print "calibration_value_record_average with " + str(check_target) + " is " + str(calibration_value_record_average)
 
+    return model_predict_value_average, calibration_value_record_average
+
 
 def start_calibration():
+    store_dict_list = []
     for goal_diff in [-3, -2, -1, 0, 1, 2, 3]:
         for manpower in [-1, 0, -1]:
             for period in [1, 2, 3]:
+                store_dict = {"Goal Different": goal_diff, "Manpower": manpower, "Period": period}
                 check_target = {"GD": goal_diff, "MD": manpower, "P": period}
-                agg2calibrate_model(check_target=check_target)
+                model_predict_average, calibration_average = agg2calibrate_model(check_target=check_target)
+                store_dict.update({"model_predict_average": model_predict_average})
+                store_dict.update({"calibration_averagev": calibration_average})
+                store_dict_list.append(store_dict)
+
+    write_csv(store_dict_list)
+
+
+def write_csv(data_record):
+    with open('calibration_entire_sum.csv', 'w') as csvfile:
+        fieldnames = (data_record[0]).keys()
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+
+        writer.writeheader()
+        for record in data_record:
+            writer.writerow(record)
 
 
 if __name__ == '__main__':
