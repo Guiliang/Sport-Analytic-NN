@@ -3,7 +3,7 @@ import tensorflow as tf
 import os
 import unicodedata
 import ast
-import mc_prediction_simple_separated
+import mc_prediction_simple_separated_gpu
 import numpy as np
 
 FEATURE_TYPE = 5
@@ -18,7 +18,7 @@ SIMPLE_AWAY_SAVED_NETWORK_PATH = "/home/gla68/PycharmProjects/Sport-Analytic-NN/
 calibration_store_dir = "/media/gla68/Windows/Hockey-data/mc_calibrate_all_feature_" + str(FEATURE_TYPE)
 
 sess_nn = tf.InteractiveSession()
-model_nn = mc_prediction_simple_separated.td_prediction_simple_V3()
+model_nn = mc_prediction_simple_separated_gpu.td_prediction_simple_V3()
 saver = tf.train.Saver()
 sess_nn.run(tf.global_variables_initializer())
 

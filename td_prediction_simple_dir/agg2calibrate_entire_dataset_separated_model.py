@@ -5,7 +5,7 @@ import unicodedata
 import ast
 
 FEATURE_TYPE = 5
-calibration_store_dir = "/media/gla68/Windows/Hockey-data/td_calibrate_all_feature_" + str(FEATURE_TYPE)
+calibration_store_dir = "/cs/oschulte/Galen/Hockey-data/td_calibrate_all_feature_" + str(FEATURE_TYPE)
 ISHOME = True
 
 
@@ -75,15 +75,17 @@ def agg2calibrate_model(check_target):
         try:
             calibration_value_game_average = float(sum(calibration_value_game_record)) / len(
                 calibration_value_game_record)
+            calibration_value_record.append(calibration_value_game_average)
         except:
             calibration_value_game_average = 0.0
-        calibration_value_record.append(calibration_value_game_average)
+
         try:
             model_predict_value_game_average = float(sum(model_predict_value_game_record)) / len(
                 model_predict_value_game_record)
+            model_predict_value_record.append(model_predict_value_game_average)
         except:
             model_predict_value_game_average = 0.0
-        model_predict_value_record.append(model_predict_value_game_average)
+
 
     # model_predict_value_record = [value[0] for value in model_predict_value_record]
     # calibration_value_record = [value[0] for value in calibration_value_record]

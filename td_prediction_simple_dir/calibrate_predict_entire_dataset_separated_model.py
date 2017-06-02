@@ -8,14 +8,15 @@ import numpy as np
 
 FEATURE_TYPE = 5
 calibration = True
-ISHOME = True
+ISHOME = False
+ITERATE_NUM = 200
 
-SIMPLE_HOME_SAVED_NETWORK_PATH = "/home/gla68/PycharmProjects/Sport-Analytic-NN/td_prediction_simple_dir/saved_NN/saved_Home_networks_feature" + str(
-    FEATURE_TYPE) + "_batch16_iterate2Converge-NEG_REWARD_GAMMA1_V3-Sequenced"
-SIMPLE_AWAY_SAVED_NETWORK_PATH = "/home/gla68/PycharmProjects/Sport-Analytic-NN/td_prediction_simple_dir/saved_NN/saved_Away_networks_feature" + str(
-    FEATURE_TYPE) + "_batch16_iterate2Converge-NEG_REWARD_GAMMA1_V3-Sequenced"
+SIMPLE_HOME_SAVED_NETWORK_PATH = "/cs/oschulte/Galen/models/saved_NN/saved_Home_networks_feature" + str(
+    FEATURE_TYPE) + "_batch16_iterate"+str(ITERATE_NUM)+"-NEG_REWARD_GAMMA1_V3-Sequenced"
+SIMPLE_AWAY_SAVED_NETWORK_PATH = "/cs/oschulte/Galen/models/saved_NN/saved_Away_networks_feature" + str(
+    FEATURE_TYPE) + "_batch16_iterate"+str(ITERATE_NUM)+"-NEG_REWARD_GAMMA1_V3-Sequenced"
 
-calibration_store_dir = "/media/gla68/Windows/Hockey-data/td_calibrate_all_feature_" + str(FEATURE_TYPE)
+calibration_store_dir = "/cs/oschulte/Galen/Hockey-data/td_calibrate_all_feature_" + str(FEATURE_TYPE)
 
 sess_nn = tf.InteractiveSession()
 model_nn = td_prediction_simple_separated.td_prediction_simple_V3()

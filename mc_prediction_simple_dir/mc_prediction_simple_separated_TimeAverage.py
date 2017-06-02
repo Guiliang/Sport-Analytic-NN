@@ -46,17 +46,17 @@ GAMMA = 1  # decay rate of past observations
 BATCH_SIZE = 16  # size of mini-batch, the size of mini-batch could be tricky, the larger mini-batch, the easier will it be converge, but if our training data is not comprehensive enough and stochastic gradients is not applied, model may converge to other things
 SPORT = "NHL"
 if Train:
-    DATA_STORE = "/media/gla68/Windows/Hockey-data/Hockey-Training-All-feature" + str(
+    DATA_STORE = "/cs/oschulte/Galen/Hockey-data/Hockey-Training-All-feature" + str(
         FEATURE_TYPE) + "-scale-neg_reward_Train"
 else:
-    DATA_STORE = "/media/gla68/Windows/Hockey-data/Hockey-Training-All-feature" + str(
+    DATA_STORE = "/cs/oschulte/Galen/Hockey-data/Hockey-Training-All-feature" + str(
         FEATURE_TYPE) + "-scale-neg_reward"
 
 DIR_GAMES_ALL = os.listdir(DATA_STORE)
-LOG_DIR = "./log_NN/mc_log_" + str(Home_model_or_away_model) + "_train_feature" + str(FEATURE_TYPE) + "_batch" + str(
+LOG_DIR = "/cs/oschulte/Galen/models/log_NN/mc_separate_log_" + str(Home_model_or_away_model) + "_train_feature" + str(FEATURE_TYPE) + "_batch" + str(
     BATCH_SIZE) + "_iterate" + str(
     ITERATE_NUM) + "-" + str(REWARD_TYPE) + TRAIN_or_TEST + "-" + Random_or_Sequenced
-SAVED_NETWORK = "./saved_NN/mc_saved_" + str(Home_model_or_away_model) + "_networks_feature" + str(
+SAVED_NETWORK = "/cs/oschulte/Galen/models/saved_NN/mc_separate_saved_" + str(Home_model_or_away_model) + "_networks_feature" + str(
     FEATURE_TYPE) + "_batch" + str(BATCH_SIZE) + "_iterate" + str(
     ITERATE_NUM) + "-" + str(REWARD_TYPE) + TRAIN_or_TEST + "-" + Random_or_Sequenced
 FORWARD_REWARD_MODE = False
@@ -421,7 +421,10 @@ def train_network(sess, model):
                     if reward[reward_index] == -1:
                         reward_append(-1, target_reward_away_record)
 
-
+            if Home_model:
+                target_reward_home_record = [float(a) / float(b) for a, b in zip(target_reward_home_record, time_remain)]
+            else:
+                target_reward_away_record = [float(a) / float(b) for a, b in zip(target_reward_away_record, time_remain)]
 
             while True:
                 if Home_model:
@@ -430,11 +433,7 @@ def train_network(sess, model):
                 else:
                     training_batch_away, train_number = build_mc_training_batch(state, target_reward_away_record,
                                                                                 train_number)
-                # except:
-                #     print "\n game:" + dir_game + " train number:" + str(train_number)
-                #     raise IndexError("get_training_batch wrong")
 
-                    # get the batch variables
                 if Home_model:
                     s_t_home_batch = [d[0] for d in training_batch_home]
                     r_t_home_batch = [d[1] for d in training_batch_home]
@@ -452,7 +451,8 @@ def train_network(sess, model):
 
                 # perform gradient step
                 [diff_v, cost_out, summary_train, _] = sess.run([model.diff_v, model.cost, merge, model.train_step],
-                                                                feed_dict={model.y: r_t_batch[0], model.x: s_t_batch[0]})
+                                                                feed_dict={model.y: r_t_batch[0],
+                                                                           model.x: s_t_batch[0]})
                 if diff_v > 0.01:
                     converge_flag = False
                 global_counter += 1

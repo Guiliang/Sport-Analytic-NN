@@ -18,7 +18,7 @@ ITERATE_NUM = 200
 # ITERATE_NUM = "2Converge"
 REWARD_TYPE = "NEG_REWARD_GAMMA1"
 MODEL_TYPE = "V4"
-Home_model_or_away_model = "Away"
+Home_model_or_away_model = "Home"
 TRAIN_or_TEST = ""
 Random_or_Sequenced = "Sequenced"
 
@@ -456,7 +456,6 @@ def train_network(sess, model):
     :param print_parameters:
     :return:
     """
-    game_number = 0
     global_counter = 0
     converge_flag = False
 
@@ -474,6 +473,44 @@ def train_network(sess, model):
         else:
             print("Could not find old network weights")
 
+    # while True:
+    #     print str(number_of_total_game * ITERATE_NUM)
+    #     if converge_flag:
+    #         break
+    #     elif game_number >= number_of_total_game * ITERATE_NUM:
+    #         break
+    #     else:
+    #         converge_flag = True
+
+    reward_all = []
+    state_all = []
+    for dir_game in DIR_GAMES_ALL:
+        game_files = os.listdir(DATA_STORE + "/" + dir_game)
+        for filename in game_files:
+            if filename.startswith("reward"):
+                reward_name = filename
+            elif filename.startswith("state"):
+                state_name = filename
+
+        reward = sio.loadmat(DATA_STORE + "/" + dir_game + "/" + reward_name)
+        try:
+            reward = (reward['reward'][0]).tolist()
+        except:
+            print "\n" + dir_game
+            continue
+        reward_count = sum(reward)
+        state = sio.loadmat(DATA_STORE + "/" + dir_game + "/" + state_name)
+        state = state['state']
+        print ("\n load file" + str(dir_game) + " success")
+        print ("reward number" + str(reward_count))
+        if len(state) != len(reward):
+            raise Exception('state length does not equal to reward length')
+
+        reward_all.append(reward)
+        state_all.append(state)
+
+    game_number = 0
+
     while True:
         print str(number_of_total_game * ITERATE_NUM)
         if converge_flag:
@@ -483,33 +520,13 @@ def train_network(sess, model):
         else:
             converge_flag = True
 
-        for dir_game in DIR_GAMES_ALL:
-            game_number += 1
-            game_files = os.listdir(DATA_STORE + "/" + dir_game)
-            for filename in game_files:
-                if filename.startswith("reward"):
-                    reward_name = filename
-                elif filename.startswith("state"):
-                    state_name = filename
-
-            reward = sio.loadmat(DATA_STORE + "/" + dir_game + "/" + reward_name)
-            try:
-                reward = (reward['reward'][0]).tolist()
-            except:
-                print "\n" + dir_game
-                continue
-            reward_count = sum(reward)
-            state = sio.loadmat(DATA_STORE + "/" + dir_game + "/" + state_name)
-            state = state['state']
-            print ("\n load file" + str(dir_game) + " success")
-            print ("reward number" + str(reward_count))
-            if len(state) != len(reward):
-                raise Exception('state length does not equal to reward length')
-
-            reward_all.append(reward)
-            state_all.append(state)
+        for game_index in range(0, len(reward_all)):
 
             train_number = 0
+            game_number += 1
+
+            reward = reward_all[game_index]
+            state = state_all[game_index]
 
             if Home_model:
                 target_reward_home_record = []
@@ -564,7 +581,14 @@ def train_network(sess, model):
 
                 if terminal:
                     # save progress after a game
-                    saver.save(sess, SAVED_NETWORK + '/' + SPORT + '-game-', global_step=game_number)
+                    if game_number % 100 == 0:
+                        saver.save(sess, SAVED_NETWORK + '/' + SPORT + '-game-', global_step=game_number)
+                    elif converge_flag:
+                        saver.save(sess, SAVED_NETWORK + '/' + SPORT + '-game-', global_step=game_number)
+                    elif game_number >= number_of_total_game * ITERATE_NUM:
+                        # save progress after a game
+                        saver.save(sess, SAVED_NETWORK + '/' + SPORT + '-game-', global_step=game_number)
+
                     break
 
     train_writer.close()

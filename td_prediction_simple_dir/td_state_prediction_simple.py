@@ -35,14 +35,14 @@ GAMMA = 1  # decay rate of past observations
 BATCH_SIZE = 16  # size of mini-batch, the size of mini-batch could be tricky, the larger mini-batch, the easier will it be converge, but if our training data is not comprehensive enough and stochastic gradients is not applied, model may converge to other things
 SPORT = "NHL"
 if Train:
-    DATA_STORE = "/media/gla68/Windows/Hockey-data/Hockey-State-Training-All-feature"+str(FEATURE_TYPE)+"-scale-neg_reward_Train"
+    DATA_STORE = "/cs/oschulte/Galen/Hockey-data/Hockey-State-Training-All-feature"+str(FEATURE_TYPE)+"-scale-neg_reward_Train"
 else:
-    DATA_STORE = "/media/gla68/Windows/Hockey-data/Hockey-State-Training-All-feature"+str(FEATURE_TYPE)+"-scale-neg_reward"
+    DATA_STORE = "/cs/oschulte/Galen/Hockey-data/Hockey-State-Training-All-feature"+str(FEATURE_TYPE)+"-scale-neg_reward"
 
 DIR_GAMES_ALL = os.listdir(DATA_STORE)
-LOG_DIR = "./log_NN/log_state_train_feature" + str(FEATURE_TYPE) + "_batch" + str(BATCH_SIZE) + "_iterate" + str(
+LOG_DIR = "/cs/oschulte/Galen/models/log_NN/log_state_train_feature" + str(FEATURE_TYPE) + "_batch" + str(BATCH_SIZE) + "_iterate" + str(
     ITERATE_NUM) + "-" + str(REWARD_TYPE) + TRAIN_or_TEST + "-" + Random_or_Sequenced
-SAVED_NETWORK = "./saved_NN/saved_state_networks_feature" + str(FEATURE_TYPE) + "_batch" + str(BATCH_SIZE) + "_iterate" + str(
+SAVED_NETWORK = "/cs/oschulte/Galen/models/saved_NN/saved_state_networks_feature" + str(FEATURE_TYPE) + "_batch" + str(BATCH_SIZE) + "_iterate" + str(
     ITERATE_NUM) + "-" + str(REWARD_TYPE) + TRAIN_or_TEST + "-" + Random_or_Sequenced
 FORWARD_REWARD_MODE = False
 
