@@ -14,10 +14,10 @@ number_of_total_game = 446
 feature_num = 26
 FEATURE_TYPE = 5
 model_train_continue = True
-ITERATE_NUM = 50
+ITERATE_NUM = 100
 REWARD_TYPE = "NEG_REWARD_GAMMA1"
-MODEL_TYPE = "V5"
-Home_model_or_away_model = "Home"
+MODEL_TYPE = "V3"
+Home_model_or_away_model = "Away"
 TRAIN_or_TEST = ""
 Random_or_Sequenced = "Sequenced"
 
@@ -46,17 +46,18 @@ GAMMA = 1  # decay rate of past observations
 BATCH_SIZE = 16  # size of mini-batch, the size of mini-batch could be tricky, the larger mini-batch, the easier will it be converge, but if our training data is not comprehensive enough and stochastic gradients is not applied, model may converge to other things
 SPORT = "NHL"
 if Train:
-    DATA_STORE = "/cs/oschulte/Galen/Hockey-data/Hockey-Training-All-feature" + str(
+    DATA_STORE = "/cs/oschulte/Galen/Hockey-data-entire/Hockey-Training-All-feature" + str(
         FEATURE_TYPE) + "-scale-neg_reward_Train"
 else:
-    DATA_STORE = "/cs/oschulte/Galen/Hockey-data/Hockey-Training-All-feature" + str(
+    DATA_STORE = "/cs/oschulte/Galen/Hockey-data-entire/Hockey-Training-All-feature" + str(
         FEATURE_TYPE) + "-scale-neg_reward"
 
 DIR_GAMES_ALL = os.listdir(DATA_STORE)
-LOG_DIR = "/cs/oschulte/Galen/models/log_NN/log_" + str(Home_model_or_away_model) + "_train_feature" + str(
+LOG_DIR = "/cs/oschulte/Galen/models/log_NN/log_entire_" + str(Home_model_or_away_model) + "_train_feature" + str(
     FEATURE_TYPE) + "_batch" + str(BATCH_SIZE) + "_iterate" + str(
     ITERATE_NUM) + "-" + str(REWARD_TYPE) + "_" + MODEL_TYPE + TRAIN_or_TEST + "-" + Random_or_Sequenced
-SAVED_NETWORK = "/cs/oschulte/Galen/models/saved_NN/saved_" + str(Home_model_or_away_model) + "_networks_feature" + str(
+SAVED_NETWORK = "/cs/oschulte/Galen/models/saved_NN/saved_entire_" + str(
+    Home_model_or_away_model) + "_networks_feature" + str(
     FEATURE_TYPE) + "_batch" + str(BATCH_SIZE) + "_iterate" + str(
     ITERATE_NUM) + "-" + str(REWARD_TYPE) + "_" + MODEL_TYPE + TRAIN_or_TEST + "-" + Random_or_Sequenced
 FORWARD_REWARD_MODE = False
@@ -505,12 +506,110 @@ class td_prediction_simple_V5(object):
         tf.summary.histogram('cost', self.cost)
 
         with tf.name_scope("train"):
+            self.global_step = tf.Variable(0, trainable=False)
+            starter_learning_rate = 0.00001
+            self.learning_rate = tf.train.exponential_decay(starter_learning_rate, self.global_step,
+                                                            50000, 0.96, staircase=True)
+            self.train_step = tf.train.GradientDescentOptimizer(self.learning_rate).minimize(self.cost,
+                                                                                             global_step=self.global_step)
 
-            global_step = tf.Variable(0, trainable=False)
-            starter_learning_rate = 0.001
-            learning_rate = tf.train.exponential_decay(starter_learning_rate, global_step,
-                                                       100000, 0.96, staircase=True)
-            self.train_step = tf.train.GradientDescentOptimizer(learning_rate).minimize(self.cost, global_step=global_step)
+            # self.train_step = tf.train.AdamOptimizer(1e-6).minimize(self.cost)
+            # self.train_step = tf.train.GradientDescentOptimizer(1e-6).minimize(self.cost)
+            # train_step = tf.train.AdadeltaOptimizer().minimize(cost)
+
+
+class td_prediction_simple_V6(object):
+    def __init__(self):
+        """
+        define the neural network
+        :return: network output
+        """
+
+        # 7 is the num of units is layer 1
+        # 1000 is the num of units in layer 2
+        # 1 is the num of unit in layer 3
+
+        num_layer_1 = feature_num
+        num_layer_2 = 1000
+        num_layer_3 = 1000
+        num_layer_4 = 1000
+        num_layer_5 = 1
+
+        max_sigmoid_1 = -1 * math.sqrt(float(6) / (num_layer_1 + num_layer_2))
+        min_sigmoid_1 = 1 * math.sqrt(float(6) / (num_layer_1 + num_layer_2))
+        max_sigmoid_2 = -1 * math.sqrt(float(6) / (num_layer_2 + num_layer_3))
+        min_sigmoid_2 = 1 * math.sqrt(float(6) / (num_layer_2 + num_layer_3))
+        max_sigmoid_3 = -1 * math.sqrt(float(6) / (num_layer_3 + num_layer_4))
+        min_sigmoid_3 = 1 * math.sqrt(float(6) / (num_layer_3 + num_layer_4))
+        max_sigmoid_4 = -1 * math.sqrt(float(6) / (num_layer_4 + num_layer_5))
+        min_sigmoid_4 = 1 * math.sqrt(float(6) / (num_layer_4 + num_layer_5))
+
+        with tf.name_scope("Dense_Layer_first"):
+            self.x = tf.placeholder(tf.float32, [None, num_layer_1], name="x_1")
+            with tf.name_scope("Weight_1"):
+                self.W1 = tf.Variable(
+                    tf.random_uniform([num_layer_1, num_layer_2], minval=min_sigmoid_1, maxval=max_sigmoid_1),
+                    name="W_1")
+            with tf.name_scope("Biases_1"):
+                self.b1 = tf.Variable(tf.zeros([num_layer_2]), name="b_1")
+            with tf.name_scope("Output_1"):
+                self.y1 = tf.matmul(self.x, self.W1) + self.b1
+            with tf.name_scope("BN_1"):
+
+            with tf.name_scope("Activation_1"):
+                self.activations1 = tf.nn.tanh(self.y1, name='activation1')
+
+        with tf.name_scope("Dense_Layer_second"):
+            with tf.name_scope("Weight_2"):
+                self.W2 = tf.Variable(
+                    tf.random_uniform([num_layer_2, num_layer_3], minval=min_sigmoid_2, maxval=max_sigmoid_2),
+                    name="W_2")
+            with tf.name_scope("Biases_2"):
+                self.b2 = tf.Variable(tf.zeros([num_layer_3]), name="b_2")
+            with tf.name_scope("Output_2"):
+                self.y2 = tf.matmul(self.activations1, self.W2) + self.b2
+            with tf.name_scope("Activation_2"):
+                self.activations2 = tf.nn.tanh(self.y2, name='activation2')
+
+        with tf.name_scope("Dense_Layer_third"):
+            with tf.name_scope("Weight_3"):
+                self.W3 = tf.Variable(
+                    tf.random_uniform([num_layer_3, num_layer_4], minval=min_sigmoid_3, maxval=max_sigmoid_3),
+                    name="W_3")
+            with tf.name_scope("Biases_3"):
+                self.b3 = tf.Variable(tf.zeros([num_layer_4]), name="b_3")
+            with tf.name_scope("Output_3"):
+                self.y3 = tf.matmul(self.activations2, self.W3) + self.b3
+            with tf.name_scope("Activation_3"):
+                self.activations3 = tf.nn.tanh(self.y3, name='activation3')
+
+        with tf.name_scope("Dense_Layer_fourth"):
+            with tf.name_scope("Weight_4"):
+                self.W4 = tf.Variable(
+                    tf.random_uniform([num_layer_4, num_layer_5], minval=min_sigmoid_4, maxval=max_sigmoid_4),
+                    name="W_4")
+            with tf.name_scope("Biases_4"):
+                self.b4 = tf.Variable(tf.zeros([num_layer_5]), name="b_4")
+            with tf.name_scope("Output_4"):
+                self.read_out = tf.matmul(self.activations3, self.W4) + self.b4
+
+        # define the cost function
+        self.y = tf.placeholder("float", [None])
+
+        with tf.name_scope("cost"):
+            self.readout_action = tf.reduce_sum(self.read_out,
+                                                reduction_indices=1)  # Computes the sum of elements across dimensions of a tensor.
+            self.diff_v = tf.reduce_mean(tf.abs(self.y - self.readout_action))
+            self.cost = tf.reduce_mean(tf.square(self.y - self.readout_action))  # square means
+        tf.summary.histogram('cost', self.cost)
+
+        with tf.name_scope("train"):
+            self.global_step = tf.Variable(0, trainable=False)
+            starter_learning_rate = 0.00001
+            self.learning_rate = tf.train.exponential_decay(starter_learning_rate, self.global_step,
+                                                            50000, 0.96, staircase=True)
+            self.train_step = tf.train.GradientDescentOptimizer(self.learning_rate).minimize(self.cost,
+                                                                                             global_step=self.global_step)
 
             # self.train_step = tf.train.AdamOptimizer(1e-6).minimize(self.cost)
             # self.train_step = tf.train.GradientDescentOptimizer(1e-6).minimize(self.cost)
@@ -739,8 +838,17 @@ def train_network(sess, model, print_parameters=False):
                             y_batch.append(r_t_batch[i] + GAMMA * ((readout_t1_batch[i]).tolist())[0])
 
                     # perform gradient step
-                    [diff_v, cost_out, summary_train, _] = sess.run([model.diff_v, model.cost, merge, model.train_step],
-                                                                    feed_dict={model.y: y_batch, model.x: s_t_batch})
+
+
+                    if MODEL_TYPE == "V5":
+                        [global_step, learning_rate, diff_v, cost_out, summary_train, _] = sess.run(
+                            [model.global_step, model.learning_rate, model.diff_v, model.cost, merge, model.train_step],
+                            feed_dict={model.y: y_batch, model.x: s_t_batch})
+                    else:
+                        [diff_v, cost_out, summary_train, _] = sess.run(
+                            [model.diff_v, model.cost, merge, model.train_step],
+                            feed_dict={model.y: y_batch, model.x: s_t_batch})
+
                     if diff_v > 0.01:
                         converge_flag = False
                     global_counter += 1
@@ -752,7 +860,12 @@ def train_network(sess, model, print_parameters=False):
                     if terminal or ((train_number - 1) / BATCH_SIZE) % 5 == 1:
                         print ("TIMESTEP:", train_number, "Game:", game_number)
                         print(str((min(readout_t1_batch)[0], max(readout_t1_batch)[0])))
-                        print ("cost of the network is" + str(cost_out))
+
+                        if MODEL_TYPE == "V5":
+                            print ("cost of the network is: " + str(cost_out) + " with learning rate: " + str(
+                                learning_rate) + " and global step: " + str(global_step))
+                        else:
+                            print ("cost of the network is: " + str(cost_out))
 
                     if terminal:
                         # save progress after a game

@@ -14,11 +14,11 @@ number_of_total_game = 446
 feature_num = 26
 FEATURE_TYPE = 5
 model_train_continue = True
-ITERATE_NUM = 200
+ITERATE_NUM = 50
 # ITERATE_NUM = "2Converge"
 REWARD_TYPE = "NEG_REWARD_GAMMA1"
-MODEL_TYPE = "V4"
-Home_model_or_away_model = "Away"
+MODEL_TYPE = "V5"
+Home_model_or_away_model = "Home"
 TRAIN_or_TEST = ""
 Random_or_Sequenced = "Sequenced"
 
@@ -424,6 +424,102 @@ class mc_prediction_simple_V4(object):
             # train_step = tf.train.AdadeltaOptimizer().minimize(cost)
 
 
+class mc_prediction_simple_V5(object):
+    def __init__(self):
+        """
+        define the neural network
+        :return: network output
+        """
+
+        # 7 is the num of units is layer 1
+        # 1000 is the num of units in layer 2
+        # 1 is the num of unit in layer 3
+
+        num_layer_1 = feature_num
+        num_layer_2 = 1000
+        num_layer_3 = 1000
+        num_layer_4 = 1000
+        num_layer_5 = 1
+
+        max_sigmoid_1 = -1 * math.sqrt(float(6) / (num_layer_1 + num_layer_2))
+        min_sigmoid_1 = 1 * math.sqrt(float(6) / (num_layer_1 + num_layer_2))
+        max_sigmoid_2 = -1 * math.sqrt(float(6) / (num_layer_2 + num_layer_3))
+        min_sigmoid_2 = 1 * math.sqrt(float(6) / (num_layer_2 + num_layer_3))
+        max_sigmoid_3 = -1 * math.sqrt(float(6) / (num_layer_3 + num_layer_4))
+        min_sigmoid_3 = 1 * math.sqrt(float(6) / (num_layer_3 + num_layer_4))
+        max_sigmoid_4 = -1 * math.sqrt(float(6) / (num_layer_4 + num_layer_5))
+        min_sigmoid_4 = 1 * math.sqrt(float(6) / (num_layer_4 + num_layer_5))
+
+        with tf.name_scope("Dense_Layer_first"):
+            self.x = tf.placeholder(tf.float32, [None, num_layer_1], name="x_1")
+            with tf.name_scope("Weight_1"):
+                self.W1 = tf.Variable(
+                    tf.random_uniform([num_layer_1, num_layer_2], minval=min_sigmoid_1, maxval=max_sigmoid_1),
+                    name="W_1")
+            with tf.name_scope("Biases_1"):
+                self.b1 = tf.Variable(tf.zeros([num_layer_2]), name="b_1")
+            with tf.name_scope("Output_1"):
+                self.y1 = tf.matmul(self.x, self.W1) + self.b1
+            with tf.name_scope("Activation_1"):
+                self.activations1 = tf.nn.tanh(self.y1, name='activation1')
+
+        with tf.name_scope("Dense_Layer_second"):
+            with tf.name_scope("Weight_2"):
+                self.W2 = tf.Variable(
+                    tf.random_uniform([num_layer_2, num_layer_3], minval=min_sigmoid_2, maxval=max_sigmoid_2),
+                    name="W_2")
+            with tf.name_scope("Biases_2"):
+                self.b2 = tf.Variable(tf.zeros([num_layer_3]), name="b_2")
+            with tf.name_scope("Output_2"):
+                self.y2 = tf.matmul(self.activations1, self.W2) + self.b2
+            with tf.name_scope("Activation_2"):
+                self.activations2 = tf.nn.tanh(self.y2, name='activation2')
+
+        with tf.name_scope("Dense_Layer_third"):
+            with tf.name_scope("Weight_3"):
+                self.W3 = tf.Variable(
+                    tf.random_uniform([num_layer_3, num_layer_4], minval=min_sigmoid_3, maxval=max_sigmoid_3),
+                    name="W_3")
+            with tf.name_scope("Biases_3"):
+                self.b3 = tf.Variable(tf.zeros([num_layer_4]), name="b_3")
+            with tf.name_scope("Output_3"):
+                self.y3 = tf.matmul(self.activations2, self.W3) + self.b3
+            with tf.name_scope("Activation_3"):
+                self.activations3 = tf.nn.tanh(self.y3, name='activation3')
+
+        with tf.name_scope("Dense_Layer_fourth"):
+            with tf.name_scope("Weight_4"):
+                self.W4 = tf.Variable(
+                    tf.random_uniform([num_layer_4, num_layer_5], minval=min_sigmoid_4, maxval=max_sigmoid_4),
+                    name="W_4")
+            with tf.name_scope("Biases_4"):
+                self.b4 = tf.Variable(tf.zeros([num_layer_5]), name="b_4")
+            with tf.name_scope("Output_4"):
+                self.read_out = tf.matmul(self.activations3, self.W4) + self.b4
+
+        # define the cost function
+        self.y = tf.placeholder("float", [None])
+
+        with tf.name_scope("cost"):
+            self.readout_action = tf.reduce_sum(self.read_out,
+                                                reduction_indices=1)  # Computes the sum of elements across dimensions of a tensor.
+            self.diff_v = tf.reduce_mean(tf.abs(self.y - self.readout_action))
+            self.cost = tf.reduce_mean(tf.square(self.y - self.readout_action))  # square means
+        tf.summary.histogram('cost', self.cost)
+
+        with tf.name_scope("train"):
+
+            self.global_step = tf.Variable(0, trainable=False)
+            starter_learning_rate = 0.001
+            self.learning_rate = tf.train.exponential_decay(starter_learning_rate, self.global_step,
+                                                       50000, 0.96, staircase=True)
+            self.train_step = tf.train.GradientDescentOptimizer(self.learning_rate).minimize(self.cost, global_step=self.global_step)
+
+            # self.train_step = tf.train.AdamOptimizer(1e-6).minimize(self.cost)
+            # self.train_step = tf.train.GradientDescentOptimizer(1e-6).minimize(self.cost)
+            # train_step = tf.train.AdadeltaOptimizer().minimize(cost)
+
+
 def reward_append(reward, reward_record):
     for reward_index in range(0, len(reward_record)):
         reward_value = (reward_record[reward_index])
@@ -506,8 +602,8 @@ def train_network(sess, model):
             if len(state) != len(reward):
                 raise Exception('state length does not equal to reward length')
 
-            reward_all.append(reward)
-            state_all.append(state)
+            # reward_all.append(reward)
+            # state_all.append(state)
 
             train_number = 0
 
@@ -549,7 +645,7 @@ def train_network(sess, model):
                     raise ValueError("Home or away model can't match")
 
                 # perform gradient step
-                [diff_v, cost_out, summary_train, _] = sess.run([model.diff_v, model.cost, merge, model.train_step],
+                [global_step, learning_rate, diff_v, cost_out, summary_train, _] = sess.run([model.global_step, model.learning_rate, model.diff_v, model.cost, merge, model.train_step],
                                                                 feed_dict={model.y: r_t_batch[0],
                                                                            model.x: s_t_batch[0]})
                 if diff_v > 0.01:
@@ -560,7 +656,7 @@ def train_network(sess, model):
                 # print info
                 if terminal or ((train_number - 1) / BATCH_SIZE) % 5 == 1:
                     print ("TIMESTEP:", train_number, "Game:", game_number)
-                    print ("cost of the network is" + str(cost_out))
+                    print ("cost of the network is: " + str(cost_out) + " with learning rate: "+str(learning_rate) + " and global step: "+ str(global_step))
 
                 if terminal:
                     # save progress after a game
@@ -585,6 +681,8 @@ def train_start():
         nn = mc_prediction_simple_V3()
     elif MODEL_TYPE == "V4":
         nn = mc_prediction_simple_V4()
+    elif MODEL_TYPE == "V5":
+        nn = mc_prediction_simple_V5()
     else:
         raise ValueError("Unclear model type")
     train_network(sess, nn)

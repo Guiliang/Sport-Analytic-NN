@@ -5,8 +5,14 @@ import unicodedata
 import ast
 
 FEATURE_TYPE = 5
-calibration_store_dir = "/cs/oschulte/Galen/Hockey-data/td_calibrate_all_feature_" + str(FEATURE_TYPE)
+# calibration_store_dir = "/cs/oschulte/Galen/Hockey-data/td_calibrate_all_feature_" + str(FEATURE_TYPE)
+calibration_store_dir = "/cs/oschulte/Galen/Hockey-data/td_calibrate_all_feature_5_2017-6-01"
+store_name = ""
 ISHOME = True
+if ISHOME:
+    save_csv_name = "td_home_calibration_entire_sum_2017-6-1.csv"
+else:
+    save_csv_name = "td_away_calibration_entire_sum_2017-6-1.csv"
 
 
 def agg2calibrate_model(check_target):
@@ -50,6 +56,7 @@ def agg2calibrate_model(check_target):
             goal_diff = calibrate_name_dict.get("scoreDifferential")
             manpower_diff = calibrate_name_dict.get("Penalty")
             time_remain = calibrate_name_dict.get("time remained")
+            home = calibrate_name_dict.get("home")
             if time_remain > 2400:
                 period = 1.0
             elif time_remain > 1200:
@@ -69,7 +76,7 @@ def agg2calibrate_model(check_target):
                 # elif not ISHOME and not home_identifier[calibrate_name_index]:  # TODO delete home_identifier[calibrate_name_index]
                 elif not ISHOME:
                     # print "Found away"
-                    model_predict_value_game_record.append(model_predict_away[calibrate_name_index])
+                    model_predict_value_game_record.append((model_predict_away[calibrate_name_index])[0])
                     calibration_value_game_record.append(float(summation_goal_away[calibrate_name_index]))
 
         try:
@@ -86,11 +93,17 @@ def agg2calibrate_model(check_target):
         except:
             model_predict_value_game_average = 0.0
 
-
     # model_predict_value_record = [value[0] for value in model_predict_value_record]
     # calibration_value_record = [value[0] for value in calibration_value_record]
-    model_predict_value_average = float(sum(model_predict_value_record)) / len(model_predict_value_record)
-    calibration_value_record_average = float(sum(calibration_value_record)) / len(calibration_value_record)
+    try:
+        model_predict_value_average = float(sum(model_predict_value_record)) / len(model_predict_value_record)
+    except:
+        model_predict_value_average = 0
+
+    try:
+        calibration_value_record_average = float(sum(calibration_value_record)) / len(calibration_value_record)
+    except:
+        calibration_value_record_average = 0
 
     print "model_predict_value_average with " + str(check_target) + " is " + str(model_predict_value_average)
     print "calibration_value_record_average with " + str(check_target) + " is " + str(calibration_value_record_average)
@@ -101,7 +114,7 @@ def agg2calibrate_model(check_target):
 def start_calibration():
     store_dict_list = []
     for goal_diff in [-3, -2, -1, 0, 1, 2, 3]:
-        for manpower in [-1, 0, -1]:
+        for manpower in [-1, 0, 1]:
             for period in [1, 2, 3]:
                 store_dict = {"Goal Different": goal_diff, "Manpower": manpower, "Period": period}
                 check_target = {"GD": goal_diff, "MD": manpower, "P": period}
@@ -114,7 +127,7 @@ def start_calibration():
 
 
 def write_csv(data_record):
-    with open('calibration_entire_sum.csv', 'w') as csvfile:
+    with open(save_csv_name, 'w') as csvfile:
         fieldnames = (data_record[0]).keys()
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
 

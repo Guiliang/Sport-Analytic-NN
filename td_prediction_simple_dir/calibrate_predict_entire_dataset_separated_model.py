@@ -9,17 +9,31 @@ import numpy as np
 FEATURE_TYPE = 5
 calibration = True
 ISHOME = False
-ITERATE_NUM = 200
+ITERATE_NUM = 50
+MODEL_TYPE = "V5"
 
-SIMPLE_HOME_SAVED_NETWORK_PATH = "/cs/oschulte/Galen/models/saved_NN/saved_Home_networks_feature" + str(
-    FEATURE_TYPE) + "_batch16_iterate"+str(ITERATE_NUM)+"-NEG_REWARD_GAMMA1_V3-Sequenced"
-SIMPLE_AWAY_SAVED_NETWORK_PATH = "/cs/oschulte/Galen/models/saved_NN/saved_Away_networks_feature" + str(
-    FEATURE_TYPE) + "_batch16_iterate"+str(ITERATE_NUM)+"-NEG_REWARD_GAMMA1_V3-Sequenced"
+SIMPLE_HOME_SAVED_NETWORK_PATH = "/cs/oschulte/Galen/models/saved_NN/saved_Home_networks_feature{0}_batch16_iterate{1}-NEG_REWARD_GAMMA1_{2}-Sequenced".format(
+    str(FEATURE_TYPE), str(ITERATE_NUM), MODEL_TYPE)
+SIMPLE_AWAY_SAVED_NETWORK_PATH = "/cs/oschulte/Galen/models/saved_NN/saved_Away_networks_feature{0}_batch16_iterate{1}-NEG_REWARD_GAMMA1_{2}-Sequenced".format(
+    str(FEATURE_TYPE), str(ITERATE_NUM), MODEL_TYPE)
 
-calibration_store_dir = "/cs/oschulte/Galen/Hockey-data/td_calibrate_all_feature_" + str(FEATURE_TYPE)
-
+# calibration_store_dir = "/cs/oschulte/Galen/Hockey-data/td_calibrate_all_feature_" + str(FEATURE_TYPE)
+calibration_store_dir = "/cs/oschulte/Galen/Hockey-data/td_calibrate_all_feature_5_2017-6-01"
 sess_nn = tf.InteractiveSession()
-model_nn = td_prediction_simple_separated.td_prediction_simple_V3()
+
+if MODEL_TYPE == "V1":
+    model_nn = td_prediction_simple_separated.td_prediction_simple()
+elif MODEL_TYPE == "V2":
+    model_nn = td_prediction_simple_separated.td_prediction_simple_V2()
+elif MODEL_TYPE == "V3":
+    model_nn = td_prediction_simple_separated.td_prediction_simple_V3()
+elif MODEL_TYPE == "V4":
+    model_nn = td_prediction_simple_separated.td_prediction_simple_V4()
+elif MODEL_TYPE == "V5":
+    model_nn = td_prediction_simple_separated.td_prediction_simple_V5()
+else:
+    raise ValueError("Unclear model type")
+
 saver = tf.train.Saver()
 sess_nn.run(tf.global_variables_initializer())
 
