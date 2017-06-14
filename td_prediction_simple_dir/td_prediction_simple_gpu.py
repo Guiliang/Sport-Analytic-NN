@@ -14,7 +14,7 @@ train the home team and away team together, use a feature to represent it.
 feature_num = 26
 FEATURE_TYPE = 5
 model_train_continue = False
-ITERATE_NUM = 50
+ITERATE_NUM = 75
 REWARD_TYPE = "NEG_REWARD_GAMMA1"
 MODEL_TYPE = "V3"
 TRAIN_or_TEST = ""
@@ -749,7 +749,7 @@ def train_network(sess, model, print_parameters=False):
     converge_flag = False
 
     # loading network
-    saver = tf.train.Saver() 
+    saver = tf.train.Saver()
     merge = tf.summary.merge_all()
     train_writer = tf.summary.FileWriter(LOG_DIR, sess.graph)
     sess.run(tf.global_variables_initializer())
@@ -774,8 +774,10 @@ def train_network(sess, model, print_parameters=False):
             converge_flag = True
 
         cost_per_iter_record = []
+        state_all = []
+        reward_all = []
+
         for dir_game in DIR_GAMES_ALL:
-            game_number += 1
             game_files = os.listdir(DATA_STORE + "/" + dir_game)
             for filename in game_files:
                 if filename.startswith("reward"):
@@ -783,20 +785,26 @@ def train_network(sess, model, print_parameters=False):
                 elif filename.startswith("state"):
                     state_name = filename
 
-            reward = sio.loadmat(DATA_STORE + "/" + dir_game + "/" + reward_name)
+            reward_load = sio.loadmat(DATA_STORE + "/" + dir_game + "/" + reward_name)
             try:
-                reward = (reward['reward'][0]).tolist()
+                reward_load = (reward_load['reward'][0]).tolist()
             except:
                 print "\n" + dir_game
                 continue
-            reward_count = sum(reward)
-            state = sio.loadmat(DATA_STORE + "/" + dir_game + "/" + state_name)
-            state = state['state']
+            reward_count = sum(reward_load)
+            state_load = sio.loadmat(DATA_STORE + "/" + dir_game + "/" + state_name)
+            state_load = state_load['state']
             print ("\n load file" + str(dir_game) + " success")
             print ("reward number" + str(reward_count))
-            if len(state) != len(reward):
+            if len(state_load) != len(reward_load):
                 raise Exception('state length does not equal to reward length')
+            state_all.append(state_load)
+            reward_all.append(reward_load)
 
+        for index in range(0, len(state_all)):
+            state = state_all[index]
+            reward = reward_all[index]
+            game_number += 1
             train_len = len(state)
             train_number = 0
 

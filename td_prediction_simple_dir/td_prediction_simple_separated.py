@@ -10,16 +10,19 @@ import math
 """
 train the home team and away team together, use a feature to represent it.
 """
-number_of_total_game = 446
+
 feature_num = 26
 FEATURE_TYPE = 5
-model_train_continue = True
-ITERATE_NUM = 100
+model_train_continue = False
+ITERATE_NUM = 25
 REWARD_TYPE = "NEG_REWARD_GAMMA1"
 MODEL_TYPE = "V3"
-Home_model_or_away_model = "Away"
+Home_model_or_away_model = "Home"
 TRAIN_or_TEST = ""
 Random_or_Sequenced = "Sequenced"
+GAMMA = 1  # decay rate of past observations
+BATCH_SIZE = 8  # size of mini-batch, the size of mini-batch could be tricky, the larger mini-batch, the easier will it be converge, but if our training data is not comprehensive enough and stochastic gradients is not applied, model may converge to other things
+SPORT = "NHL"
 
 if Home_model_or_away_model == "Home":
     Home_model = True
@@ -41,10 +44,6 @@ elif Random_or_Sequenced == "Sequenced":
     Random_select = False
 else:
     raise ValueError("Random_or_Sequenced setting wrong")
-
-GAMMA = 1  # decay rate of past observations
-BATCH_SIZE = 16  # size of mini-batch, the size of mini-batch could be tricky, the larger mini-batch, the easier will it be converge, but if our training data is not comprehensive enough and stochastic gradients is not applied, model may converge to other things
-SPORT = "NHL"
 if Train:
     DATA_STORE = "/cs/oschulte/Galen/Hockey-data-entire/Hockey-Training-All-feature" + str(
         FEATURE_TYPE) + "-scale-neg_reward_Train"
@@ -53,6 +52,7 @@ else:
         FEATURE_TYPE) + "-scale-neg_reward"
 
 DIR_GAMES_ALL = os.listdir(DATA_STORE)
+number_of_total_game = len(DIR_GAMES_ALL)
 LOG_DIR = "/cs/oschulte/Galen/models/log_NN/log_entire_" + str(Home_model_or_away_model) + "_train_feature" + str(
     FEATURE_TYPE) + "_batch" + str(BATCH_SIZE) + "_iterate" + str(
     ITERATE_NUM) + "-" + str(REWARD_TYPE) + "_" + MODEL_TYPE + TRAIN_or_TEST + "-" + Random_or_Sequenced
@@ -555,9 +555,12 @@ class td_prediction_simple_V6(object):
             with tf.name_scope("Output_1"):
                 self.y1 = tf.matmul(self.x, self.W1) + self.b1
             with tf.name_scope("BN_1"):
-
+                self.bn1 = tf.contrib.layers.batch_norm(self.y1,
+                                                        center=True, scale=True,
+                                                        is_training=True,
+                                                        scope='bn1')
             with tf.name_scope("Activation_1"):
-                self.activations1 = tf.nn.tanh(self.y1, name='activation1')
+                self.activations1 = tf.nn.tanh(self.bn1, name='activation1')
 
         with tf.name_scope("Dense_Layer_second"):
             with tf.name_scope("Weight_2"):
@@ -568,8 +571,13 @@ class td_prediction_simple_V6(object):
                 self.b2 = tf.Variable(tf.zeros([num_layer_3]), name="b_2")
             with tf.name_scope("Output_2"):
                 self.y2 = tf.matmul(self.activations1, self.W2) + self.b2
+            with tf.name_scope("BN_2"):
+                self.bn2 = tf.contrib.layers.batch_norm(self.y2,
+                                                        center=True, scale=True,
+                                                        is_training=True,
+                                                        scope='bn2')
             with tf.name_scope("Activation_2"):
-                self.activations2 = tf.nn.tanh(self.y2, name='activation2')
+                self.activations2 = tf.nn.tanh(self.bn2, name='activation2')
 
         with tf.name_scope("Dense_Layer_third"):
             with tf.name_scope("Weight_3"):
@@ -580,8 +588,13 @@ class td_prediction_simple_V6(object):
                 self.b3 = tf.Variable(tf.zeros([num_layer_4]), name="b_3")
             with tf.name_scope("Output_3"):
                 self.y3 = tf.matmul(self.activations2, self.W3) + self.b3
+            with tf.name_scope("BN_3"):
+                self.bn3 = tf.contrib.layers.batch_norm(self.y3,
+                                                        center=True, scale=True,
+                                                        is_training=True,
+                                                        scope='bn3')
             with tf.name_scope("Activation_3"):
-                self.activations3 = tf.nn.tanh(self.y3, name='activation3')
+                self.activations3 = tf.nn.tanh(self.bn3, name='activation3')
 
         with tf.name_scope("Dense_Layer_fourth"):
             with tf.name_scope("Weight_4"):
@@ -604,16 +617,96 @@ class td_prediction_simple_V6(object):
         tf.summary.histogram('cost', self.cost)
 
         with tf.name_scope("train"):
-            self.global_step = tf.Variable(0, trainable=False)
-            starter_learning_rate = 0.00001
-            self.learning_rate = tf.train.exponential_decay(starter_learning_rate, self.global_step,
-                                                            50000, 0.96, staircase=True)
-            self.train_step = tf.train.GradientDescentOptimizer(self.learning_rate).minimize(self.cost,
-                                                                                             global_step=self.global_step)
+            self.train_step = tf.train.AdamOptimizer(1e-6).minimize(self.cost)
 
-            # self.train_step = tf.train.AdamOptimizer(1e-6).minimize(self.cost)
-            # self.train_step = tf.train.GradientDescentOptimizer(1e-6).minimize(self.cost)
-            # train_step = tf.train.AdadeltaOptimizer().minimize(cost)
+
+class td_prediction_simple_V7(object):
+    def __init__(self):
+        """
+        define the neural network
+        :return: network output
+        """
+
+        # 7 is the num of units is layer 1
+        # 1000 is the num of units in layer 2
+        # 1 is the num of unit in layer 3
+
+        num_layer_1 = feature_num
+        num_layer_2 = 1000
+        num_layer_3 = 1000
+        num_layer_4 = 1000
+        num_layer_5 = 1
+
+        with tf.name_scope("Dense_Layer_first"):
+            self.x = tf.placeholder(tf.float32, [None, num_layer_1], name="x_1")
+            with tf.name_scope("Weight_1"):
+                self.W1 = tf.get_variable('w1_xaiver', [num_layer_1, num_layer_2],
+                                          initializer=tf.contrib.layers.xavier_initializer())
+            with tf.name_scope("Biases_1"):
+                self.b1 = tf.Variable(tf.zeros([num_layer_2]), name="b_1")
+            with tf.name_scope("Output_1"):
+                self.y1 = tf.matmul(self.x, self.W1) + self.b1
+            with tf.name_scope("BN_1"):
+                self.bn1 = tf.contrib.layers.batch_norm(self.y1,
+                                                        center=True, scale=True,
+                                                        is_training=True,
+                                                        scope='bn1')
+            with tf.name_scope("Activation_1"):
+                self.activations1 = tf.nn.relu(self.bn1, name='activation1')
+
+        with tf.name_scope("Dense_Layer_second"):
+            with tf.name_scope("Weight_2"):
+                self.W2 = tf.get_variable('w2_xaiver', [num_layer_2, num_layer_3],
+                                          initializer=tf.contrib.layers.xavier_initializer())
+            with tf.name_scope("Biases_2"):
+                self.b2 = tf.Variable(tf.zeros([num_layer_3]), name="b_2")
+            with tf.name_scope("Output_2"):
+                self.y2 = tf.matmul(self.activations1, self.W2) + self.b2
+            with tf.name_scope("BN_2"):
+                self.bn2 = tf.contrib.layers.batch_norm(self.y2,
+                                                        center=True, scale=True,
+                                                        is_training=True,
+                                                        scope='bn2')
+            with tf.name_scope("Activation_2"):
+                self.activations2 = tf.nn.relu(self.bn2, name='activation2')
+
+        with tf.name_scope("Dense_Layer_third"):
+            with tf.name_scope("Weight_3"):
+                self.W3 = tf.get_variable('w3_xaiver', [num_layer_3, num_layer_4],
+                                          initializer=tf.contrib.layers.xavier_initializer())
+            with tf.name_scope("Biases_3"):
+                self.b3 = tf.Variable(tf.zeros([num_layer_4]), name="b_3")
+            with tf.name_scope("Output_3"):
+                self.y3 = tf.matmul(self.activations2, self.W3) + self.b3
+            with tf.name_scope("BN_3"):
+                self.bn3 = tf.contrib.layers.batch_norm(self.y3,
+                                                        center=True, scale=True,
+                                                        is_training=True,
+                                                        scope='bn3')
+            with tf.name_scope("Activation_3"):
+                self.activations3 = tf.nn.relu(self.bn3, name='activation3')
+
+        with tf.name_scope("Dense_Layer_fourth"):
+            with tf.name_scope("Weight_4"):
+                self.W4 = tf.get_variable('w4_xaiver', [num_layer_4, num_layer_5],
+                                          initializer=tf.contrib.layers.xavier_initializer())
+            with tf.name_scope("Biases_4"):
+                self.b4 = tf.Variable(tf.zeros([num_layer_5]), name="b_4")
+            with tf.name_scope("Output_4"):
+                self.read_out = tf.matmul(self.activations3, self.W4) + self.b4
+
+        # define the cost function
+        self.y = tf.placeholder("float", [None])
+
+        with tf.name_scope("cost"):
+            self.readout_action = tf.reduce_sum(self.read_out,
+                                                reduction_indices=1)  # Computes the sum of elements across dimensions of a tensor.
+            self.diff_v = tf.reduce_mean(tf.abs(self.y - self.readout_action))
+            self.cost = tf.reduce_mean(tf.square(self.y - self.readout_action))  # square means
+        tf.summary.histogram('cost', self.cost)
+
+        with tf.name_scope("train"):
+            self.train_step = tf.train.AdamOptimizer(1e-6).minimize(self.cost)
 
 
 def get_next_test_event():
@@ -722,6 +815,12 @@ def build_training_batch(state, reward):
     return batch_return
 
 
+def write_list_txt(data_list):
+    with open(LOG_DIR+'/avg_cost_record.txt', 'wb') as f:
+        for data in data_list:
+            f.write(data)
+
+
 def train_network(sess, model, print_parameters=False):
     """
     train the network
@@ -745,6 +844,8 @@ def train_network(sess, model, print_parameters=False):
         else:
             print("Could not find old network weights")
 
+    cost_all_record = []
+
     # iterate over the training data
     # for i in range(0, ITERATE_NUM):
     while True:
@@ -754,6 +855,8 @@ def train_network(sess, model, print_parameters=False):
             break
         else:
             converge_flag = True
+
+        cost_per_iter_record = []
         for dir_game in DIR_GAMES_ALL:
             game_number += 1
             game_files = os.listdir(DATA_STORE + "/" + dir_game)
@@ -817,15 +920,6 @@ def train_network(sess, model, print_parameters=False):
 
                     y_batch = []
 
-                    # # debug network with W1_print, y1_print, b1_print, W2_print, y2_print, b2_print
-                    # if print_parameters:
-                    #     sess.run(model.W1_print, feed_dict={model.x: s_t1_batch})
-                    #     sess.run(model.y1_print, feed_dict={model.x: s_t1_batch})
-                    #     sess.run(model.b1_print, feed_dict={model.x: s_t1_batch})
-                    #     sess.run(model.W2_print, feed_dict={model.x: s_t1_batch})
-                    #     sess.run(model.y2_print, feed_dict={model.x: s_t1_batch})
-                    #     sess.run(model.b2_print, feed_dict={model.x: s_t1_batch})
-
                     readout_t1_batch = model.read_out.eval(feed_dict={model.x: s_t1_batch})  # get value of s
 
                     for i in range(0, len(batch_home_return)):
@@ -836,9 +930,6 @@ def train_network(sess, model, print_parameters=False):
                             break
                         else:
                             y_batch.append(r_t_batch[i] + GAMMA * ((readout_t1_batch[i]).tolist())[0])
-
-                    # perform gradient step
-
 
                     if MODEL_TYPE == "V5":
                         [global_step, learning_rate, diff_v, cost_out, summary_train, _] = sess.run(
@@ -852,6 +943,7 @@ def train_network(sess, model, print_parameters=False):
                     if diff_v > 0.01:
                         converge_flag = False
                     global_counter += 1
+                    cost_per_iter_record.append(cost_out)
                     train_writer.add_summary(summary_train, global_step=global_counter)
                     # update the old values
                     s_t0 = s_tl
@@ -873,79 +965,12 @@ def train_network(sess, model, print_parameters=False):
                         break
             else:
                 raise ValueError("Haven't define for random yet")
-                #     batch_all = get_training_batch_all(s_t0, state, reward)
-                #     random.shuffle(batch_all)
-                #     batch_select_index = 0
-                #     terminal = 0
-                #     while True:
-                #         if batch_select_index + BATCH_SIZE < len(batch_all):
-                #             batch_select = batch_all[batch_select_index:batch_select_index + BATCH_SIZE]
-                #             batch_select_index = batch_select_index + BATCH_SIZE
-                #         else:
-                #             terminal = 1
-                #             batch_select = batch_all[batch_select_index:len(batch_all)]
-                #             batch_select_index = batch_select_index + BATCH_SIZE
-                #
-                #         # get the batch variables
-                #         s_t_batch = [d[0] for d in batch_select]
-                #         r_t_batch = [d[1] for d in batch_select]
-                #         s_t1_batch = [d[2] for d in batch_select]
-                #
-                #         y_batch = []
-                #
-                #         # # debug network with W1_print, y1_print, b1_print, W2_print, y2_print, b2_print
-                #         # if print_parameters:
-                #         #     sess.run(model.W1_print, feed_dict={model.x: s_t1_batch})
-                #         #     sess.run(model.y1_print, feed_dict={model.x: s_t1_batch})
-                #         #     sess.run(model.b1_print, feed_dict={model.x: s_t1_batch})
-                #         #     sess.run(model.W2_print, feed_dict={model.x: s_t1_batch})
-                #         #     sess.run(model.y2_print, feed_dict={model.x: s_t1_batch})
-                #         #     sess.run(model.b2_print, feed_dict={model.x: s_t1_batch})
-                #         try:
-                #             readout_t1_batch = model.read_out.eval(feed_dict={model.x: s_t1_batch})  # get value of s
-                #
-                #             for i in range(0, len(batch_select)):
-                #                 y_batch.append(r_t_batch[i] + GAMMA * ((readout_t1_batch[i]).tolist())[0])
-                #
-                #             [diff_v, cost_out, summary_train, _] = sess.run(
-                #                 [model.diff_v, model.cost, merge, model.train_step],
-                #                 feed_dict={model.y: y_batch, model.x: s_t_batch})
-                #         except:
-                #             traceback.print_exc()
-                #             raise ValueError("sess.run is wrong")
-                #         if diff_v > 0.01:
-                #             converge_flag = False
-                #         global_counter += 1
-                #         train_writer.add_summary(summary_train, global_step=global_counter)
-                #
-                #         # print info
-                #         if terminal or ((batch_select_index - 1) / BATCH_SIZE) % 5 == 1:
-                #             print ("TIMESTEP:", batch_select_index, "Game:", game_number)
-                #             print(str((min(readout_t1_batch)[0], max(readout_t1_batch)[0])))
-                #             print ("cost of the random network is" + str(cost_out))
-                #
-                #         if terminal:
-                #             # save progress after a game
-                #             saver.save(sess, SAVED_NETWORK + '/' + SPORT + '-game-', global_step=game_number)
-                #             break
 
+        cost_per_iter_average = sum(cost_per_iter_record) / float(len(cost_per_iter_record))
+        cost_all_record.append("Iter:"+str(game_number/number_of_total_game) + " avg_cost:" + str(cost_per_iter_average))
+
+    # write_list_txt(cost_per_iter_record)
     train_writer.close()
-
-
-# def compute_state_q(x, readout):
-#     """
-#     print testing data
-#     :param x: network input placeholder
-#     :param readout:
-#     :return:
-#     """
-#     t = 0
-#     terminal = 0
-#     if terminal != 1:
-#         s_t, r_t, a_t, terminal = get_next_test_event()
-#         readout_t = readout.eval(feed_dict={x: s_t})
-#         q_t = readout_t[a_t]
-#         print ("time", t, "\tstate:", s_t, "\t q_value:", q_t)
 
 
 def train_start():
@@ -965,6 +990,10 @@ def train_start():
         nn = td_prediction_simple_V4()
     elif MODEL_TYPE == "V5":
         nn = td_prediction_simple_V5()
+    elif MODEL_TYPE == "V6":
+        nn = td_prediction_simple_V6()
+    elif MODEL_TYPE == "V7":
+        nn = td_prediction_simple_V7()
     else:
         raise ValueError("Unclear model type")
     train_network(sess, nn)

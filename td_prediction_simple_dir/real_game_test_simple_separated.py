@@ -1,4 +1,6 @@
 import os
+
+import math
 import scipy.io as sio
 import tensorflow as tf
 import td_prediction_simple_separated
@@ -6,14 +8,18 @@ import matplotlib.pyplot as plt
 from scipy.stats import pearsonr
 
 FEATURE_TYPE = 5
-SIMPLE_HOME_SAVED_NETWORK_PATH = "/home/gla68/PycharmProjects/Sport-Analytic-NN/td_prediction_simple_dir/saved_NN/saved_Home_networks_feature" + str(
-    FEATURE_TYPE) + "_batch16_iterate2Converge-NEG_REWARD_GAMMA1_V3-Sequenced"
-SIMPLE_AWAY_SAVED_NETWORK_PATH = "/home/gla68/PycharmProjects/Sport-Analytic-NN/td_prediction_simple_dir/saved_NN/saved_Away_networks_feature" + str(
-    FEATURE_TYPE) + "_batch16_iterate2Converge-NEG_REWARD_GAMMA1_V3-Sequenced"
+MODEL_TYPE = "V3"
+ITERATE_NUM = 50
+
+
+SIMPLE_HOME_SAVED_NETWORK_PATH = "/cs/oschulte/Galen/models/saved_NN/saved_entire_Home_networks_feature" + str(
+    FEATURE_TYPE) + "_batch16_iterate"+str(ITERATE_NUM)+"-NEG_REWARD_GAMMA1_"+MODEL_TYPE+"-Sequenced"
+SIMPLE_AWAY_SAVED_NETWORK_PATH = "/cs/oschulte/Galen/models/saved_NN/saved_entire_Away_networks_feature" + str(
+    FEATURE_TYPE) + "_batch16_iterate"+str(ITERATE_NUM)+"-NEG_REWARD_GAMMA1_"+MODEL_TYPE+"-Sequenced"
 
 
 def iterate_over_games(model_iter, sess_iter):
-    test_dir = "/media/gla68/Windows/Hockey-data/Hockey-Training-All-feature" + str(
+    test_dir = "/cs/oschulte/Galen/Hockey-data-entire/Hockey-Training-All-feature" + str(
         FEATURE_TYPE) + "-scale-neg_reward"
     dir_test_all = os.listdir(test_dir)
     for dir_game in dir_test_all:
@@ -32,15 +38,17 @@ def iterate_over_games(model_iter, sess_iter):
         nn_real_game(SIMPLE_HOME_SAVED_NETWORK_PATH, sess_iter)
         readout_t_batch_home = model_iter.read_out.eval(feed_dict={model_iter.x: state})
         readout_record_home = (readout_t_batch_home[:, 0]).tolist()
+        print readout_record_home
         # readout_record_home = [value[0] for value in readout_record_home]
 
         nn_real_game(SIMPLE_AWAY_SAVED_NETWORK_PATH, sess_iter)
         readout_t_batch_away = model_iter.read_out.eval(feed_dict={model_iter.x: state})
         readout_record_away = (readout_t_batch_away[:, 0]).tolist()
+        print readout_record_away
         # readout_record_away = [value[0] for value in readout_record_away]
-        readout_record_away_abs = map(abs, readout_record_away)
+        # readout_record_away_abs = map(abs, readout_record_away)
 
-        stimulate_value_rate = [((float(c)-float(d))/(float(c)+float(d))) for c, d in zip(readout_record_home, readout_record_away_abs)]
+        stimulate_value_rate = [((float(c) + float(d))/(abs(float(c)) + abs(float(d)))) for c, d in zip(readout_record_home, readout_record_away)]
         draw_game_predict(stimulate_value_rate=stimulate_value_rate, reward=reward)
 
 
@@ -111,7 +119,23 @@ def nn_real_game(SIMPLE_SAVED_NETWORK_PATH, sess):
 
 if __name__ == '__main__':
     sess_nn = tf.InteractiveSession()
-    model_nn = td_prediction_simple_separated.td_prediction_simple_V3()
+    if MODEL_TYPE == "V1":
+        model_nn = td_prediction_simple_separated.td_prediction_simple()
+    elif MODEL_TYPE == "V2":
+        model_nn = td_prediction_simple_separated.td_prediction_simple_V2()
+    elif MODEL_TYPE == "V3":
+        model_nn = td_prediction_simple_separated.td_prediction_simple_V3()
+    elif MODEL_TYPE == "V4":
+        model_nn = td_prediction_simple_separated.td_prediction_simple_V4()
+    elif MODEL_TYPE == "V5":
+        model_nn = td_prediction_simple_separated.td_prediction_simple_V5()
+    elif MODEL_TYPE == "V6":
+        model_nn = td_prediction_simple_separated.td_prediction_simple_V6()
+    elif MODEL_TYPE == "V7":
+        model_nn = td_prediction_simple_separated.td_prediction_simple_V7()
+    else:
+        raise ValueError("Unclear model type")
+    # model_nn = td_prediction_simple_separated.td_prediction_simple_V3()
     iterate_over_games(model_nn, sess_nn)
 
     # # stimulate_value_home = nn_real_game(SIMPLE_HOME_SAVED_NETWORK_PATH, sess=sess_nn, model=model_nn_home)

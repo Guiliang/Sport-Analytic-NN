@@ -11,17 +11,12 @@ calibration_store_dir = "/cs/oschulte/Galen/Hockey-data-entire/td_calibrate_all_
     FEATURE_TYPE) + "_" + MODEL_TYPE + "_Iter" + str(ITERATE_NUM)
 # calibration_store_dir = "/cs/oschulte/Galen/Hockey-data/td_calibrate_all_feature_5_2017-6-01"
 store_name = ""
-ISHOME = True
-if ISHOME:
-    save_csv_name = "td_home_calibration_entire_feature_" + str(
-        FEATURE_TYPE) + "_" + MODEL_TYPE + "_Iter" + str(ITERATE_NUM) + "_sum_2017-6-12.csv"
-    save_game_csv_name = "td_home_game_record_entire_feature_" + str(
-        FEATURE_TYPE) + "_" + MODEL_TYPE + "_Iter" + str(ITERATE_NUM) + "_sum_2017-6-12.csv"
-else:
-    save_csv_name = "td_away_calibration_entire_feature_" + str(FEATURE_TYPE) + "_" + MODEL_TYPE + "_Iter" + str(
-        ITERATE_NUM) + "_sum_2017-6-12.csv"
-    save_game_csv_name = "td_away_game_record_entire_feature_{0}_{1}_Iter{2}_sum_2017-6-12.csv".format(str(
-        FEATURE_TYPE), MODEL_TYPE, str(ITERATE_NUM))
+# ISHOME = True
+
+save_csv_name = "td_calibration_entire_feature_" + str(
+    FEATURE_TYPE) + "_" + MODEL_TYPE + "_Iter" + str(ITERATE_NUM) + "_sum_2017-6-12.csv"
+save_game_csv_name = "td_game_record_entire_feature_" + str(
+    FEATURE_TYPE) + "_" + MODEL_TYPE + "_Iter" + str(ITERATE_NUM) + "_sum_2017-6-12.csv"
 
 
 def agg2calibrate_model(check_target):
@@ -51,8 +46,7 @@ def agg2calibrate_model(check_target):
 
         calibrate_values = ((sio.loadmat(calibrate_value_name))["training_data_dict_all_value"]).tolist()
         calibrate_names = ((sio.loadmat(calibrate_name_name))["training_data_dict_all_name"]).tolist()
-        model_predict_home = ((sio.loadmat(model_predict_home_name))["model_predict_home"]).tolist()
-        model_predict_away = ((sio.loadmat(model_predict_away_name))["model_predict_away"]).tolist()
+        model_predict = ((sio.loadmat(model_predict_home_name))["model_predict"]).tolist()
         home_identifier = (((sio.loadmat(home_identifier_name))["home_identifier"])[0]).tolist()
         summation_goal_home = (((sio.loadmat(summation_goal_home_name))["summation_goal_home"]).tolist())[0]
         summation_goal_away = (((sio.loadmat(summation_goal_away_name))["summation_goal_away"]).tolist())[0]
@@ -60,8 +54,7 @@ def agg2calibrate_model(check_target):
         calibration_value_game_record = []
         model_predict_value_game_record = []
 
-        if not len(calibrate_names) == len(model_predict_home) and len(model_predict_home) == len(
-                model_predict_away) and len(model_predict_away) == len(summation_goal_home) and len(
+        if not len(calibrate_names) == len(model_predict) and len(model_predict) == len(summation_goal_home) and len(
             summation_goal_home) != len(summation_goal_away):
             raise ValueError("lens of data don't consist")
 
@@ -86,15 +79,13 @@ def agg2calibrate_model(check_target):
                     manpower_diff) and float(check_target.get("P")) == float(period):
                 game_found_flag = True
                 # if ISHOME and home_identifier[calibrate_name_index]:  # TODO delete home_identifier[calibrate_name_index]
-                if ISHOME:
-                    # print "Found home"
-                    model_predict_value_game_record.append((model_predict_home[calibrate_name_index])[0])
-                    calibration_value_game_record.append(float(summation_goal_home[calibrate_name_index]))
-                # elif not ISHOME and not home_identifier[calibrate_name_index]:  # TODO delete home_identifier[calibrate_name_index]
-                elif not ISHOME:
-                    # print "Found away"
-                    model_predict_value_game_record.append((model_predict_away[calibrate_name_index])[0])
-                    calibration_value_game_record.append(float(summation_goal_away[calibrate_name_index]))
+                # if ISHOME:
+                # print "Found home"
+                model_predict_value_game_record.append((model_predict[calibrate_name_index])[0])
+                calibration_value_game_record.append(float(summation_goal_home[calibrate_name_index]) - float(summation_goal_away[calibrate_name_index]))
+
+                # model_predict_value_game_record.append((model_predict_away[calibrate_name_index])[0])
+                # calibration_value_game_record.append(float(summation_goal_away[calibrate_name_index]))
 
         if game_found_flag:
             found_game_name_record.append(calibration_dir_game)

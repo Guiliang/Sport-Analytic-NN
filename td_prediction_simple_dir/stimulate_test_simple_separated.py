@@ -3,26 +3,45 @@ import numpy as np
 import scipy.io as sio
 import tensorflow as tf
 
-from td_prediction_simple_dir import td_prediction_simple
+import td_prediction_simple_separated
 
 FEATURE_TYPE = 5
-ISHOME = True
 ACTION_TYPE = "shot"
 STIMULATE_TYPE = "position"
+MODEL_TYPE = "V5"
+ITERATE_NUM = 50
 
-SIMPLE_HOME_SAVED_NETWORK_PATH = "/home/gla68/PycharmProjects/Sport-Analytic-NN/td_prediction_simple_dir/saved_NN/saved_Home_networks_feature" + str(
-    FEATURE_TYPE) + "_batch16_iterate2Converge-NEG_REWARD_GAMMA1_V3-Sequenced"
-SIMPLE_AWAY_SAVED_NETWORK_PATH = "/home/gla68/PycharmProjects/Sport-Analytic-NN/td_prediction_simple_dir/saved_NN/saved_Away_networks_feature" + str(
-    FEATURE_TYPE) + "_batch16_iterate2Converge-NEG_REWARD_GAMMA1_V3-Sequenced"
 
-SIMULATION_HOME_DATA_PATH = "/media/gla68/Windows/Hockey-data/Simulation-data-feature" + str(
-    FEATURE_TYPE) + "/" + STIMULATE_TYPE + "_simulation/" + STIMULATE_TYPE + "_simulation-" + ACTION_TYPE + "-feature" + str(
+if MODEL_TYPE == "V1":
+    nn = td_prediction_simple_separated.td_prediction_simple()
+elif MODEL_TYPE == "V2":
+    nn = td_prediction_simple_separated.td_prediction_simple_V2()
+elif MODEL_TYPE == "V3":
+    nn = td_prediction_simple_separated.td_prediction_simple_V3()
+elif MODEL_TYPE == "V4":
+    nn = td_prediction_simple_separated.td_prediction_simple_V4()
+elif MODEL_TYPE == "V5":
+    nn = td_prediction_simple_separated.td_prediction_simple_V5()
+elif MODEL_TYPE == "V6":
+    nn = td_prediction_simple_separated.td_prediction_simple_V6()
+elif MODEL_TYPE == "V7":
+    nn = td_prediction_simple_separated.td_prediction_simple_V7()
+else:
+    raise ValueError("Unclear model type")
+
+SIMPLE_HOME_SAVED_NETWORK_PATH = "/cs/oschulte/Galen/models/saved_NN/saved_entire_Home_networks_feature" + str(
+    FEATURE_TYPE) + "_batch16_iterate"+str(ITERATE_NUM)+"-NEG_REWARD_GAMMA1_"+MODEL_TYPE+"-Sequenced"
+SIMPLE_AWAY_SAVED_NETWORK_PATH = "/cs/oschulte/Galen/models/saved_NN/saved_entire_Away_networks_feature" + str(
+    FEATURE_TYPE) + "_batch16_iterate"+str(ITERATE_NUM)+"-NEG_REWARD_GAMMA1_"+MODEL_TYPE+"-Sequenced"
+
+SIMULATION_HOME_DATA_PATH = "/cs/oschulte/Galen/Hockey-data-entire/Simulation-data-feature" + str(
+    FEATURE_TYPE) + "/" + STIMULATE_TYPE + "_simulation/Home_" + STIMULATE_TYPE + "_simulation-" + ACTION_TYPE + "-feature" + str(
     FEATURE_TYPE) + "-[][].mat"
-SIMULATION_AWAY_DATA_PATH = "/media/gla68/Windows/Hockey-data/Simulation-data-feature" + str(
+SIMULATION_AWAY_DATA_PATH = "/cs/oschulte/Galen/Hockey-data-entire/Simulation-data-feature" + str(
     FEATURE_TYPE) + "/" + STIMULATE_TYPE + "_simulation/Away_" + STIMULATE_TYPE + "_simulation-" + ACTION_TYPE + "-feature" + str(
     FEATURE_TYPE) + "-[][].mat"
 
-RNN_SAVED_NETWORK_PATH = "./saved_NN/"
+# RNN_SAVED_NETWORK_PATH = "./saved_NN/"
 
 
 # SIMPLE_SAVED_NETWORK_PATH = "./saved_networks_feature2_FORWARD"
@@ -98,7 +117,7 @@ def draw_value_over_position(y):
 
 if __name__ == '__main__':
     sess_nn = tf.InteractiveSession()
-    model_nn = td_prediction_simple.td_prediction_simple_V3()
+    model_nn = nn
     stimulate_value_home = nn_simulation(SIMULATION_HOME_DATA_PATH, SIMPLE_HOME_SAVED_NETWORK_PATH)
     stimulate_value_away = nn_simulation(SIMULATION_AWAY_DATA_PATH, SIMPLE_AWAY_SAVED_NETWORK_PATH)
     stimulate_value_home = [value[0] for value in stimulate_value_home]

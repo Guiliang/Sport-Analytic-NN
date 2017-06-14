@@ -138,7 +138,7 @@ class Model(object):
             for grad, var in zip(grads, tvars):
                 with tf.variable_scope('trace'):
                     # e-> = lambda * e-> + <grad of output w.r.t weights>
-                    trace = tf.Variable(tf.zeros(grad.get_shape()), trainable=False, name='trace')
+                    trace = tf.Variable(tf.zeros(grad.get_shape()), trainable=False, name='trace')  # remember trace is variable, once initialize, keep updating
                     trace_op = trace.assign((lamda * trace) + grad)
                     # tf.summary.scalar(var.name + '/traces', trace)
 

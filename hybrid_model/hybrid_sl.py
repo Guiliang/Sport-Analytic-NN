@@ -18,10 +18,10 @@ FEATURE_TYPE = 7
 SPORT = "NHL"
 ITERATE_NUM = "2Converge"
 REWARD_TYPE = "NEG_REWARD_GAMMA1_V3"
-DATA_STORE = "/media/gla68/Windows/Hockey-data/Hybrid-RNN-Hockey-Training-All-feature7-scale-neg_reward-length-dynamic"
-LOG_DIR = "./hybrid_sl_log_NN/log_train_feature" + str(FEATURE_TYPE) + "_batch" + str(BATCH_SIZE) + "_iterate" + str(
+DATA_STORE = "/cs/oschulte/Galen/Hockey-data/Hybrid-RNN-Hockey-Training-All-feature7-scale-neg_reward-length-dynamic"
+LOG_DIR = "/cs/oschulte/Galen/models/hybrid_sl_log_NN/log_train_feature" + str(FEATURE_TYPE) + "_batch" + str(BATCH_SIZE) + "_iterate" + str(
     ITERATE_NUM)
-SAVED_NETWORK = "./hybrid_sl_saved_NN/saved_networks_feature" + str(FEATURE_TYPE) + "_batch" + str(
+SAVED_NETWORK = "/cs/oschulte/Galen/models/hybrid_sl_saved_NN/saved_networks_feature" + str(FEATURE_TYPE) + "_batch" + str(
     BATCH_SIZE) + "_iterate" + str(
     ITERATE_NUM)
 DIR_GAMES_ALL = os.listdir(DATA_STORE)
@@ -210,6 +210,7 @@ def train_network(sess, model, print_parameters=False):
                 if terminal:
                     # save progress after a game
                     saver.save(sess, SAVED_NETWORK + '/' + SPORT + '-game-', global_step=game_number)
+
                     break
 
                 t_batch_pre = t_batch
