@@ -20,10 +20,10 @@ SPORT = "NHL"
 REWARD_TYPE = "NEG_REWARD_GAMMA1_V3"
 DATA_STORE = "/cs/oschulte/Galen/Hockey-data-entire/Hybrid-RNN-Hockey-Training-All-feature" + str(
     FEATURE_TYPE) + "-scale-neg_reward_length-dynamic"
-LOG_DIR = "/cs/oschulte/Galen/models/hybrid_sl_log_NN/log_train_feature" + str(FEATURE_TYPE) + "_batch" + str(
+LOG_DIR = "/cs/oschulte/Galen/models/hybrid_sl_log_NN/cut_log_train_feature" + str(FEATURE_TYPE) + "_batch" + str(
     BATCH_SIZE) + "_iterate" + str(
     ITERATE_NUM)
-SAVED_NETWORK = "/cs/oschulte/Galen/models/hybrid_sl_saved_NN/saved_networks_feature" + str(
+SAVED_NETWORK = "/cs/oschulte/Galen/models/hybrid_sl_saved_NN/cut_saved_networks_feature" + str(
     FEATURE_TYPE) + "_batch" + str(
     BATCH_SIZE) + "_iterate" + str(
     ITERATE_NUM)
@@ -128,25 +128,29 @@ def get_training_batch(s_t0, state_input, reward, train_number, train_len, state
         if s_length_t0 > 10:  # if trace length is too long
             s_length_t0 = 10
         try:
-            s_reward_t0 = reward[train_number -1]
             s_reward_t1 = reward[train_number]
+            s_reward_t0 = reward[train_number - 1]
         except IndexError:
             raise IndexError("s_reward wrong with index")
         train_number += 1
         if train_number + 1 == train_len:
-            trace_length_index_t0 = s_length_t0 - 1
             trace_length_index_t1 = s_length_t1 - 1
+            trace_length_index_t0 = s_length_t0 - 1
             r_t0 = np.asarray([s_reward_t0[trace_length_index_t0]])
             r_t1 = np.asarray([s_reward_t1[trace_length_index_t1]])
-            batch_return.append((s_t0, s_t1, r_t0, s_length_t0, s_length_t1, 0))
-            batch_return.append((s_t1, s_t1, r_t1, s_length_t1, s_length_t1, 1))
+            batch_return.append((s_t0, s_t1, r_t0, s_length_t0, s_length_t1, 0, 0))
+            batch_return.append((s_t1, s_t1, r_t1, s_length_t1, s_length_t1, 1, 0))
             s_t0 = s_t1
             break
-        trace_length_index_t0 = s_length_t0 - 1
+        trace_length_index_t0 = s_length_t0 - 1  # we want the reward of s_t0, so -2
         r_t0 = np.asarray([s_reward_t0[trace_length_index_t0]])
         if r_t0 != [float(0)]:
-            print str(r_t0)
-        batch_return.append((s_t0, s_t1, r_t0, s_length_t0, s_length_t1, 0))
+            print r_t0
+            batch_return.append((s_t0, s_t1, r_t0, s_length_t0, s_length_t1, 0, 1))
+            # train_number += 1
+            s_t0 = s_t1
+            break
+        batch_return.append((s_t0, s_t1, r_t0, s_length_t0, s_length_t1, 0, 0))
         current_batch_length += 1
         s_t0 = s_t1
 
@@ -193,6 +197,8 @@ def train_network(sess, model, print_parameters=False):
             reward_count = sum(reward)
             state_input = sio.loadmat(DATA_STORE + "/" + dir_game + "/" + state_input_name)
             state_input = (state_input['hybrid_input_state'])
+            # state_output = sio.loadmat(DATA_STORE + "/" + dir_game + "/" + state_output_name)
+            # state_output = state_output['hybrid_output_state']
             state_trace_length = sio.loadmat(DATA_STORE + "/" + dir_game + "/" + state_trace_length_name)
             state_trace_length = (state_trace_length['hybrid_trace_length'])[0]
             state_trace_length = handle_trace_length(state_trace_length)
@@ -229,10 +235,9 @@ def train_network(sess, model, print_parameters=False):
 
                 for i in range(0, len(batch)):
                     terminal = batch[i][5]
-                    # if r_t_batch[i][-1] != float(0):
-                    #     print r_t_batch[i][-1]
+                    cut = batch[i][6]
                     # if terminal, only equals reward
-                    if terminal:
+                    if terminal or cut:
                         y_batch.append([float(r_t_batch[i][-1])])
                         break
                     else:

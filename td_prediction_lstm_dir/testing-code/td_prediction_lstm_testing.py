@@ -10,23 +10,25 @@ FEATURE_NUMBER = 25
 BATCH_SIZE = 16
 GAMMA = 1
 H_SIZE = 512
-# DROPOUT_KEEP_PROB = 0.8
-RNN_LAYER = 2
+
 USE_HIDDEN_STATE = False
 FEATURE_TYPE = 5
-ITERATE_NUM = 25
+ITERATE_NUM = 150
+TEST_LENGTH = 100
 
+MODEL_TYPE = "V2"
+model_train_continue = True
 SPORT = "NHL"
 REWARD_TYPE = "NEG_REWARD_GAMMA1_V3"
-DATA_STORE = "/cs/oschulte/Galen/Hockey-data-entire/Hybrid-RNN-Hockey-Training-All-feature" + str(
+DATA_STORE = "/cs/oschulte/Galen/Hockey-data-entire/Test" + str(TEST_LENGTH) + "-Hybrid-RNN-Hockey-Training-All-feature" + str(
     FEATURE_TYPE) + "-scale-neg_reward_length-dynamic"
-LOG_DIR = "/cs/oschulte/Galen/models/hybrid_sl_log_NN/log_train_feature" + str(FEATURE_TYPE) + "_batch" + str(
+LOG_DIR = "/cs/oschulte/Galen/models/hybrid_sl_log_NN/Test" + str(TEST_LENGTH) + "-log_train_feature" + str(FEATURE_TYPE) + "_batch" + str(
     BATCH_SIZE) + "_iterate" + str(
-    ITERATE_NUM)
-SAVED_NETWORK = "/cs/oschulte/Galen/models/hybrid_sl_saved_NN/saved_networks_feature" + str(
+    ITERATE_NUM) + MODEL_TYPE
+SAVED_NETWORK = "/cs/oschulte/Galen/models/hybrid_sl_saved_NN/Test" + str(TEST_LENGTH) + "-saved_networks_feature" + str(
     FEATURE_TYPE) + "_batch" + str(
     BATCH_SIZE) + "_iterate" + str(
-    ITERATE_NUM)
+    ITERATE_NUM) + MODEL_TYPE
 DIR_GAMES_ALL = os.listdir(DATA_STORE)
 number_of_total_game = len(DIR_GAMES_ALL)
 
@@ -47,7 +49,7 @@ class td_prediction_lstm:
             # single_cell = tf.contrib.rnn.DropoutWrapper(lstm_cell, input_keep_prob=DROPOUT_KEEP_PROB,
             #                                             output_keep_prob=DROPOUT_KEEP_PROB)
 
-            self.cell = tf.contrib.rnn.MultiRNNCell([lstm_cell] * RNN_LAYER, state_is_tuple=True)
+            self.cell = tf.contrib.rnn.MultiRNNCell([lstm_cell] * 2, state_is_tuple=True)
 
             self.rnn_output, self.rnn_state = tf.nn.dynamic_rnn(  # while loop dynamic learning rnn
                 inputs=self.rnn_input, cell=self.cell, sequence_length=self.trace_lengths, dtype=tf.float32,
@@ -86,6 +88,64 @@ class td_prediction_lstm:
             self.read_out = tf.matmul(self.activation1, self.W2) + self.b2
 
         self.y = tf.placeholder("float", [None, num_layer_3])
+
+        with tf.name_scope("cost"):
+            self.readout_action = self.read_out
+            self.cost = tf.reduce_mean(tf.square(self.y - self.readout_action))
+        tf.summary.histogram('cost', self.cost)
+
+        with tf.name_scope("train"):
+            self.train_step = tf.train.AdamOptimizer(1e-6).minimize(self.cost)
+
+
+class td_prediction_lstm_V2:
+    def __init__(self, rnn_type='bp_last_step'):
+        """
+        define the neural network
+        :return: network output
+        """
+        with tf.name_scope("LSTM_layer"):
+            self.rnn_input = tf.placeholder(tf.float32, [None, MAX_TRACE_LENGTH, FEATURE_NUMBER], name="x_1")
+            self.trace_lengths = tf.placeholder(tf.int32, [None], name="tl")
+
+            lstm_cell = tf.contrib.rnn.LSTMCell(num_units=H_SIZE, state_is_tuple=True,
+                                                initializer=tf.random_uniform_initializer(-1.0, 1.0))
+
+            # single_cell = tf.contrib.rnn.DropoutWrapper(lstm_cell, input_keep_prob=DROPOUT_KEEP_PROB,
+            #                                             output_keep_prob=DROPOUT_KEEP_PROB)
+
+            self.cell = tf.contrib.rnn.MultiRNNCell([lstm_cell] * 1, state_is_tuple=True)
+
+            self.rnn_output, self.rnn_state = tf.nn.dynamic_rnn(  # while loop dynamic learning rnn
+                inputs=self.rnn_input, cell=self.cell, sequence_length=self.trace_lengths, dtype=tf.float32,
+                scope=rnn_type + '_rnn')
+
+            # state_in = single_cell.zero_state(BATCH_SIZE, tf.float32)
+            # rnn_output, rnn_state = tf.contrib.rnn.static_rnn(inputs=rnn_input, cell=cell, dtype=tf.float32, scope=rnn_type + '_rnn')
+
+            # tf.contrib.rnn.BasicLSTMCell()  # LSTM with rectifier, don't need dropout wrapper?
+
+            # [batch_size, max_time, cell.output_size]
+            self.outputs = tf.stack(self.rnn_output)
+
+            # Hack to build the indexing and retrieve the right output.
+            self.batch_size = tf.shape(self.outputs)[0]
+            # Start indices for each sample
+            self.index = tf.range(0, self.batch_size) * MAX_TRACE_LENGTH + (self.trace_lengths - 1)
+            # Indexing
+            self.rnn_last = tf.gather(tf.reshape(self.outputs, [-1, H_SIZE]), self.index)
+
+        num_layer_1 = H_SIZE
+        num_layer_2 = 1
+
+        with tf.name_scope("Dense_Layer_first"):
+            self.W1 = tf.get_variable('w1_xaiver', [num_layer_1, num_layer_2],
+                                      initializer=tf.contrib.layers.xavier_initializer())
+            self.b1 = tf.Variable(tf.zeros([num_layer_2]), name="b_1")
+            self.read_out = tf.matmul(self.rnn_last, self.W1) + self.b1
+            # self.activation1 = tf.nn.relu(self.y1, name='activation')
+
+        self.y = tf.placeholder("float", [None, num_layer_2])
 
         with tf.name_scope("cost"):
             self.readout_action = self.read_out
@@ -163,6 +223,17 @@ def train_network(sess, model, print_parameters=False):
     merge = tf.summary.merge_all()
     train_writer = tf.summary.FileWriter(LOG_DIR, sess.graph)
     sess.run(tf.global_variables_initializer())
+    if model_train_continue:
+        checkpoint = tf.train.get_checkpoint_state(SAVED_NETWORK)
+        check_point_game_number = int((checkpoint.model_checkpoint_path.split("-"))[-1])
+        game_number_checkpoint = check_point_game_number % number_of_total_game
+        game_number = check_point_game_number
+        game_starting_point = 0
+        if checkpoint and checkpoint.model_checkpoint_path:
+            saver.restore(sess, checkpoint.model_checkpoint_path)
+            print("Successfully loaded:", checkpoint.model_checkpoint_path)
+        else:
+            print("Could not find old network weights")
 
     while True:
         if converge_flag:
@@ -172,15 +243,19 @@ def train_network(sess, model, print_parameters=False):
         else:
             converge_flag = True
         for dir_game in DIR_GAMES_ALL:
+
+            if model_train_continue:  # go the check point data
+                game_starting_point += 1
+                if game_number_checkpoint + 1 > game_starting_point:
+                    continue
+
             game_number += 1
             game_files = os.listdir(DATA_STORE + "/" + dir_game)
             for filename in game_files:
                 if "reward" in filename:
                     reward_name = filename
-                elif "input" in filename:
+                elif "hybrid_input_state" in filename:
                     state_input_name = filename
-                elif "output" in filename:
-                    state_output_name = filename
                 elif "trace" in filename:
                     state_trace_length_name = filename
 
@@ -271,7 +346,13 @@ def train_start():
         os.mkdir(SAVED_NETWORK)
 
     sess = tf.InteractiveSession()
-    nn = td_prediction_lstm()
+    if MODEL_TYPE == "V1":
+        nn = td_prediction_lstm()
+    elif MODEL_TYPE == "V2":
+        nn = td_prediction_lstm_V2()
+    else:
+        raise ValueError("model type error")
+
     train_network(sess, nn)
 
 
