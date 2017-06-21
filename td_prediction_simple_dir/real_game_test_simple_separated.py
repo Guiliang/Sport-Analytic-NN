@@ -9,7 +9,7 @@ from scipy.stats import pearsonr
 
 FEATURE_TYPE = 5
 MODEL_TYPE = "V3"
-ITERATE_NUM = 50
+ITERATE_NUM = 25
 
 
 SIMPLE_HOME_SAVED_NETWORK_PATH = "/cs/oschulte/Galen/models/saved_NN/saved_entire_Home_networks_feature" + str(
@@ -48,7 +48,7 @@ def iterate_over_games(model_iter, sess_iter):
         # readout_record_away = [value[0] for value in readout_record_away]
         # readout_record_away_abs = map(abs, readout_record_away)
 
-        stimulate_value_rate = [((float(c) + float(d))/(abs(float(c)) + abs(float(d)))) for c, d in zip(readout_record_home, readout_record_away)]
+        stimulate_value_rate = [(float(c)/(float(c) - float(d))) for c, d in zip(readout_record_home, readout_record_away)]
         draw_game_predict(stimulate_value_rate=stimulate_value_rate, reward=reward)
 
 

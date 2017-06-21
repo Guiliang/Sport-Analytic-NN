@@ -5,8 +5,8 @@ import unicodedata
 import ast
 
 FEATURE_TYPE = 5
-MODEL_TYPE = "V6"
-ITERATE_NUM = 50
+MODEL_TYPE = "V3"
+ITERATE_NUM = 75
 calibration_store_dir = "/cs/oschulte/Galen/Hockey-data-entire/td_calibrate_all_feature_" + str(
     FEATURE_TYPE) + "_" + MODEL_TYPE + "_Iter" + str(ITERATE_NUM)
 # calibration_store_dir = "/cs/oschulte/Galen/Hockey-data/td_calibrate_all_feature_5_2017-6-01"
@@ -31,10 +31,8 @@ def agg2calibrate_model(check_target):
                 calibrate_value_name = calibration_store_dir + "/" + calibration_dir_game + "/" + file_name
             elif "training_data_dict_all_name" in file_name:
                 calibrate_name_name = calibration_store_dir + "/" + calibration_dir_game + "/" + file_name
-            elif "model_predict_home" in file_name:
-                model_predict_home_name = calibration_store_dir + "/" + calibration_dir_game + "/" + file_name
-            elif "model_predict_away" in file_name:
-                model_predict_away_name = calibration_store_dir + "/" + calibration_dir_game + "/" + file_name
+            elif "model_predict" in file_name:
+                model_predict_name = calibration_store_dir + "/" + calibration_dir_game + "/" + file_name
             elif "home_identifier" in file_name:
                 home_identifier_name = calibration_store_dir + "/" + calibration_dir_game + "/" + file_name
             elif "summation_goal_home" in file_name:
@@ -44,10 +42,10 @@ def agg2calibrate_model(check_target):
             else:
                 continue
 
-        calibrate_values = ((sio.loadmat(calibrate_value_name))["training_data_dict_all_value"]).tolist()
+        # calibrate_values = ((sio.loadmat(calibrate_value_name))["training_data_dict_all_value"]).tolist()
         calibrate_names = ((sio.loadmat(calibrate_name_name))["training_data_dict_all_name"]).tolist()
-        model_predict = ((sio.loadmat(model_predict_home_name))["model_predict"]).tolist()
-        home_identifier = (((sio.loadmat(home_identifier_name))["home_identifier"])[0]).tolist()
+        model_predict = ((sio.loadmat(model_predict_name))["model_predict"]).tolist()
+        # home_identifier = (((sio.loadmat(home_identifier_name))["home_identifier"])[0]).tolist()
         summation_goal_home = (((sio.loadmat(summation_goal_home_name))["summation_goal_home"]).tolist())[0]
         summation_goal_away = (((sio.loadmat(summation_goal_away_name))["summation_goal_away"]).tolist())[0]
 
@@ -82,7 +80,7 @@ def agg2calibrate_model(check_target):
                 # if ISHOME:
                 # print "Found home"
                 model_predict_value_game_record.append((model_predict[calibrate_name_index])[0])
-                calibration_value_game_record.append(float(summation_goal_home[calibrate_name_index]) - float(summation_goal_away[calibrate_name_index]))
+                calibration_value_game_record.append(float(summation_goal_home[calibrate_name_index]) + float(summation_goal_away[calibrate_name_index]))
 
                 # model_predict_value_game_record.append((model_predict_away[calibrate_name_index])[0])
                 # calibration_value_game_record.append(float(summation_goal_away[calibrate_name_index]))

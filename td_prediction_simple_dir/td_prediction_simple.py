@@ -721,9 +721,11 @@ def get_training_batch(s_t0, state, reward, train_number, train_len):
     while current_batch_length < BATCH_SIZE:
         s_t1 = state[train_number]
         r_t0 = reward[train_number - 1]
+        r_t1 = reward[train_number]
         train_number += 1
         if train_number + 1 == train_len:
-            batch_return.append((s_t0, r_t0, s_t1, 1))
+            batch_return.append((s_t0, r_t0, s_t1, 0))
+            batch_return.append((s_t1, r_t1, s_t1, 1))
             break
         batch_return.append((s_t0, r_t0, s_t1, 0))
         current_batch_length += 1

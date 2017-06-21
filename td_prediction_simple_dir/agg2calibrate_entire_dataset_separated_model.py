@@ -5,23 +5,26 @@ import unicodedata
 import ast
 
 FEATURE_TYPE = 5
-MODEL_TYPE = "V6"
-ITERATE_NUM = 50
+MODEL_TYPE = "V3"
+ITERATE_NUM = 25
+BATCH_SIZE = 32
 calibration_store_dir = "/cs/oschulte/Galen/Hockey-data-entire/td_calibrate_all_feature_" + str(
-    FEATURE_TYPE) + "_" + MODEL_TYPE + "_Iter" + str(ITERATE_NUM)
+    FEATURE_TYPE) + "_" + MODEL_TYPE + "_Iter" + str(ITERATE_NUM) + "_batch" + str(BATCH_SIZE)
 # calibration_store_dir = "/cs/oschulte/Galen/Hockey-data/td_calibrate_all_feature_5_2017-6-01"
 store_name = ""
 ISHOME = True
 if ISHOME:
     save_csv_name = "td_home_calibration_entire_feature_" + str(
-        FEATURE_TYPE) + "_" + MODEL_TYPE + "_Iter" + str(ITERATE_NUM) + "_sum_2017-6-12.csv"
+        FEATURE_TYPE) + "_" + MODEL_TYPE + "_Iter" + str(ITERATE_NUM) + "_batch" + str(
+        BATCH_SIZE) + "_sum_2017-6-17.csv"
     save_game_csv_name = "td_home_game_record_entire_feature_" + str(
-        FEATURE_TYPE) + "_" + MODEL_TYPE + "_Iter" + str(ITERATE_NUM) + "_sum_2017-6-12.csv"
+        FEATURE_TYPE) + "_" + MODEL_TYPE + "_Iter" + str(ITERATE_NUM) + "_batch" + str(
+        BATCH_SIZE) + "_sum_2017-6-17.csv"
 else:
     save_csv_name = "td_away_calibration_entire_feature_" + str(FEATURE_TYPE) + "_" + MODEL_TYPE + "_Iter" + str(
-        ITERATE_NUM) + "_sum_2017-6-12.csv"
-    save_game_csv_name = "td_away_game_record_entire_feature_{0}_{1}_Iter{2}_sum_2017-6-12.csv".format(str(
-        FEATURE_TYPE), MODEL_TYPE, str(ITERATE_NUM))
+        ITERATE_NUM) + "_batch" + str(BATCH_SIZE) + "_sum_2017-6-17.csv"
+    save_game_csv_name = "td_away_game_record_entire_feature_{0}_{1}_Iter{2}_batch{3}_sum_2017-6-17.csv".format(str(
+        FEATURE_TYPE), MODEL_TYPE, str(ITERATE_NUM), str(BATCH_SIZE))
 
 
 def agg2calibrate_model(check_target):

@@ -732,6 +732,7 @@ def get_training_batch(s_t0, state, reward, train_number, train_len):
         s_t1 = state[train_number]
         # r_t1 = reward[train_number]
         r_t0 = reward[train_number - 1]
+        r_t1 = reward[train_number]
         train_number += 1
         if train_number + 1 == train_len:
             if FORWARD_REWARD_MODE:
@@ -739,14 +740,20 @@ def get_training_batch(s_t0, state, reward, train_number, train_len):
                 # batch_return.append((s_t0, r_t1, s_t1, 1))
             else:
                 if r_t0 == float(0):
-                    batch_home_return.append((s_t0, r_t0, s_t1, 1))
-                    batch_away_return.append((s_t0, r_t0, s_t1, 1))
+                    batch_home_return.append((s_t0, r_t0, s_t1, 0))
+                    batch_away_return.append((s_t0, r_t0, s_t1, 0))
+                    batch_home_return.append((s_t1, r_t1, s_t1, 1))
+                    batch_away_return.append((s_t1, r_t1, s_t1, 1))
                 elif r_t0 == float(-1):
-                    batch_home_return.append((s_t0, 0, s_t1, 1))
-                    batch_away_return.append((s_t0, r_t0, s_t1, 1))
+                    batch_home_return.append((s_t0, 0, s_t1, 0))
+                    batch_away_return.append((s_t0, r_t0, s_t1, 0))
+                    batch_home_return.append((s_t1, 0, s_t1, 1))
+                    batch_away_return.append((s_t1, r_t1, s_t1, 1))
                 elif r_t0 == float(1):
-                    batch_home_return.append((s_t0, r_t0, s_t1, 1))
-                    batch_away_return.append((s_t0, 0, s_t1, 1))
+                    batch_home_return.append((s_t0, r_t0, s_t1, 0))
+                    batch_away_return.append((s_t0, 0, s_t1, 0))
+                    batch_home_return.append((s_t1, r_t1, s_t1, 1))
+                    batch_away_return.append((s_t1, 0, s_t1, 1))
                 else:
                     raise ValueError("invalid reward, haven't match to 0,1 or -1")
             break

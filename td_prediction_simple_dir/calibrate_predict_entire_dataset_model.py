@@ -8,7 +8,7 @@ import numpy as np
 
 FEATURE_TYPE = 5
 calibration = True
-ITERATE_NUM = 25
+ITERATE_NUM = 75
 MODEL_TYPE = "V3"
 
 SIMPLE_SAVED_NETWORK_PATH = "/cs/oschulte/Galen/models/saved_NN/saved_entire__networks_feature{0}_batch16_iterate{1}-NEG_REWARD_GAMMA1_{2}-Sequenced".format(

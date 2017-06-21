@@ -11,13 +11,15 @@ calibration = True
 ISHOME = False
 ITERATE_NUM = 25
 MODEL_TYPE = "V3"
+BATCH_SIZE = 8
 
-SIMPLE_HOME_SAVED_NETWORK_PATH = "/cs/oschulte/Galen/models/saved_NN/saved_entire_Home_networks_feature{0}_batch16_iterate{1}-NEG_REWARD_GAMMA1_{2}-Sequenced".format(
-    str(FEATURE_TYPE), str(ITERATE_NUM), MODEL_TYPE)
-SIMPLE_AWAY_SAVED_NETWORK_PATH = "/cs/oschulte/Galen/models/saved_NN/saved_entire_Away_networks_feature{0}_batch16_iterate{1}-NEG_REWARD_GAMMA1_{2}-Sequenced".format(
-    str(FEATURE_TYPE), str(ITERATE_NUM), MODEL_TYPE)
+SIMPLE_HOME_SAVED_NETWORK_PATH = "/cs/oschulte/Galen/models/saved_NN/saved_entire_Home_networks_feature{0}_batch{1}_iterate{2}-NEG_REWARD_GAMMA1_{3}-Sequenced".format(
+    str(FEATURE_TYPE), str(BATCH_SIZE), str(ITERATE_NUM), MODEL_TYPE)
+SIMPLE_AWAY_SAVED_NETWORK_PATH = "/cs/oschulte/Galen/models/saved_NN/saved_entire_Away_networks_feature{0}_batch{1}_iterate{2}-NEG_REWARD_GAMMA1_{3}-Sequenced".format(
+    str(FEATURE_TYPE), str(BATCH_SIZE), str(ITERATE_NUM), MODEL_TYPE)
 
-calibration_store_dir = "/cs/oschulte/Galen/Hockey-data-entire/td_calibrate_all_feature_" + str(FEATURE_TYPE)+"_"+MODEL_TYPE+"_Iter"+str(ITERATE_NUM)
+calibration_store_dir = "/cs/oschulte/Galen/Hockey-data-entire/td_calibrate_all_feature_" + str(
+    FEATURE_TYPE) + "_" + MODEL_TYPE + "_Iter" + str(ITERATE_NUM)+"_batch"+str(BATCH_SIZE)
 # calibration_store_dir = "/cs/oschulte/Galen/Hockey-data/td_calibrate_all_feature_5_2017-6-01"
 sess_nn = tf.InteractiveSession()
 
@@ -51,7 +53,7 @@ if checkpoint and checkpoint.model_checkpoint_path:
     saver.restore(sess_nn, checkpoint.model_checkpoint_path)
     print("Successfully loaded:", checkpoint.model_checkpoint_path)
 else:
-    raise Exception("can't restore network: "+SIMPLE_SAVED_NETWORK_PATH)
+    raise Exception("can't restore network: " + SIMPLE_SAVED_NETWORK_PATH)
 
 for calibration_dir_game in os.listdir(calibration_store_dir):
     for file_name in os.listdir(calibration_store_dir + "/" + calibration_dir_game):
@@ -81,7 +83,7 @@ for calibration_dir_game in os.listdir(calibration_store_dir):
     else:
         data_name = "model_predict_away"
 
-    sio.savemat(calibration_store_dir + "/" + calibration_dir_game+"/" + "home_identifier",
+    sio.savemat(calibration_store_dir + "/" + calibration_dir_game + "/" + "home_identifier",
                 {"home_identifier": home_identifier})
     sio.savemat(calibration_store_dir + "/" + calibration_dir_game + "/" + data_name,
                 {data_name: np.asarray(readout_t1_batch)})
