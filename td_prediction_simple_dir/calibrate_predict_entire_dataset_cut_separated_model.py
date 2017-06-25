@@ -11,16 +11,15 @@ calibration = True
 ISHOME = False
 ITERATE_NUM = 25
 MODEL_TYPE = "V3"
-BATCH_SIZE = 32
+BATCH_SIZE = 8
 
-SIMPLE_HOME_SAVED_NETWORK_PATH = "/cs/oschulte/Galen/models/saved_NN/saved_entire_Home_networks_feature{0}_batch{1}_iterate{2}-NEG_REWARD_GAMMA1_{3}-Sequenced".format(
+SIMPLE_HOME_SAVED_NETWORK_PATH = "/cs/oschulte/Galen/models/saved_NN/cut_saved_entire_Home_networks_feature{0}_batch{1}_iterate{2}-NEG_REWARD_GAMMA1_{3}-Sequenced".format(
     str(FEATURE_TYPE), str(BATCH_SIZE), str(ITERATE_NUM), MODEL_TYPE)
-SIMPLE_AWAY_SAVED_NETWORK_PATH = "/cs/oschulte/Galen/models/saved_NN/saved_entire_Away_networks_feature{0}_batch{1}_iterate{2}-NEG_REWARD_GAMMA1_{3}-Sequenced".format(
+SIMPLE_AWAY_SAVED_NETWORK_PATH = "/cs/oschulte/Galen/models/saved_NN/cut_saved_entire_Away_networks_feature{0}_batch{1}_iterate{2}-NEG_REWARD_GAMMA1_{3}-Sequenced".format(
     str(FEATURE_TYPE), str(BATCH_SIZE), str(ITERATE_NUM), MODEL_TYPE)
 
-calibration_store_dir = "/cs/oschulte/Galen/Hockey-data-entire/td_calibrate_all_feature_" + str(
-    FEATURE_TYPE) + "_" + MODEL_TYPE + "_Iter" + str(ITERATE_NUM)+"_batch"+str(BATCH_SIZE)
-# calibration_store_dir = "/cs/oschulte/Galen/Hockey-data/td_calibrate_all_feature_5_2017-6-01"
+# "Hockey-Training-All-feature5-scale-neg_reward"
+calibration_store_dir = "/cs/oschulte/Galen/Hockey-data-entire/Hockey-Training-All-feature{0}-scale-neg_reward".format(str(FEATURE_TYPE))
 sess_nn = tf.InteractiveSession()
 
 if MODEL_TYPE == "V1":
@@ -57,14 +56,14 @@ else:
 
 for calibration_dir_game in os.listdir(calibration_store_dir):
     for file_name in os.listdir(calibration_store_dir + "/" + calibration_dir_game):
-        if "training_data_dict_all_value" in file_name:
+        if "state" in file_name:
             calibrate_value_name = calibration_store_dir + "/" + calibration_dir_game + "/" + file_name
         elif "training_data_dict_all_name" in file_name:
             calibrate_name_name = calibration_store_dir + "/" + calibration_dir_game + "/" + file_name
         else:
             continue
 
-    calibrate_values = (sio.loadmat(calibrate_value_name))["training_data_dict_all_value"]
+    calibrate_values = (sio.loadmat(calibrate_value_name))["state"]
     calibrate_names = (sio.loadmat(calibrate_name_name))["training_data_dict_all_name"]
 
     home_identifier = []
@@ -79,9 +78,11 @@ for calibration_dir_game in os.listdir(calibration_store_dir):
     readout_t1_batch = model_nn.read_out.eval(feed_dict={model_nn.x: calibrate_values})  # get value of s
 
     if ISHOME:
-        data_name = "model_predict_home"
+        data_name = "model_cut_predict_home_feature_" + str(
+            FEATURE_TYPE) + "_" + MODEL_TYPE + "_Iter" + str(ITERATE_NUM) + "_batch" + str(BATCH_SIZE)
     else:
-        data_name = "model_predict_away"
+        data_name = "model_cut_predict_away_feature_" + str(
+            FEATURE_TYPE) + "_" + MODEL_TYPE + "_Iter" + str(ITERATE_NUM) + "_batch" + str(BATCH_SIZE)
 
     sio.savemat(calibration_store_dir + "/" + calibration_dir_game + "/" + "home_identifier",
                 {"home_identifier": home_identifier})

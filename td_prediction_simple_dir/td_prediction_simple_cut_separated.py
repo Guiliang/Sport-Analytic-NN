@@ -17,7 +17,7 @@ model_train_continue = True
 ITERATE_NUM = 25
 REWARD_TYPE = "NEG_REWARD_GAMMA1"
 MODEL_TYPE = "V3"
-Home_model_or_away_model = "Home"
+Home_model_or_away_model = "Away"
 Random_or_Sequenced = "Sequenced"
 GAMMA = 1  # decay rate of past observations
 BATCH_SIZE = 8  # size of mini-batch, the size of mini-batch could be tricky, the larger mini-batch, the easier will it be converge, but if our training data is not comprehensive enough and stochastic gradients is not applied, model may converge to other things
@@ -42,10 +42,10 @@ DATA_STORE = "/cs/oschulte/Galen/Hockey-data-entire/Hockey-Training-All-feature"
 
 DIR_GAMES_ALL = os.listdir(DATA_STORE)
 number_of_total_game = len(DIR_GAMES_ALL)
-LOG_DIR = "/cs/oschulte/Galen/models/log_NN/log_entire_" + str(Home_model_or_away_model) + "_train_feature" + str(
+LOG_DIR = "/cs/oschulte/Galen/models/log_NN/cut_log_entire_" + str(Home_model_or_away_model) + "_train_feature" + str(
     FEATURE_TYPE) + "_batch" + str(BATCH_SIZE) + "_iterate" + str(
     ITERATE_NUM) + "-" + str(REWARD_TYPE) + "_" + MODEL_TYPE + "-" + Random_or_Sequenced
-SAVED_NETWORK = "/cs/oschulte/Galen/models/saved_NN/saved_entire_" + str(
+SAVED_NETWORK = "/cs/oschulte/Galen/models/saved_NN/cut_saved_entire_" + str(
     Home_model_or_away_model) + "_networks_feature" + str(
     FEATURE_TYPE) + "_batch" + str(BATCH_SIZE) + "_iterate" + str(
     ITERATE_NUM) + "-" + str(REWARD_TYPE) + "_" + MODEL_TYPE + "-" + Random_or_Sequenced
