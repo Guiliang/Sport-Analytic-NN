@@ -1,17 +1,13 @@
-import scipy.io as sio
-import tensorflow as tf
 import os
 
+import matplotlib.pyplot as plt
+import numpy as np
+import scipy.io as sio
+import td_prediction_simple
+import tensorflow as tf
 from scipy.stats import pearsonr
 
-import td_prediction_RNN
-import td_prediction_simple
 import td_prediction_eligibility_trace as et
-import matplotlib.pyplot as plt
-from scipy.misc import imread
-import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sb
 
 STIMULATE_TYPE = "angel"
 FEATURE_TYPE = 8

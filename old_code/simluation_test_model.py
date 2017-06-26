@@ -1,11 +1,12 @@
-import scipy.io as sio
-import tensorflow as tf
-import td_prediction_RNN
-import td_prediction_simple
-import td_prediction_eligibility_trace as et
 import matplotlib.pyplot as plt
-from scipy.misc import imread
 import numpy as np
+import scipy.io as sio
+import td_prediction_simple
+import tensorflow as tf
+
+import td_prediction_eligibility_trace as et
+from old_code import td_prediction_RNN
+
 FEATURE_TYPE = 6
 
 SIMPLE_SAVED_NETWORK_PATH = "./saved_NN/saved_networks_feature6_batch16_iterate2Converge-NEG_REWARD_GAMMA1_V3"
