@@ -11,23 +11,17 @@ BATCH_SIZE = 8
 calibration_store_dir = "/cs/oschulte/Galen/Hockey-data-entire/Test100-Hockey-Training-All-feature{0}-scale-neg_reward".format(str(FEATURE_TYPE))
 # calibration_store_dir = "/cs/oschulte/Galen/Hockey-data/td_calibrate_all_feature_5_2017-6-01"
 store_name = ""
-ISHOME = False
-if ISHOME:
-    save_csv_name = "td_testing_cut_home_calibration_entire_feature_" + str(
-        FEATURE_TYPE) + "_" + MODEL_TYPE + "_Iter" + str(ITERATE_NUM) + "_batch" + str(
-        BATCH_SIZE) + "_sum_2017-6-17.csv"
-    save_game_csv_name = "td_testing_cut_home_game_record_entire_feature_" + str(
-        FEATURE_TYPE) + "_" + MODEL_TYPE + "_Iter" + str(ITERATE_NUM) + "_batch" + str(
-        BATCH_SIZE) + "_sum_2017-6-17.csv"
-else:
-    save_csv_name = "td_testing_cut_away_calibration_entire_feature_" + str(FEATURE_TYPE) + "_" + MODEL_TYPE + "_Iter" + str(
-        ITERATE_NUM) + "_batch" + str(BATCH_SIZE) + "_sum_2017-6-17.csv"
-    save_game_csv_name = "td_testing_cut_away_game_record_entire_feature_{0}_{1}_Iter{2}_batch{3}_sum_2017-6-17.csv".format(str(
-        FEATURE_TYPE), MODEL_TYPE, str(ITERATE_NUM), str(BATCH_SIZE))
 
-data_home_name = "model_cut_predict_home_feature_" + str(
-    FEATURE_TYPE) + "_" + MODEL_TYPE + "_Iter" + str(ITERATE_NUM) + "_batch" + str(BATCH_SIZE)
-data_away_name = "model_cut_predict_away_feature_" + str(
+
+save_csv_name = "td_testing_cut_calibration_entire_feature_" + str(
+    FEATURE_TYPE) + "_" + MODEL_TYPE + "_Iter" + str(ITERATE_NUM) + "_batch" + str(
+    BATCH_SIZE) + "_sum_2017-6-17.csv"
+save_game_csv_name = "td_testing_cut_game_record_entire_feature_" + str(
+    FEATURE_TYPE) + "_" + MODEL_TYPE + "_Iter" + str(ITERATE_NUM) + "_batch" + str(
+    BATCH_SIZE) + "_sum_2017-6-17.csv"
+
+
+data_name = "model_cut_predict_feature_" + str(
     FEATURE_TYPE) + "_" + MODEL_TYPE + "_Iter" + str(ITERATE_NUM) + "_batch" + str(BATCH_SIZE)
 
 
@@ -41,31 +35,26 @@ def agg2calibrate_model(check_target):
         for file_name in os.listdir(calibration_store_dir + "/" + calibration_dir_game):
             if "training_data_dict_all_name" in file_name:
                 calibrate_name_name = calibration_store_dir + "/" + calibration_dir_game + "/" + file_name
-            elif data_home_name in file_name:
-                model_predict_home_name = calibration_store_dir + "/" + calibration_dir_game + "/" + file_name
-            elif data_away_name in file_name:
-                model_predict_away_name = calibration_store_dir + "/" + calibration_dir_game + "/" + file_name
+            elif data_name in file_name:
+                model_predict_name = calibration_store_dir + "/" + calibration_dir_game + "/" + file_name
             elif "summation_cut_goal_home" in file_name:
                 summation_cut_goal_home_name = calibration_store_dir + "/" + calibration_dir_game + "/" + file_name
             elif "summation_cut_goal_away" in file_name:
                 summation_cut_goal_away_name = calibration_store_dir + "/" + calibration_dir_game + "/" + file_name
-            elif "summation_cut_goal" in file_name:
-                summation_cut_goal_name = calibration_store_dir + "/" + calibration_dir_game + "/" + file_name
             else:
                 continue
 
         calibrate_names = ((sio.loadmat(calibrate_name_name))["training_data_dict_all_name"]).tolist()
-        model_predict_home = ((sio.loadmat(model_predict_home_name))[data_home_name]).tolist()
-        model_predict_away = ((sio.loadmat(model_predict_away_name))[data_away_name]).tolist()
-        summation_cut_goal = (((sio.loadmat(summation_cut_goal_name))["summation_cut_goal"]).tolist())[0]
+        model_predict = ((sio.loadmat(model_predict_name))[data_name]).tolist()
         summation_cut_goal_home = (((sio.loadmat(summation_cut_goal_home_name))["summation_cut_goal_home"]).tolist())[0]
         summation_cut_goal_away = (((sio.loadmat(summation_cut_goal_away_name))["summation_cut_goal_away"]).tolist())[0]
 
         # calibration_value_game_record = []
         # model_predict_value_game_record = []
 
-        if not len(calibrate_names) == len(model_predict_home) and len(model_predict_home) == len(
-                model_predict_away) and len(model_predict_away) == len(summation_cut_goal):
+        if not len(calibrate_names) == len(model_predict) and len(model_predict) == len(
+                summation_cut_goal_home) and len(summation_cut_goal_away) == len(
+                summation_cut_goal_home):
             raise ValueError("lens of data don't consist")
 
         for calibrate_name_index in range(0, len(calibrate_names)):
@@ -95,17 +84,8 @@ def agg2calibrate_model(check_target):
                 game_found_flag = True
                 # if ISHOME and home_identifier[calibrate_name_index]:  # TODO delete home_identifier[calibrate_name_index]
                 try:
-                    if ISHOME:
-                        # print "Found home"
-                        model_predict_value_record.append((model_predict_home[calibrate_name_index])[0])
-                        # calibration_value_game_record.append(float(summation_cut_goal[calibrate_name_index]))
-                        calibration_value_record.append(float(summation_cut_goal_home[calibrate_name_index]))
-                    # elif not ISHOME and not home_identifier[calibrate_name_index]:  # TODO delete home_identifier[calibrate_name_index]
-                    elif not ISHOME:
-                        # print "Found away"
-                        model_predict_value_record.append((model_predict_away[calibrate_name_index])[0])
-                        # calibration_value_game_record.append(float(summation_cut_goal[calibrate_name_index]))
-                        calibration_value_record.append(float(summation_cut_goal_away[calibrate_name_index]))
+                    model_predict_value_record.append((model_predict[calibrate_name_index])[0])
+                    calibration_value_record.append(float(summation_cut_goal_home[calibrate_name_index])+float(summation_cut_goal_away[calibrate_name_index]))
                 except:
                     print "error"
 

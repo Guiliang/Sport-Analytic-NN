@@ -6,20 +6,26 @@ import ast
 import td_prediction_simple_cut_testing
 import numpy as np
 
-FEATURE_TYPE = 9
+FEATURE_TYPE = 5
 calibration = True
-ITERATE_NUM = 25
+ITERATE_NUM = 75
 MODEL_TYPE = "V3"
 BATCH_SIZE = 8
 DATA_SIZE = 100
-td_prediction_simple_cut_testing.feature_num = 27
+td_prediction_simple_cut_testing.feature_num = 26
+Scale = True
 
-SIMPLE_SAVED_NETWORK_PATH = "/cs/oschulte/Galen/models/saved_NN/Test{0}-cut_saved_entire__networks_feature{1}_batch{2}_iterate{3}-NEG_REWARD_GAMMA1_{4}-Sequenced".format(
-    str(DATA_SIZE), str(FEATURE_TYPE), str(BATCH_SIZE), str(ITERATE_NUM), MODEL_TYPE)
+if Scale:
+    SIMPLE_SAVED_NETWORK_PATH = "/cs/oschulte/Galen/models/saved_NN/Scale-Test{0}-cut_saved_entire__networks_feature{1}_batch{2}_iterate{3}-NEG_REWARD_GAMMA1_{4}-Sequenced".format(
+        str(DATA_SIZE), str(FEATURE_TYPE), str(BATCH_SIZE), str(ITERATE_NUM), MODEL_TYPE)
+    calibration_store_dir = "/cs/oschulte/Galen/Hockey-data-entire/Test{0}-Hockey-Training-All-feature{1}-scale-neg_reward".format(
+        str(DATA_SIZE), str(FEATURE_TYPE))
+else:
+    SIMPLE_SAVED_NETWORK_PATH = "/cs/oschulte/Galen/models/saved_NN/Test{0}-cut_saved_entire__networks_feature{1}_batch{2}_iterate{3}-NEG_REWARD_GAMMA1_{4}-Sequenced".format(
+        str(DATA_SIZE), str(FEATURE_TYPE), str(BATCH_SIZE), str(ITERATE_NUM), MODEL_TYPE)
+    calibration_store_dir = "/cs/oschulte/Galen/Hockey-data-entire/Test{0}-Hockey-Training-All-feature{1}-neg_reward".format(
+        str(DATA_SIZE), str(FEATURE_TYPE))
 
-# "Hockey-Training-All-feature5-scale-neg_reward"
-calibration_store_dir = "/cs/oschulte/Galen/Hockey-data-entire/Test{0}-Hockey-Training-All-feature{1}-scale-neg_reward".format(
-    str(DATA_SIZE), str(FEATURE_TYPE))
 sess_nn = tf.InteractiveSession()
 
 if MODEL_TYPE == "V1":

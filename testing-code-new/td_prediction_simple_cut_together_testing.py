@@ -14,7 +14,7 @@ train the home team and away team together, use a feature to represent it.
 feature_num = 26
 FEATURE_TYPE = 5
 model_train_continue = False
-ITERATE_NUM = 75
+ITERATE_NUM = 50
 REWARD_TYPE = "NEG_REWARD_GAMMA1"
 MODEL_TYPE = "V3"
 Home_model_or_away_model = "together"
@@ -23,6 +23,7 @@ GAMMA = 1  # decay rate of past observations
 BATCH_SIZE = 32  # size of mini-batch, the size of mini-batch could be tricky, the larger mini-batch, the easier will it be converge, but if our training data is not comprehensive enough and stochastic gradients is not applied, model may converge to other things
 SPORT = "NHL"
 TEST_LENGTH = 100
+Scale = True
 
 if Random_or_Sequenced == "Random":
     Random_select = True
@@ -37,15 +38,36 @@ DATA_STORE = "/cs/oschulte/Galen/Hockey-data-entire/Test" + str(
 
 DIR_GAMES_ALL = os.listdir(DATA_STORE)
 number_of_total_game = len(DIR_GAMES_ALL)
-LOG_DIR = "/cs/oschulte/Galen/models/log_NN/Test" + str(
-    TEST_LENGTH) + "-cut_log_entire_" + str(Home_model_or_away_model) + "_train_feature" + str(
-    FEATURE_TYPE) + "_batch" + str(BATCH_SIZE) + "_iterate" + str(
-    ITERATE_NUM) + "-" + str(REWARD_TYPE) + "_" + MODEL_TYPE + "-" + Random_or_Sequenced
-SAVED_NETWORK = "/cs/oschulte/Galen/models/saved_NN/Test" + str(
-    TEST_LENGTH) + "-cut_saved_entire_" + str(
-    Home_model_or_away_model) + "_networks_feature" + str(
-    FEATURE_TYPE) + "_batch" + str(BATCH_SIZE) + "_iterate" + str(
-    ITERATE_NUM) + "-" + str(REWARD_TYPE) + "_" + MODEL_TYPE + "-" + Random_or_Sequenced
+
+if Scale:
+    DATA_STORE = "/cs/oschulte/Galen/Hockey-data-entire/Test" + str(
+        TEST_LENGTH) + "-Hockey-Training-All-feature" + str(
+        FEATURE_TYPE) + "-scale-neg_reward"
+
+    LOG_DIR = "/cs/oschulte/Galen/models/log_NN/Scale-Test" + str(
+        TEST_LENGTH) + "-cut_log_entire_" + str(Home_model_or_away_model) + "_train_feature" + str(
+        FEATURE_TYPE) + "_batch" + str(BATCH_SIZE) + "_iterate" + str(
+        ITERATE_NUM) + "-" + str(REWARD_TYPE) + "_" + MODEL_TYPE + "-" + Random_or_Sequenced
+    SAVED_NETWORK = "/cs/oschulte/Galen/models/saved_NN/Scale-Test" + str(
+        TEST_LENGTH) + "-cut_saved_entire_" + str(
+        Home_model_or_away_model) + "_networks_feature" + str(
+        FEATURE_TYPE) + "_batch" + str(BATCH_SIZE) + "_iterate" + str(
+        ITERATE_NUM) + "-" + str(REWARD_TYPE) + "_" + MODEL_TYPE + "-" + Random_or_Sequenced
+
+else:
+    DATA_STORE = "/cs/oschulte/Galen/Hockey-data-entire/Test" + str(
+        TEST_LENGTH) + "-Hockey-Training-All-feature" + str(
+        FEATURE_TYPE) + "-neg_reward"
+
+    LOG_DIR = "/cs/oschulte/Galen/models/log_NN/Test" + str(
+        TEST_LENGTH) + "-cut_log_entire_" + str(Home_model_or_away_model) + "_train_feature" + str(
+        FEATURE_TYPE) + "_batch" + str(BATCH_SIZE) + "_iterate" + str(
+        ITERATE_NUM) + "-" + str(REWARD_TYPE) + "_" + MODEL_TYPE + "-" + Random_or_Sequenced
+    SAVED_NETWORK = "/cs/oschulte/Galen/models/saved_NN/Test" + str(
+        TEST_LENGTH) + "-cut_saved_entire_" + str(
+        Home_model_or_away_model) + "_networks_feature" + str(
+        FEATURE_TYPE) + "_batch" + str(BATCH_SIZE) + "_iterate" + str(
+        ITERATE_NUM) + "-" + str(REWARD_TYPE) + "_" + MODEL_TYPE + "-" + Random_or_Sequenced
 FORWARD_REWARD_MODE = False
 
 
@@ -729,11 +751,11 @@ def get_cut_training_batch(s_t0, state, reward, train_number, train_len):
                     batch_return.append((s_t0, r_t0_combine, s_t1, 0, 0))
 
                     if r_t1 == float(0):
-                        r_t1_combine = [r_t1, r_t1]
+                        r_t1_combine = [float(0), float(0)]
                     elif r_t1 == float(-1):
-                        r_t1_combine = [float(0), r_t1]
+                        r_t1_combine = [float(0), float(1)]
                     elif r_t1 == float(1):
-                        r_t1_combine = [r_t1, float(0)]
+                        r_t1_combine = [float(1), float(0)]
                     else:
                         raise ValueError("incorrect r_t1")
                     batch_return.append((s_t1, r_t1_combine, s_t1, 1, 0))
@@ -742,11 +764,11 @@ def get_cut_training_batch(s_t0, state, reward, train_number, train_len):
                     batch_return.append((s_t0, r_t0_combine, s_t1, 0, 0))
 
                     if r_t1 == float(0):
-                        r_t1_combine = [r_t1, r_t1]
+                        r_t1_combine = [float(0), float(0)]
                     elif r_t1 == float(-1):
-                        r_t1_combine = [float(0), r_t1]
+                        r_t1_combine = [float(0), float(1)]
                     elif r_t1 == float(1):
-                        r_t1_combine = [r_t1, float(0)]
+                        r_t1_combine = [float(1), float(0)]
                     else:
                         raise ValueError("incorrect r_t1")
                     batch_return.append((s_t1, r_t1_combine, s_t1, 1, 0))
@@ -755,11 +777,11 @@ def get_cut_training_batch(s_t0, state, reward, train_number, train_len):
                     batch_return.append((s_t0, r_t0_combine, s_t1, 0, 0))
 
                     if r_t1 == float(0):
-                        r_t1_combine = [r_t1, r_t1]
+                        r_t1_combine = [float(0), float(0)]
                     elif r_t1 == float(-1):
-                        r_t1_combine = [float(0), r_t1]
+                        r_t1_combine = [float(0), float(1)]
                     elif r_t1 == float(1):
-                        r_t1_combine = [r_t1, float(0)]
+                        r_t1_combine = [float(1), float(0)]
                     else:
                         raise ValueError("incorrect r_t1")
                     batch_return.append((s_t1, r_t1_combine, s_t1, 1, 0))

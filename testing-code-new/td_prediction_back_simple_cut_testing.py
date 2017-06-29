@@ -4,6 +4,7 @@ import scipy.io as sio
 import tensorflow as tf
 import os
 import traceback
+import sys
 import numpy as np
 import math
 
@@ -11,15 +12,15 @@ import math
 train the home team and away team together, use a feature to represent it.
 """
 
-feature_num = 27
-FEATURE_TYPE = 9
+feature_num = 26
+FEATURE_TYPE = 5
 model_train_continue = True
 ITERATE_NUM = 75
 REWARD_TYPE = "NEG_REWARD_GAMMA1"
 MODEL_TYPE = "V3"
 Random_or_Sequenced = "Sequenced"
 GAMMA = 1  # decay rate of past observations
-BATCH_SIZE = 8  # size of mini-batch, the size of mini-batch could be tricky, the larger mini-batch, the easier will it be converge, but if our training data is not comprehensive enough and stochastic gradients is not applied, model may converge to other things
+BATCH_SIZE = 32  # size of mini-batch, the size of mini-batch could be tricky, the larger mini-batch, the easier will it be converge, but if our training data is not comprehensive enough and stochastic gradients is not applied, model may converge to other things
 SPORT = "NHL"
 TEST_LENGTH = 100
 SCALE = True
@@ -33,26 +34,26 @@ else:
 
 if SCALE:
     DATA_STORE = "/cs/oschulte/Galen/Hockey-data-entire/Test" + str(
-        TEST_LENGTH) + "-Hockey-Training-All-feature" + str(
+        TEST_LENGTH) + "-Back-Hockey-Training-All-feature" + str(
         FEATURE_TYPE) + "-scale-neg_reward"
     LOG_DIR = "/cs/oschulte/Galen/models/log_NN/Scale-Test" + str(
-        TEST_LENGTH) + "-cut_log_entire__train_feature" + str(
+        TEST_LENGTH) + "-back-cut_log_entire__train_feature" + str(
         FEATURE_TYPE) + "_batch" + str(BATCH_SIZE) + "_iterate" + str(
         ITERATE_NUM) + "-" + str(REWARD_TYPE) + "_" + MODEL_TYPE + "-" + Random_or_Sequenced
     SAVED_NETWORK = "/cs/oschulte/Galen/models/saved_NN/Scale-Test" + str(
-        TEST_LENGTH) + "-cut_saved_entire__networks_feature" + str(
+        TEST_LENGTH) + "-back-cut_saved_entire__networks_feature" + str(
         FEATURE_TYPE) + "_batch" + str(BATCH_SIZE) + "_iterate" + str(
         ITERATE_NUM) + "-" + str(REWARD_TYPE) + "_" + MODEL_TYPE + "-" + Random_or_Sequenced
 else:
     DATA_STORE = "/cs/oschulte/Galen/Hockey-data-entire/Test" + str(
-        TEST_LENGTH) + "-Hockey-Training-All-feature" + str(
+        TEST_LENGTH) + "-Back-Hockey-Training-All-feature" + str(
         FEATURE_TYPE) + "-neg_reward"
     LOG_DIR = "/cs/oschulte/Galen/models/log_NN/Test" + str(
-        TEST_LENGTH) + "-cut_log_entire__train_feature" + str(
+        TEST_LENGTH) + "-back-cut_log_entire__train_feature" + str(
         FEATURE_TYPE) + "_batch" + str(BATCH_SIZE) + "_iterate" + str(
         ITERATE_NUM) + "-" + str(REWARD_TYPE) + "_" + MODEL_TYPE + "-" + Random_or_Sequenced
     SAVED_NETWORK = "/cs/oschulte/Galen/models/saved_NN/Test" + str(
-        TEST_LENGTH) + "-cut_saved_entire__networks_feature" + str(
+        TEST_LENGTH) + "-back-cut_saved_entire__networks_feature" + str(
         FEATURE_TYPE) + "_batch" + str(BATCH_SIZE) + "_iterate" + str(
         ITERATE_NUM) + "-" + str(REWARD_TYPE) + "_" + MODEL_TYPE + "-" + Random_or_Sequenced
 
@@ -718,48 +719,61 @@ def get_next_test_event():
     return state, reward, terminal
 
 
-def get_cut_training_batch(s_t0, state, reward, train_number, train_len):
+def get_back_training_batch(s_t1, state, reward, train_number, train_len):
     """
     combine training data to a batch
     :return: [last_state_of_batch, batch, time_series]
     """
     batch_return = []
-    current_batch_length = 0
-    while current_batch_length < BATCH_SIZE:
-        s_t1 = state[train_number]
-        # r_t1 = reward[train_number]
-        r_t0 = reward[train_number - 1]
-        r_t1 = reward[train_number]
-        train_number += 1
-        if train_number + 1 == train_len:
-            if FORWARD_REWARD_MODE:
-                raise ValueError("invalid FORWARD_REWARD_MODE, haven't defined")
-                # batch_return.append((s_t0, r_t1, s_t1, 1))
-            else:
-                batch_return.append((s_t0, r_t0, s_t1, 0, 0))
-                batch_return.append((s_t1, r_t1, s_t1, 1, 0))
+    if len(state) == 1:
+        batch_return.append((state[0], reward[0], state[0], 1, 1))
+        s_t1 = state[0]
+    else:
+        current_batch_length = 0
+        while current_batch_length < BATCH_SIZE:
+            s_t0 = state[train_number - 1]
+            # r_t1 = reward[train_number]
+            r_t0 = reward[train_number - 1]
+            r_t1 = reward[train_number]
 
-            break
-        if FORWARD_REWARD_MODE:
-            raise ValueError("invalid FORWARD_REWARD_MODE, haven't defined")
-            # batch_return.append((s_t0, r_t1, s_t1, 0))
-        else:
-            if r_t0 == float(0):
-                batch_return.append((s_t0, r_t0, s_t1, 0, 0))
-            elif r_t0 == float(-1):
-                batch_return.append((s_t0, r_t0, s_t1, 0, 1))
-                s_t0 = s_t1
-                break
-            elif r_t0 == float(1):
-                batch_return.append((s_t0, r_t0, s_t1, 0, 1))
-                s_t0 = s_t1
-                break
-            else:
-                raise ValueError("invalid reward, haven't match to 0,1 or -1")
-        current_batch_length += 1
-        s_t0 = s_t1
+            if train_number + 1 == train_len and train_number - 1 == 0:
+                if FORWARD_REWARD_MODE:
+                    raise ValueError("invalid FORWARD_REWARD_MODE, haven't defined")
+                    # batch_return.append((s_t0, r_t1, s_t1, 1))
+                else:
+                    batch_return.append((s_t1, r_t1, s_t1, 0, 1))
+                    batch_return.append((s_t0, r_t0, s_t1, 1, 0))
+                    break
+                    # current_batch_length += 2
 
-    return s_t0, batch_return, train_number
+            elif train_number + 1 == train_len:
+                if FORWARD_REWARD_MODE:
+                    raise ValueError("invalid FORWARD_REWARD_MODE, haven't defined")
+                    # batch_return.append((s_t0, r_t1, s_t1, 1))
+                else:
+                    batch_return.append((s_t1, r_t1, s_t1, 0, 1))
+                    batch_return.append((s_t0, r_t0, s_t1, 0, 0))
+                current_batch_length += 2
+            elif train_number - 1 == 0:
+                if FORWARD_REWARD_MODE:
+                    raise ValueError("invalid FORWARD_REWARD_MODE, haven't defined")
+                    # batch_return.append((s_t0, r_t1, s_t1, 1))
+                else:
+                    batch_return.append((s_t0, r_t0, s_t1, 1, 0))
+                    break
+                    # current_batch_length += 1
+            else:
+                if FORWARD_REWARD_MODE:
+                    raise ValueError("invalid FORWARD_REWARD_MODE, haven't defined")
+                    # batch_return.append((s_t0, r_t1, s_t1, 0))
+                else:
+                    batch_return.append((s_t0, r_t0, s_t1, 0, 0))
+                current_batch_length += 1
+
+            train_number -= 1
+            s_t1 = s_t0
+
+    return s_t1, batch_return, train_number
 
 
 def get_training_batch_all(s_t0, state, reward):
@@ -862,102 +876,116 @@ def train_network(sess, model, print_parameters=False):
 
             game_number += 1
             game_files = os.listdir(DATA_STORE + "/" + dir_game)
-            for filename in game_files:
-                if filename.startswith("reward"):
-                    reward_name = filename
-                elif filename.startswith("state"):
-                    state_name = filename
 
-            reward = sio.loadmat(DATA_STORE + "/" + dir_game + "/" + reward_name)
-            try:
-                reward = (reward['reward'][0]).tolist()
-            except:
-                print "\n" + dir_game
-                continue
-            reward_count = sum(reward)
-            state = sio.loadmat(DATA_STORE + "/" + dir_game + "/" + state_name)
-            state = state['state']
-            print ("\n load file" + str(dir_game) + " success")
-            print ("reward number" + str(reward_count))
-            if len(state) != len(reward):
-                raise Exception('state length does not equal to reward length')
+            for part_number in range(0, 100000):
 
-            train_len = len(state)
-            train_number = 0
+                find_flag = False
 
-            # start training
-            s_t0 = state[0]
-            r_t0 = reward[0]
-            train_number += 1
+                for filename in game_files:
+                    if filename.startswith("part_{0}_reward".format(part_number)):
+                        reward_name = filename
+                        find_flag = True
+                    elif filename.startswith("part_{0}_state".format(part_number)):
+                        state_name = filename
+                        find_flag = True
 
-            if not Random_select:
-                while True:
-                    try:
+                if not find_flag:
+                    break
 
-                        s_tl, batch_return, train_number = get_cut_training_batch(s_t0, state,
-                                                                                  reward,
-                                                                                  train_number,
-                                                                                  train_len)
-                    except:
-                        print "\n game:" + dir_game + " train number:" + str(train_number)
-                        raise IndexError("get_training_batch wrong")
+                reward = sio.loadmat(DATA_STORE + "/" + dir_game + "/" + reward_name)
+                try:
+                    reward = (reward['reward'][0]).tolist()
+                except:
+                    print "\n" + dir_game
+                    continue
+                reward_count = sum(reward)
+                state = sio.loadmat(DATA_STORE + "/" + dir_game + "/" + state_name)
+                state = state['state']
+                print ("\n load file" + str(dir_game) + " success")
+                print ("reward number" + str(reward_count))
+                if len(state) != len(reward):
+                    raise Exception('state length does not equal to reward length')
 
-                    batch = batch_return
-                    s_t_home_batch = [d[0] for d in batch]
-                    r_t_home_batch = [d[1] for d in batch]
-                    s_t1_home_batch = [d[2] for d in batch]
-                    s_t_batch = s_t_home_batch
-                    r_t_batch = r_t_home_batch
-                    s_t1_batch = s_t1_home_batch
+                train_len = len(state)
+                train_number = train_len
 
-                    y_batch = []
+                # start training
+                train_number -= 1
+                s_t1 = state[train_number]
 
-                    readout_t1_batch = model.read_out.eval(feed_dict={model.x: s_t1_batch})  # get value of s
+                if not Random_select:
+                    while True:
 
-                    for i in range(0, len(batch)):
-                        terminal = batch[i][3]
-                        cut = batch[i][4]
-                        # if terminal, only equals reward
-                        if terminal or cut:
-                            y_batch.append(float(r_t_batch[i]))
-                            break
-                        else:
-                            y_batch.append(r_t_batch[i] + GAMMA * ((readout_t1_batch[i]).tolist())[0])
+                        try:
+                            s_tl, batch_return, train_number = get_back_training_batch(s_t1, state,
+                                                                                       reward,
+                                                                                       train_number,
+                                                                                       train_len)
+                        except:
+                            traceback.print_exc(file=sys.stdout)
 
-                    if MODEL_TYPE == "V5":
-                        [global_step, learning_rate, diff_v, cost_out, summary_train, _] = sess.run(
-                            [model.global_step, model.learning_rate, model.diff_v, model.cost, merge, model.train_step],
-                            feed_dict={model.y: y_batch, model.x: s_t_batch})
-                    else:
-                        [diff_v, cost_out, summary_train, _] = sess.run(
-                            [model.diff_v, model.cost, merge, model.train_step],
-                            feed_dict={model.y: y_batch, model.x: s_t_batch})
+                        batch = batch_return
+                        s_t_home_batch = [d[0] for d in batch]
+                        r_t_home_batch = [d[1] for d in batch]
+                        s_t1_home_batch = [d[2] for d in batch]
+                        s_t_batch = s_t_home_batch
+                        r_t_batch = r_t_home_batch
+                        s_t1_batch = s_t1_home_batch
 
-                    if diff_v > 0.01:
-                        converge_flag = False
-                    global_counter += 1
-                    cost_per_iter_record.append(cost_out)
-                    train_writer.add_summary(summary_train, global_step=global_counter)
-                    # update the old values
-                    s_t0 = s_tl
+                        y_batch = []
 
-                    # print info
-                    if terminal or ((train_number - 1) / BATCH_SIZE) % 5 == 1:
-                        print ("TIMESTEP:", train_number, "Game:", game_number)
-                        print(str((min(readout_t1_batch)[0], max(readout_t1_batch)[0])))
+                        readout_t1_batch = model.read_out.eval(feed_dict={model.x: s_t1_batch})  # get value of s
+
+                        for i in range(0, len(batch)):
+                            start = batch[i][3]
+                            terminal = batch[i][4]
+                            # if terminal, only equals reward
+                            if terminal and start:
+                                y_batch.append(float(r_t_batch[i]))
+                                break
+                            elif terminal:
+                                y_batch.append(float(r_t_batch[i]))
+                            elif start:
+                                y_batch.append(r_t_batch[i] + GAMMA * ((readout_t1_batch[i]).tolist())[0])
+                                break
+                            else:
+                                y_batch.append(r_t_batch[i] + GAMMA * ((readout_t1_batch[i]).tolist())[0])
 
                         if MODEL_TYPE == "V5":
-                            print ("cost of the network is: " + str(cost_out) + " with learning rate: " + str(
-                                learning_rate) + " and global step: " + str(global_step))
+                            [global_step, learning_rate, diff_v, cost_out, summary_train, _] = sess.run(
+                                [model.global_step, model.learning_rate, model.diff_v, model.cost, merge,
+                                 model.train_step],
+                                feed_dict={model.y: y_batch, model.x: s_t_batch})
                         else:
-                            print ("cost of the network is: " + str(cost_out))
+                            [diff_v, cost_out, summary_train, _] = sess.run(
+                                [model.diff_v, model.cost, merge, model.train_step],
+                                feed_dict={model.y: y_batch, model.x: s_t_batch})
 
-                    if terminal:
-                        # save progress after a game
-                        saver.save(sess, SAVED_NETWORK + '/' + SPORT + '-game-', global_step=game_number)
-                        break
-            else:
-                raise ValueError("Haven't define for random yet")
+                        if diff_v > 0.01:
+                            converge_flag = False
+                        global_counter += 1
+                        cost_per_iter_record.append(cost_out)
+                        train_writer.add_summary(summary_train, global_step=global_counter)
+                        # update the old values
+                        s_t1 = s_tl
+
+                        # print info
+                        if start or ((train_number - 1) / BATCH_SIZE) % 5 == 1:
+                            print ("TIMESTEP:", train_number, "Game:", game_number)
+                            print(str((min(readout_t1_batch)[0], max(readout_t1_batch)[0])))
+
+                            if MODEL_TYPE == "V5":
+                                print ("cost of the network is: " + str(cost_out) + " with learning rate: " + str(
+                                    learning_rate) + " and global step: " + str(global_step))
+                            else:
+                                print ("cost of the network is: " + str(cost_out))
+
+                        if start:
+                            # save progress after a game
+                            saver.save(sess, SAVED_NETWORK + '/' + SPORT + '-game-', global_step=game_number)
+                            break
+                else:
+                    raise ValueError("Haven't define for random yet")
 
         cost_per_iter_average = sum(cost_per_iter_record) / float(len(cost_per_iter_record))
         cost_all_record.append(

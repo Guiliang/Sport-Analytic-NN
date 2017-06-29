@@ -6,20 +6,17 @@ import numpy as np
 import time
 
 FEATURE_NUMBER = 26
-# MODEL_DIR = './et_dir/et_models_neg_tieC/'
-# SUMMARY_DIR = './et_dir/et_summaries_neg_tieC/'
-# CHECKPOINT_DIR = './et_dir/et_checkpoints_neg_tieC/'
-MODEL_DIR = './et_dir/et_models_neg_tieC/'
-SUMMARY_DIR = './et_dir/et_summaries_neg_tieC/'
-CHECKPOINT_DIR = './et_dir/et_checkpoints_neg_tieC/'
+MODEL_DIR = '/cs/oschulte/Galen/models/et_dir/et_models_neg_tieC/'
+SUMMARY_DIR = '/cs/oschulte/Galen/models/et_dir/et_summaries_neg_tieC/'
+CHECKPOINT_DIR = '/cs/oschulte/Galen/models/et_dir/et_checkpoints_neg_tieC/'
 model_path = os.environ.get('MODEL_PATH', MODEL_DIR)
 summary_path = os.environ.get('SUMMARY_PATH', SUMMARY_DIR)
 checkpoint_path = os.environ.get('CHECKPOINT_PATH', CHECKPOINT_DIR)
 DATA_STORE = "/cs/oschulte/Galen/Hockey-data-entire/Test" + str(
-        100) + "-Hockey-Training-All-feature" + str(
-        5) + "-scale-neg_reward"
+    100) + "-ET-Hockey-Training-All-feature" + str(
+    5) + "-scale-neg_reward"
 DIR_GAMES_ALL = os.listdir(DATA_STORE)
-ITERATE_NUM = 1000
+ITERATE_NUM = 50
 
 
 # helper to initialize a weight and bias variable
@@ -75,10 +72,10 @@ class Model(object):
         tf.summary.scalar('V', tf.reduce_sum(self.V))
 
         # delta = V_next - V
-        delta_op = tf.reduce_sum(self.V_next - self.V, name='delta')
+        self.delta_op = tf.reduce_sum(self.V_next - self.V, name='delta')
 
         # mean squared error of the difference between the next state and the current state
-        loss_op = tf.reduce_mean(tf.square(self.V_next - self.V), name='loss')
+        self.loss_op = tf.reduce_mean(tf.square(self.V_next - self.V), name='loss')
 
         # check if the model predicts the correct state
         accuracy_op = tf.reduce_sum(tf.cast(tf.equal(tf.round(self.V_next), tf.round(self.V)), dtype='float'),
@@ -97,8 +94,8 @@ class Model(object):
             delta_avg_ema = tf.train.ExponentialMovingAverage(decay=0.999)
             accuracy_avg_ema = tf.train.ExponentialMovingAverage(decay=0.999)
 
-            loss_sum_op = loss_sum.assign_add(loss_op)
-            delta_sum_op = delta_sum.assign_add(delta_op)
+            loss_sum_op = loss_sum.assign_add(self.loss_op)
+            delta_sum_op = delta_sum.assign_add(self.delta_op)
             accuracy_sum_op = accuracy_sum.assign_add(accuracy_op)
 
             loss_avg_op = tf.div(loss_sum, tf.maximum(game_step, 1.0))
@@ -140,12 +137,13 @@ class Model(object):
             for grad, var in zip(grads, tvars):
                 with tf.variable_scope('trace'):
                     # e-> = lambda * e-> + <grad of output w.r.t weights>
-                    trace = tf.Variable(tf.zeros(grad.get_shape()), trainable=False, name='trace')  # remember trace is variable, once initialize, keep updating
+                    trace = tf.Variable(tf.zeros(grad.get_shape()), trainable=False,
+                                        name='trace')  # remember trace is variable, once initialize, keep updating
                     trace_op = trace.assign((lamda * trace) + grad)
                     # tf.summary.scalar(var.name + '/traces', trace)
 
                 # grad with trace = alpha * delta * e
-                grad_trace = alpha * delta_op * trace_op
+                grad_trace = alpha * self.delta_op * trace_op
                 # tf.summary.scalar(var.name + '/gradients/trace', grad_trace)
 
                 grad_apply = var.assign_add(grad_trace)
@@ -228,10 +226,11 @@ class Model(object):
                     game_step += 1
                     s_t1 = np.array([state[game_step]])
                     V_next = self.get_output(s_t1)
-                    self.sess.run(self.train_op, feed_dict={self.s_t0: s_t0, self.V_next: V_next})
+                    self.sess.run(self.train_op,
+                                  feed_dict={self.s_t0: s_t0, self.V_next: V_next})
                     s_t0 = s_t1
 
-                print "reward is:"+str(reward[game_step])
+                print "reward is:" + str(reward[game_step])
                 if reward[game_step] == 1:
                     reward_input = 1
                     winner = "home"
@@ -239,21 +238,21 @@ class Model(object):
                     reward_input = -1
                     winner = "away"
                 else:
-                    continue
                     reward_input = 0
                     winner = "tie"
-                _, global_step, summaries, _ = self.sess.run([
+                _, cost, global_step, summaries, _ = self.sess.run([
                     self.train_op,
+                    self.loss_op,
                     self.global_step,
                     self.summaries_op,
                     self.reset_op
                 ], feed_dict={self.s_t0: s_t0, self.V_next: np.array([[reward_input]], dtype='float')})
                 summary_writer.add_summary(summaries, global_step=global_step)
-
+                print "cost is:{0}".format(str(cost))
                 print("Iteration %d/%d (Winner: %s) in %d turns" % (i, ITERATE_NUM, winner, game_step))
                 self.saver.save(self.sess, self.checkpoint_path + 'checkpoint', global_step=global_step)
 
-        print ("error data directory is:"+str(except_num))
+        print ("error data directory is:" + str(except_num))
         summary_writer.close()
 
 

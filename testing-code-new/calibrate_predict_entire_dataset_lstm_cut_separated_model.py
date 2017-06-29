@@ -67,7 +67,7 @@ for calibration_dir_game in os.listdir(calibration_store_dir):
         else:
             home_identifier.append(0)
 
-    readout_t1_batch = model_nn.read_out.eval(feed_dict={model_nn.x: calibrate_values})  # get value of s
+    # readout_t1_batch = model_nn.read_out.eval(feed_dict={model_nn.x: calibrate_values})  # get value of s #TODO: where is trace length?
 
     if ISHOME:
         data_name = "lstm_model_cut_predict_home_feature_" + str(
