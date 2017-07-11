@@ -48,7 +48,7 @@ class Model(object):
                            name='lambda')
 
         # learning rate decay
-        alpha = tf.maximum(0.01, tf.train.exponential_decay(0.1, self.global_step,
+        alpha = tf.maximum(0.0001, tf.train.exponential_decay(0.001, self.global_step,
                                                             40000, 0.96, staircase=True), name='alpha')
 
         tf.summary.scalar('lambda', lamda)

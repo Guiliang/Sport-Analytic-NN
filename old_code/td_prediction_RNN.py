@@ -28,49 +28,49 @@ USE_HIDDEN_STATE = False
 # Download Data
 # scp -r gla68@142.58.21.224:/home/gla68/Documents/Hockey-data/RNN-Hockey-Training-All/game000060 /Users/liu/Desktop/sport-analytic/Data/rnn_all_match_feature/
 
-class create_network_RNN_type1:
-    def __init__(self, rnn_type='bp_every_step'):
-        """
-        define the neural network
-        :param rnn_type:
-        :return:
-        :return: network output
-        """
-        rnn_input = tf.placeholder(tf.float32, [BATCH_SIZE, TRACE_LENGTH, FEATURE_NUMBER], name="x_1")
-
-        lstm_cell = tf.contrib.rnn_cell.LSTMCell(num_units=H_SIZE, state_is_tuple=True,
-                                                 initializer=tf.random_uniform_initializer(-1.0, 1.0))
-
-        single_cell = tf.contrib.rnn.DropoutWrapper(lstm_cell, input_keep_prob=DROPOUT_KEEP_PROB,
-                                                    output_keep_prob=DROPOUT_KEEP_PROB)
-
-        self.cell = tf.contrib.rnn.MultiRNNCell([single_cell] * RNN_LAYER, state_is_tuple=True)
-
-        self.rnn_output, self.rnn_state = tf.nn.dynamic_rnn(  # while loop dynamic learning rnn
-            inputs=rnn_input, cell=self.cell, dtype=tf.float32, scope=rnn_type + '_rnn')
-
-        # state_in = single_cell.zero_state(BATCH_SIZE, tf.float32)
-        # rnn_output, rnn_state = tf.contrib.rnn.static_rnn(inputs=rnn_input, cell=cell, dtype=tf.float32, scope=rnn_type + '_rnn')
-
-        # tf.contrib.rnn.BasicLSTMCell()  # LSTM with rectifier, don't need dropout wrapper?
-
-        self.rnn = tf.reshape(self.rnn_output, shape=[BATCH_SIZE, -1])
-
-        num_layer_1 = H_SIZE * TRACE_LENGTH
-        num_layer_2 = TRACE_LENGTH
-        max_sigmoid_1 = -4 * math.sqrt(float(6) / (num_layer_1 + num_layer_2))
-        min_sigmoid_1 = 4 * math.sqrt(float(6) / (num_layer_1 + num_layer_2))
-        self.w1 = tf.Variable(tf.random_uniform([num_layer_1, num_layer_2], minval=min_sigmoid_1, maxval=max_sigmoid_1),
-                              name="W_1")
-        self.b1 = tf.Variable(tf.zeros([num_layer_2]), name="b_1")
-        self.y1 = tf.matmul(self.rnn, self.w1) + self.b1
-        self.read_out = tf.nn.sigmoid(self.y1, name='activation')
-
-        self.y = tf.placeholder("float", [BATCH_SIZE, TRACE_LENGTH])
-
-        self.cost = tf.reduce_mean(tf.square(self.y - self.read_out))
-
-        self.train_step = tf.train.AdamOptimizer(1e-6).minimize(self.cost)
+# class create_network_RNN_type1:
+#     def __init__(self, rnn_type='bp_every_step'):
+#         """
+#         define the neural network
+#         :param rnn_type:
+#         :return:
+#         :return: network output
+#         """
+#         rnn_input = tf.placeholder(tf.float32, [BATCH_SIZE, TRACE_LENGTH, FEATURE_NUMBER], name="x_1")
+#
+#         lstm_cell = tf.contrib.rnn_cell.LSTMCell(num_units=H_SIZE, state_is_tuple=True,
+#                                                  initializer=tf.random_uniform_initializer(-1.0, 1.0))
+#
+#         single_cell = tf.contrib.rnn.DropoutWrapper(lstm_cell, input_keep_prob=DROPOUT_KEEP_PROB,
+#                                                     output_keep_prob=DROPOUT_KEEP_PROB)
+#
+#         self.cell = tf.contrib.rnn.MultiRNNCell([single_cell] * RNN_LAYER, state_is_tuple=True)
+#
+#         self.rnn_output, self.rnn_state = tf.nn.dynamic_rnn(  # while loop dynamic learning rnn
+#             inputs=rnn_input, cell=self.cell, dtype=tf.float32, scope=rnn_type + '_rnn')
+#
+#         # state_in = single_cell.zero_state(BATCH_SIZE, tf.float32)
+#         # rnn_output, rnn_state = tf.contrib.rnn.static_rnn(inputs=rnn_input, cell=cell, dtype=tf.float32, scope=rnn_type + '_rnn')
+#
+#         # tf.contrib.rnn.BasicLSTMCell()  # LSTM with rectifier, don't need dropout wrapper?
+#
+#         self.rnn = tf.reshape(self.rnn_output, shape=[BATCH_SIZE, -1])
+#
+#         num_layer_1 = H_SIZE * TRACE_LENGTH
+#         num_layer_2 = TRACE_LENGTH
+#         max_sigmoid_1 = -4 * math.sqrt(float(6) / (num_layer_1 + num_layer_2))
+#         min_sigmoid_1 = 4 * math.sqrt(float(6) / (num_layer_1 + num_layer_2))
+#         self.w1 = tf.Variable(tf.random_uniform([num_layer_1, num_layer_2], minval=min_sigmoid_1, maxval=max_sigmoid_1),
+#                               name="W_1")
+#         self.b1 = tf.Variable(tf.zeros([num_layer_2]), name="b_1")
+#         self.y1 = tf.matmul(self.rnn, self.w1) + self.b1
+#         self.read_out = tf.nn.sigmoid(self.y1, name='activation')
+#
+#         self.y = tf.placeholder("float", [BATCH_SIZE, TRACE_LENGTH])
+#
+#         self.cost = tf.reduce_mean(tf.square(self.y - self.read_out))
+#
+#         self.train_step = tf.train.AdamOptimizer(1e-6).minimize(self.cost)
 
 
 class create_network_RNN_type2:

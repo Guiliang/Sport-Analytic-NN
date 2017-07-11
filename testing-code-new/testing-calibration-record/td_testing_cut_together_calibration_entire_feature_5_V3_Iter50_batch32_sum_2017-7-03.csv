@@ -1,0 +1,4 @@
+model_predict_home_value_record_average,model_predict_away_value_record_average,calibration_away_value_record_average,Manpower,Goal Different,Period,calibration_home_value_record_average
+0.5268303330530125,-0.5294326417217933,-0.5,0,0,1,0.5
+0.42653175388022757,-0.4632608051448965,-0.4805194805194805,0,0,2,0.5064935064935064
+0.3166522769192082,-0.4063927004747864,-0.4418604651162791,0,0,3,0.37209302325581395

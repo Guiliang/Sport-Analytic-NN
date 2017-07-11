@@ -1,10 +1,12 @@
-import scipy.io as sio
-import tensorflow as tf
+import ast
 import os
 import unicodedata
-import ast
-import td_prediction_lstm
+
 import numpy as np
+import scipy.io as sio
+import tensorflow as tf
+
+import td_prediction_lstm
 
 FEATURE_TYPE = 5
 calibration = True

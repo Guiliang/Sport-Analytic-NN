@@ -1,3 +1,4 @@
+import csv
 import random
 
 import scipy.io as sio
@@ -15,14 +16,13 @@ train the home team and away team together, use a feature to represent it.
 feature_num = 26
 FEATURE_TYPE = 5
 model_train_continue = True
-ITERATE_NUM = 75
+ITERATE_NUM = 50
 REWARD_TYPE = "NEG_REWARD_GAMMA1"
 MODEL_TYPE = "V3"
 Random_or_Sequenced = "Sequenced"
 GAMMA = 1  # decay rate of past observations
 BATCH_SIZE = 32  # size of mini-batch, the size of mini-batch could be tricky, the larger mini-batch, the easier will it be converge, but if our training data is not comprehensive enough and stochastic gradients is not applied, model may converge to other things
 SPORT = "NHL"
-TEST_LENGTH = 100
 SCALE = True
 
 if Random_or_Sequenced == "Random":
@@ -33,27 +33,21 @@ else:
     raise ValueError("Random_or_Sequenced setting wrong")
 
 if SCALE:
-    DATA_STORE = "/cs/oschulte/Galen/Hockey-data-entire/Test" + str(
-        TEST_LENGTH) + "-Back-Hockey-Training-All-feature" + str(
+    DATA_STORE = "/cs/oschulte/Galen/Hockey-data-entire/Back-Hockey-Training-All-feature" + str(
         FEATURE_TYPE) + "-scale-neg_reward"
-    LOG_DIR = "/cs/oschulte/Galen/models/log_NN/Scale-Test" + str(
-        TEST_LENGTH) + "-back-cut_log_entire__train_feature" + str(
+    LOG_DIR = "/cs/oschulte/Galen/models/log_NN/Scale-dp-back-cut_log_entire__train_feature" + str(
         FEATURE_TYPE) + "_batch" + str(BATCH_SIZE) + "_iterate" + str(
         ITERATE_NUM) + "-" + str(REWARD_TYPE) + "_" + MODEL_TYPE + "-" + Random_or_Sequenced
-    SAVED_NETWORK = "/cs/oschulte/Galen/models/saved_NN/Scale-Test" + str(
-        TEST_LENGTH) + "-back-cut_saved_entire__networks_feature" + str(
+    SAVED_NETWORK = "/cs/oschulte/Galen/models/saved_NN/Scale-dp-back-cut_saved_entire__networks_feature" + str(
         FEATURE_TYPE) + "_batch" + str(BATCH_SIZE) + "_iterate" + str(
         ITERATE_NUM) + "-" + str(REWARD_TYPE) + "_" + MODEL_TYPE + "-" + Random_or_Sequenced
 else:
-    DATA_STORE = "/cs/oschulte/Galen/Hockey-data-entire/Test" + str(
-        TEST_LENGTH) + "-Back-Hockey-Training-All-feature" + str(
+    DATA_STORE = "/cs/oschulte/Galen/Hockey-data-entire/Back-Hockey-Training-All-feature" + str(
         FEATURE_TYPE) + "-neg_reward"
-    LOG_DIR = "/cs/oschulte/Galen/models/log_NN/Test" + str(
-        TEST_LENGTH) + "-back-cut_log_entire__train_feature" + str(
+    LOG_DIR = "/cs/oschulte/Galen/models/log_NN/dp-back-cut_log_entire__train_feature" + str(
         FEATURE_TYPE) + "_batch" + str(BATCH_SIZE) + "_iterate" + str(
         ITERATE_NUM) + "-" + str(REWARD_TYPE) + "_" + MODEL_TYPE + "-" + Random_or_Sequenced
-    SAVED_NETWORK = "/cs/oschulte/Galen/models/saved_NN/Test" + str(
-        TEST_LENGTH) + "-back-cut_saved_entire__networks_feature" + str(
+    SAVED_NETWORK = "/cs/oschulte/Galen/models/saved_NN/dp-back-cut_saved_entire__networks_feature" + str(
         FEATURE_TYPE) + "_batch" + str(BATCH_SIZE) + "_iterate" + str(
         ITERATE_NUM) + "-" + str(REWARD_TYPE) + "_" + MODEL_TYPE + "-" + Random_or_Sequenced
 
@@ -148,7 +142,7 @@ class td_prediction_simple(object):
         tf.summary.histogram('cost', self.cost)
 
         with tf.name_scope("train"):
-            self.train_step = tf.train.AdamOptimizer(1e-6).minimize(self.cost)
+            self.train_step = tf.train.AdamOptimizer(1e-4).minimize(self.cost)
             # self.train_step = tf.train.GradientDescentOptimizer(1e-6).minimize(self.cost)
             # train_step = tf.train.AdadeltaOptimizer().minimize(cost)
 
@@ -223,7 +217,7 @@ class td_prediction_simple_V2(object):
         tf.summary.histogram('cost', self.cost)
 
         with tf.name_scope("train"):
-            self.train_step = tf.train.AdamOptimizer(1e-6).minimize(self.cost)
+            self.train_step = tf.train.AdamOptimizer(1e-4).minimize(self.cost)
             # self.train_step = tf.train.GradientDescentOptimizer(1e-6).minimize(self.cost)
             # train_step = tf.train.AdadeltaOptimizer().minimize(cost)
 
@@ -312,7 +306,7 @@ class td_prediction_simple_V3(object):
         tf.summary.histogram('cost', self.cost)
 
         with tf.name_scope("train"):
-            self.train_step = tf.train.AdamOptimizer(1e-6).minimize(self.cost)
+            self.train_step = tf.train.AdamOptimizer(1e-4).minimize(self.cost)
             # self.train_step = tf.train.GradientDescentOptimizer(1e-6).minimize(self.cost)
             # train_step = tf.train.AdadeltaOptimizer().minimize(cost)
 
@@ -708,29 +702,121 @@ class td_prediction_simple_V7(object):
             self.train_step = tf.train.AdamOptimizer(1e-6).minimize(self.cost)
 
 
-def get_next_test_event():
-    """
-    retrieve next event from sport data
-    :return:
-    """
-    state = []
-    reward = 0
-    terminal = 0
-    return state, reward, terminal
+class td_prediction_simple_V8(object):
+    def __init__(self):
+        """
+        define the neural network
+        :return: network output
+        """
+
+        num_layer_1 = feature_num
+        num_layer_2 = 1000
+        num_layer_3 = 1000
+        num_layer_4 = 1000
+        num_layer_5 = 1
+
+        max_sigmoid_1 = -1 * math.sqrt(float(60) / (num_layer_1 + num_layer_2))
+        min_sigmoid_1 = 1 * math.sqrt(float(60) / (num_layer_1 + num_layer_2))
+        max_sigmoid_2 = -1 * math.sqrt(float(60) / (num_layer_2 + num_layer_3))
+        min_sigmoid_2 = 1 * math.sqrt(float(60) / (num_layer_2 + num_layer_3))
+        max_sigmoid_3 = -1 * math.sqrt(float(60) / (num_layer_3 + num_layer_4))
+        min_sigmoid_3 = 1 * math.sqrt(float(60) / (num_layer_3 + num_layer_4))
+        max_sigmoid_4 = -1 * math.sqrt(float(60) / (num_layer_4 + num_layer_5))
+        min_sigmoid_4 = 1 * math.sqrt(float(60) / (num_layer_4 + num_layer_5))
+
+        with tf.name_scope("Dense_Layer_first"):
+            self.x = tf.placeholder(tf.float32, [None, num_layer_1], name="x_1")
+            with tf.name_scope("Weight_1"):
+                self.W1 = tf.Variable(
+                    tf.random_uniform([num_layer_1, num_layer_2], minval=min_sigmoid_1, maxval=max_sigmoid_1),
+                    name="W_1")
+            with tf.name_scope("Biases_1"):
+                self.b1 = tf.Variable(tf.zeros([num_layer_2]), name="b_1")
+            with tf.name_scope("Output_1"):
+                self.y1 = tf.matmul(self.x, self.W1) + self.b1
+            with tf.name_scope("Activation_1"):
+                self.activations1 = tf.nn.tanh(self.y1, name='activation1')
+
+        with tf.name_scope("Dense_Layer_second"):
+            with tf.name_scope("Weight_2"):
+                self.W2 = tf.Variable(
+                    tf.random_uniform([num_layer_2, num_layer_3], minval=min_sigmoid_2, maxval=max_sigmoid_2),
+                    name="W_2")
+            with tf.name_scope("Biases_2"):
+                self.b2 = tf.Variable(tf.zeros([num_layer_3]), name="b_2")
+            with tf.name_scope("Output_2"):
+                self.y2 = tf.matmul(self.activations1, self.W2) + self.b2
+            with tf.name_scope("Activation_2"):
+                self.activations2 = tf.nn.tanh(self.y2, name='activation2')
+
+        with tf.name_scope("Dense_Layer_third"):
+            with tf.name_scope("Weight_3"):
+                self.W3 = tf.Variable(
+                    tf.random_uniform([num_layer_3, num_layer_4], minval=min_sigmoid_3, maxval=max_sigmoid_3),
+                    name="W_3")
+            with tf.name_scope("Biases_3"):
+                self.b3 = tf.Variable(tf.zeros([num_layer_4]), name="b_3")
+            with tf.name_scope("Output_3"):
+                self.y3 = tf.matmul(self.activations2, self.W3) + self.b3
+            with tf.name_scope("Activation_3"):
+                self.activations3 = tf.nn.tanh(self.y3, name='activation3')
+
+        with tf.name_scope("Dense_Layer_fourth"):
+            with tf.name_scope("Weight_4"):
+                self.W4 = tf.Variable(
+                    tf.random_uniform([num_layer_4, num_layer_5], minval=min_sigmoid_4, maxval=max_sigmoid_4),
+                    name="W_4")
+            with tf.name_scope("Biases_4"):
+                self.b4 = tf.Variable(tf.zeros([num_layer_5]), name="b_4")
+            with tf.name_scope("Output_4"):
+                self.read_out = tf.matmul(self.activations3, self.W4) + self.b4
+
+        # define the cost function
+        self.y = tf.placeholder("float", [None])
+
+        with tf.name_scope("cost"):
+            self.readout_action = tf.reduce_sum(self.read_out,
+                                                reduction_indices=1)  # Computes the sum of elements across dimensions of a tensor.
+            self.diff_v = tf.reduce_mean(tf.abs(self.y - self.readout_action))
+            self.cost = tf.reduce_mean(tf.square(self.y - self.readout_action))  # square means
+        tf.summary.histogram('cost', self.cost)
+
+        with tf.name_scope("train"):
+            self.train_step = tf.train.AdamOptimizer(1e-6).minimize(self.cost)
+            # self.train_step = tf.train.GradientDescentOptimizer(1e-6).minimize(self.cost)
+            # train_step = tf.train.AdadeltaOptimizer().minimize(cost)
 
 
-def get_back_training_batch(s_t1, state, reward, train_number, train_len):
-    """
-    combine training data to a batch
-    :return: [last_state_of_batch, batch, time_series]
-    """
+# def get_next_test_event():
+#     """
+#     retrieve next event from sport data
+#     :return:
+#     """
+#     state = []
+#     reward = 0
+#     terminal = 0
+#     return state, reward, terminal
+
+def re_order_training_batch(all_episodes_batch):
+    reordered_training_batch = []
+    for state_num in range(0, 4000, 1):
+        for episode_batch_return in all_episodes_batch:
+            try:
+                batch_temp = episode_batch_return[state_num]
+                reordered_training_batch.append(batch_temp)
+            except:
+                continue
+    return reordered_training_batch
+
+
+def get_back_training_episode_data(s_t1, state, reward, train_number, train_len):
     batch_return = []
     if len(state) == 1:
         batch_return.append((state[0], reward[0], state[0], 1, 1))
         s_t1 = state[0]
     else:
         current_batch_length = 0
-        while current_batch_length < BATCH_SIZE:
+        while current_batch_length < train_len:
             s_t0 = state[train_number - 1]
             # r_t1 = reward[train_number]
             r_t0 = reward[train_number - 1]
@@ -741,8 +827,8 @@ def get_back_training_batch(s_t1, state, reward, train_number, train_len):
                     raise ValueError("invalid FORWARD_REWARD_MODE, haven't defined")
                     # batch_return.append((s_t0, r_t1, s_t1, 1))
                 else:
-                    batch_return.append((s_t1, r_t1, s_t1, 0, 1))
-                    batch_return.append((s_t0, r_t0, s_t1, 1, 0))
+                    batch_return.append((s_t1, r_t1, s_t1, 1))
+                    batch_return.append((s_t0, r_t0, s_t1, 0))
                     break
                     # current_batch_length += 2
 
@@ -751,15 +837,15 @@ def get_back_training_batch(s_t1, state, reward, train_number, train_len):
                     raise ValueError("invalid FORWARD_REWARD_MODE, haven't defined")
                     # batch_return.append((s_t0, r_t1, s_t1, 1))
                 else:
-                    batch_return.append((s_t1, r_t1, s_t1, 0, 1))
-                    batch_return.append((s_t0, r_t0, s_t1, 0, 0))
+                    batch_return.append((s_t1, r_t1, s_t1, 1))
+                    batch_return.append((s_t0, r_t0, s_t1, 0))
                 current_batch_length += 2
             elif train_number - 1 == 0:
                 if FORWARD_REWARD_MODE:
                     raise ValueError("invalid FORWARD_REWARD_MODE, haven't defined")
                     # batch_return.append((s_t0, r_t1, s_t1, 1))
                 else:
-                    batch_return.append((s_t0, r_t0, s_t1, 1, 0))
+                    batch_return.append((s_t0, r_t0, s_t1, 0))
                     break
                     # current_batch_length += 1
             else:
@@ -767,57 +853,115 @@ def get_back_training_batch(s_t1, state, reward, train_number, train_len):
                     raise ValueError("invalid FORWARD_REWARD_MODE, haven't defined")
                     # batch_return.append((s_t0, r_t1, s_t1, 0))
                 else:
-                    batch_return.append((s_t0, r_t0, s_t1, 0, 0))
+                    batch_return.append((s_t0, r_t0, s_t1, 0))
                 current_batch_length += 1
 
             train_number -= 1
             s_t1 = s_t0
 
-    return s_t1, batch_return, train_number
-
-
-def get_training_batch_all(s_t0, state, reward):
-    """
-    combine all the training data to a batch
-    :return: [last_state_of_batch, batch, time_series]
-    """
-    batch_return = []
-    train_number = 1
-    train_len = len(state)
-    while train_number < train_len:
-        s_t1 = state[train_number]
-        r_t0 = reward[train_number - 1]
-        train_number += 1
-        if train_number + 1 == train_len:
-            batch_return.append((s_t0, r_t0, s_t1))
-            break
-
-        batch_return.append((s_t0, r_t0, s_t1))
-        s_t0 = s_t1
-
     return batch_return
 
 
-def build_training_batch(state, reward):
-    """
-    build batches
-    :param state:
-    :param reward:
-    :return:
-    """
-    batch_return = []
-    batch_number = len(state)
-    s_t0 = state[0]
-    for num in range(1, batch_number):
-        s_t1 = state[num]
-        r_t1 = reward[num]
-        if num == batch_number - 1:
-            terminal = 1
-        else:
-            terminal = 0
-        batch_return.append({'state_0': s_t0, 'reward': r_t1, 'state_1': s_t1, 'terminal': terminal})
-        s_t0 = s_t1
-    return batch_return
+# def get_back_training_batch(s_t1, state, reward, train_number, train_len):
+#     """
+#     combine training data to a batch
+#     :return: [last_state_of_batch, batch, time_series]
+#     """
+#     batch_return = []
+#     if len(state) == 1:
+#         batch_return.append((state[0], reward[0], state[0], 1, 1))
+#         s_t1 = state[0]
+#     else:
+#         current_batch_length = 0
+#         while current_batch_length < BATCH_SIZE:
+#             s_t0 = state[train_number - 1]
+#             # r_t1 = reward[train_number]
+#             r_t0 = reward[train_number - 1]
+#             r_t1 = reward[train_number]
+#
+#             if train_number + 1 == train_len and train_number - 1 == 0:
+#                 if FORWARD_REWARD_MODE:
+#                     raise ValueError("invalid FORWARD_REWARD_MODE, haven't defined")
+#                     # batch_return.append((s_t0, r_t1, s_t1, 1))
+#                 else:
+#                     batch_return.append((s_t1, r_t1, s_t1, 0, 1))
+#                     batch_return.append((s_t0, r_t0, s_t1, 1, 0))
+#                     break
+#                     # current_batch_length += 2
+#
+#             elif train_number + 1 == train_len:
+#                 if FORWARD_REWARD_MODE:
+#                     raise ValueError("invalid FORWARD_REWARD_MODE, haven't defined")
+#                     # batch_return.append((s_t0, r_t1, s_t1, 1))
+#                 else:
+#                     batch_return.append((s_t1, r_t1, s_t1, 0, 1))
+#                     batch_return.append((s_t0, r_t0, s_t1, 0, 0))
+#                 current_batch_length += 2
+#             elif train_number - 1 == 0:
+#                 if FORWARD_REWARD_MODE:
+#                     raise ValueError("invalid FORWARD_REWARD_MODE, haven't defined")
+#                     # batch_return.append((s_t0, r_t1, s_t1, 1))
+#                 else:
+#                     batch_return.append((s_t0, r_t0, s_t1, 1, 0))
+#                     break
+#                     # current_batch_length += 1
+#             else:
+#                 if FORWARD_REWARD_MODE:
+#                     raise ValueError("invalid FORWARD_REWARD_MODE, haven't defined")
+#                     # batch_return.append((s_t0, r_t1, s_t1, 0))
+#                 else:
+#                     batch_return.append((s_t0, r_t0, s_t1, 0, 0))
+#                 current_batch_length += 1
+#
+#             train_number -= 1
+#             s_t1 = s_t0
+#
+#     return s_t1, batch_return, train_number
+
+
+# def get_training_batch_all(s_t0, state, reward):
+#     """
+#     combine all the training data to a batch
+#     :return: [last_state_of_batch, batch, time_series]
+#     """
+#     batch_return = []
+#     train_number = 1
+#     train_len = len(state)
+#     while train_number < train_len:
+#         s_t1 = state[train_number]
+#         r_t0 = reward[train_number - 1]
+#         train_number += 1
+#         if train_number + 1 == train_len:
+#             batch_return.append((s_t0, r_t0, s_t1))
+#             break
+#
+#         batch_return.append((s_t0, r_t0, s_t1))
+#         s_t0 = s_t1
+#
+#     return batch_return
+
+
+# def build_training_batch(state, reward):
+#     """
+#     build batches
+#     :param state:
+#     :param reward:
+#     :return:
+#     """
+#     batch_return = []
+#     batch_number = len(state)
+#     s_t0 = state[0]
+#     for num in range(1, batch_number):
+#         s_t1 = state[num]
+#         r_t1 = reward[num]
+#         if num == batch_number - 1:
+#             terminal = 1
+#         else:
+#             terminal = 0
+#         batch_return.append({'state_0': s_t0, 'reward': r_t1, 'state_1': s_t1, 'terminal': terminal})
+#         s_t0 = s_t1
+#     return batch_return
+
 
 
 def write_list_txt(data_list):
@@ -826,13 +970,58 @@ def write_list_txt(data_list):
             f.write(data)
 
 
+def write_game_average_csv(data_record):
+    try:
+        if os.path.exists(LOG_DIR + '/avg_cost_record.csv'):
+            with open(LOG_DIR + '/avg_cost_record.csv', 'a') as csvfile:
+                fieldnames = (data_record[0]).keys()
+                writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+                for record in data_record:
+                    writer.writerow(record)
+        else:
+            with open(LOG_DIR + '/avg_cost_record.csv', 'w') as csvfile:
+                fieldnames = (data_record[0]).keys()
+                writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+                writer.writeheader()
+                for record in data_record:
+                    writer.writerow(record)
+    except:
+        if os.path.exists(LOG_DIR + '/avg_cost_record2.csv'):
+            with open(LOG_DIR + '/avg_cost_record.csv', 'a') as csvfile:
+                fieldnames = (data_record[0]).keys()
+                writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+                for record in data_record:
+                    writer.writerow(record)
+        else:
+            with open(LOG_DIR + '/avg_cost_record2.csv', 'w') as csvfile:
+                fieldnames = (data_record[0]).keys()
+                writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+                writer.writeheader()
+                for record in data_record:
+                    writer.writerow(record)
+
+
+def get_batch(reordered_all_episodes_batch, train_batch_number):
+    batch_return = []
+    current_batch_length = 0
+
+    while current_batch_length < BATCH_SIZE:
+        try:
+            batch_return.append(reordered_all_episodes_batch[train_batch_number])
+            train_batch_number += 1
+            current_batch_length += 1
+        except:
+            return batch_return, train_batch_number, 1
+
+    return batch_return, train_batch_number, 0
+
+
 def train_network(sess, model, print_parameters=False):
     """
     train the network
     :param print_parameters:
     :return:
     """
-    game_number = 0
     global_counter = 0
     converge_flag = False
 
@@ -841,156 +1030,145 @@ def train_network(sess, model, print_parameters=False):
     merge = tf.summary.merge_all()
     train_writer = tf.summary.FileWriter(LOG_DIR, sess.graph)
     sess.run(tf.global_variables_initializer())
-    if model_train_continue:
-        checkpoint = tf.train.get_checkpoint_state(SAVED_NETWORK)
-        if checkpoint and checkpoint.model_checkpoint_path:
-            check_point_game_number = int((checkpoint.model_checkpoint_path.split("-"))[-1])
-            game_number_checkpoint = check_point_game_number % number_of_total_game
-            game_number = check_point_game_number
-            game_starting_point = 0
-            saver.restore(sess, checkpoint.model_checkpoint_path)
-            print("Successfully loaded:", checkpoint.model_checkpoint_path)
-        else:
-            print("Could not find old network weights")
 
     cost_all_record = []
 
-    # iterate over the training data
-    # for i in range(0, ITERATE_NUM):
+    all_episodes_batch = []
+    for dir_game in DIR_GAMES_ALL:
+
+        game_files = os.listdir(DATA_STORE + "/" + dir_game)
+
+        for part_number in range(0, 100000):
+
+            find_flag = False
+
+            for filename in game_files:
+                if filename.startswith("part_{0}_reward".format(part_number)):
+                    reward_name = filename
+                    find_flag = True
+                elif filename.startswith("part_{0}_state".format(part_number)):
+                    state_name = filename
+                    find_flag = True
+
+            if not find_flag:
+                break
+
+            reward = sio.loadmat(DATA_STORE + "/" + dir_game + "/" + reward_name)
+            try:
+                reward = (reward['reward'][0]).tolist()
+            except:
+                print "\n" + dir_game
+                continue
+            reward_count = sum(reward)
+            state = sio.loadmat(DATA_STORE + "/" + dir_game + "/" + state_name)
+            state = state['state']
+            print ("\n load file" + str(dir_game) + " success")
+            print ("reward number" + str(reward_count))
+            if len(state) != len(reward):
+                raise Exception('state length does not equal to reward length')
+
+            train_len = len(state)
+            train_number = train_len
+
+            # start training
+            train_number -= 1
+            s_t1 = state[train_number]
+            episode_batch_return = get_back_training_episode_data(s_t1, state,
+                                                                  reward,
+                                                                  train_number,
+                                                                  train_len)
+            all_episodes_batch.append(episode_batch_return)
+            # break
+
+    iterate_number_now = 0
+    reordered_all_episodes_batch = re_order_training_batch(all_episodes_batch)
+
     while True:
+        train_batch_number = 0
+        iterate_number_now += 1
+        iter_cost_record = []
         if converge_flag:
             break
-        elif game_number >= number_of_total_game * ITERATE_NUM:
+        elif iterate_number_now > ITERATE_NUM:
             break
         else:
             converge_flag = True
 
         cost_per_iter_record = []
-        for dir_game in DIR_GAMES_ALL:
+        all_episodes_batch = []
 
-            if model_train_continue:  # go the check point data
-                if checkpoint and checkpoint.model_checkpoint_path:
-                    game_starting_point += 1
-                    if game_number_checkpoint + 1 > game_starting_point:
-                        continue
+        if not Random_select:
+            while True:
 
-            game_number += 1
-            game_files = os.listdir(DATA_STORE + "/" + dir_game)
-
-            for part_number in range(0, 100000):
-
-                find_flag = False
-
-                for filename in game_files:
-                    if filename.startswith("part_{0}_reward".format(part_number)):
-                        reward_name = filename
-                        find_flag = True
-                    elif filename.startswith("part_{0}_state".format(part_number)):
-                        state_name = filename
-                        find_flag = True
-
-                if not find_flag:
-                    break
-
-                reward = sio.loadmat(DATA_STORE + "/" + dir_game + "/" + reward_name)
                 try:
-                    reward = (reward['reward'][0]).tolist()
+                    batch, train_batch_number, terminal = get_batch(reordered_all_episodes_batch, train_batch_number)
                 except:
-                    print "\n" + dir_game
-                    continue
-                reward_count = sum(reward)
-                state = sio.loadmat(DATA_STORE + "/" + dir_game + "/" + state_name)
-                state = state['state']
-                print ("\n load file" + str(dir_game) + " success")
-                print ("reward number" + str(reward_count))
-                if len(state) != len(reward):
-                    raise Exception('state length does not equal to reward length')
+                    traceback.print_exc(file=sys.stdout)
 
-                train_len = len(state)
-                train_number = train_len
+                s_t_home_batch = [d[0] for d in batch]
+                r_t_home_batch = [d[1] for d in batch]
+                s_t1_home_batch = [d[2] for d in batch]
+                s_t_batch = s_t_home_batch
+                r_t_batch = r_t_home_batch
+                s_t1_batch = s_t1_home_batch
 
-                # start training
-                train_number -= 1
-                s_t1 = state[train_number]
+                y_batch = []
 
-                if not Random_select:
-                    while True:
+                readout_t1_batch = model.read_out.eval(feed_dict={model.x: s_t1_batch})  # get value of s
 
-                        try:
-                            s_tl, batch_return, train_number = get_back_training_batch(s_t1, state,
-                                                                                       reward,
-                                                                                       train_number,
-                                                                                       train_len)
-                        except:
-                            traceback.print_exc(file=sys.stdout)
+                for i in range(0, len(batch)):
+                    # if terminal, only equals reward
+                    last = batch[i][3]
+                    if last:
+                        y_batch.append(float(r_t_batch[i]))
+                    elif terminal:
+                        y_batch.append(r_t_batch[i] + GAMMA * ((readout_t1_batch[i]).tolist())[0])
+                        break
+                    else:
+                        y_batch.append(r_t_batch[i] + GAMMA * ((readout_t1_batch[i]).tolist())[0])
 
-                        batch = batch_return
-                        s_t_home_batch = [d[0] for d in batch]
-                        r_t_home_batch = [d[1] for d in batch]
-                        s_t1_home_batch = [d[2] for d in batch]
-                        s_t_batch = s_t_home_batch
-                        r_t_batch = r_t_home_batch
-                        s_t1_batch = s_t1_home_batch
-
-                        y_batch = []
-
-                        readout_t1_batch = model.read_out.eval(feed_dict={model.x: s_t1_batch})  # get value of s
-
-                        for i in range(0, len(batch)):
-                            start = batch[i][3]
-                            terminal = batch[i][4]
-                            # if terminal, only equals reward
-                            if terminal and start:
-                                y_batch.append(float(r_t_batch[i]))
-                                break
-                            elif terminal:
-                                y_batch.append(float(r_t_batch[i]))
-                            elif start:
-                                y_batch.append(r_t_batch[i] + GAMMA * ((readout_t1_batch[i]).tolist())[0])
-                                break
-                            else:
-                                y_batch.append(r_t_batch[i] + GAMMA * ((readout_t1_batch[i]).tolist())[0])
-
-                        if MODEL_TYPE == "V5":
-                            [global_step, learning_rate, diff_v, cost_out, summary_train, _] = sess.run(
-                                [model.global_step, model.learning_rate, model.diff_v, model.cost, merge,
-                                 model.train_step],
-                                feed_dict={model.y: y_batch, model.x: s_t_batch})
-                        else:
-                            [diff_v, cost_out, summary_train, _] = sess.run(
-                                [model.diff_v, model.cost, merge, model.train_step],
-                                feed_dict={model.y: y_batch, model.x: s_t_batch})
-
-                        if float(diff_v)/BATCH_SIZE > 0.01:
-                            converge_flag = False
-
-                        global_counter += 1
-                        cost_per_iter_record.append(cost_out)
-                        train_writer.add_summary(summary_train, global_step=global_counter)
-                        # update the old values
-                        s_t1 = s_tl
-
-                        # print info
-                        if start or ((train_number - 1) / BATCH_SIZE) % 5 == 1:
-                            print ("TIMESTEP:", train_number, "Game:", game_number)
-                            print(str((min(readout_t1_batch)[0], max(readout_t1_batch)[0])))
-
-                            if MODEL_TYPE == "V5":
-                                print ("cost of the network is: " + str(cost_out) + " with learning rate: " + str(
-                                    learning_rate) + " and global step: " + str(global_step))
-                            else:
-                                print ("cost of the network is: " + str(cost_out))
-
-                        if start:
-                            # save progress after a game
-                            saver.save(sess, SAVED_NETWORK + '/' + SPORT + '-game-', global_step=game_number)
-                            break
+                if MODEL_TYPE == "V5":
+                    [global_step, learning_rate, diff_v, cost_out, summary_train, _] = sess.run(
+                        [model.global_step, model.learning_rate, model.diff_v, model.cost, merge,
+                         model.train_step],
+                        feed_dict={model.y: y_batch, model.x: s_t_batch})
                 else:
-                    raise ValueError("Haven't define for random yet")
+                    [diff_v, cost_out, summary_train, _] = sess.run(
+                        [model.diff_v, model.cost, merge, model.train_step],
+                        feed_dict={model.y: y_batch, model.x: s_t_batch})
 
-        cost_per_iter_average = sum(cost_per_iter_record) / float(len(cost_per_iter_record))
-        cost_all_record.append(
-            "Iter:" + str(game_number / number_of_total_game) + " avg_cost:" + str(cost_per_iter_average))
+                if float(diff_v) / BATCH_SIZE > 0.01:
+                    converge_flag = False
+
+                global_counter += 1
+                iter_cost_record.append(cost_out)
+                cost_per_iter_record.append(cost_out)
+                train_writer.add_summary(summary_train, global_step=global_counter)
+
+                # print info
+                if terminal or ((train_batch_number - 1) / BATCH_SIZE) % 5 == 1:
+                    print ("TIMESTEP:", train_batch_number, "iterate:", iterate_number_now)
+                    print(str((min(readout_t1_batch)[0], max(readout_t1_batch)[0])))
+
+                    if MODEL_TYPE == "V5":
+                        print ("cost of the network is: " + str(cost_out) + " with learning rate: " + str(
+                            learning_rate) + " and global step: " + str(global_step))
+                    else:
+                        print ("cost of the network is: " + str(cost_out))
+
+                if terminal:
+                    # save progress after a game
+                    saver.save(sess, SAVED_NETWORK + '/' + SPORT + '-iterate-', global_step=iterate_number_now)
+                    break
+            cost_per_game_average = sum(iter_cost_record) / len(iter_cost_record)
+            write_game_average_csv([{"iteration": str(iterate_number_now),
+                                     "cost_per_game_average": cost_per_game_average}])
+        else:
+            raise ValueError("Haven't define for random yet")
+
+            # cost_per_iter_average = sum(cost_per_iter_record) / float(len(cost_per_iter_record))
+            # cost_all_record.append(
+            #     "Iter:" + str(game_number / number_of_total_game) + " avg_cost:" + str(cost_per_iter_average))
 
     # write_list_txt(cost_per_iter_record)
     train_writer.close()
@@ -1017,6 +1195,8 @@ def train_start():
         nn = td_prediction_simple_V6()
     elif MODEL_TYPE == "V7":
         nn = td_prediction_simple_V7()
+    elif MODEL_TYPE == "V8":
+        nn = td_prediction_simple_V8()
     else:
         raise ValueError("Unclear model type")
     train_network(sess, nn)

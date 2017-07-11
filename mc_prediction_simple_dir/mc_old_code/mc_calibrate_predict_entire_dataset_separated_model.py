@@ -1,45 +1,26 @@
-import scipy.io as sio
-import tensorflow as tf
+import ast
 import os
 import unicodedata
-import ast
-import td_prediction_simple_separated
+
 import numpy as np
+import scipy.io as sio
+import tensorflow as tf
+
+import mc_prediction_simple_separated_gpu
 
 FEATURE_TYPE = 5
 calibration = True
-ISHOME = False
-ITERATE_NUM = 25
-MODEL_TYPE = "V3"
-BATCH_SIZE = 32
+ISHOME = True
 
-SIMPLE_HOME_SAVED_NETWORK_PATH = "/cs/oschulte/Galen/models/saved_NN/saved_entire_Home_networks_feature{0}_batch{1}_iterate{2}-NEG_REWARD_GAMMA1_{3}-Sequenced".format(
-    str(FEATURE_TYPE), str(BATCH_SIZE), str(ITERATE_NUM), MODEL_TYPE)
-SIMPLE_AWAY_SAVED_NETWORK_PATH = "/cs/oschulte/Galen/models/saved_NN/saved_entire_Away_networks_feature{0}_batch{1}_iterate{2}-NEG_REWARD_GAMMA1_{3}-Sequenced".format(
-    str(FEATURE_TYPE), str(BATCH_SIZE), str(ITERATE_NUM), MODEL_TYPE)
+SIMPLE_HOME_SAVED_NETWORK_PATH = "/home/gla68/PycharmProjects/Sport-Analytic-NN/mc_prediction_simple_dir/saved_NN/mc_saved_Home_networks_feature" + str(
+    FEATURE_TYPE) + "_batch16_iterate25-NEG_REWARD_GAMMA1_V3-Sequenced"
+SIMPLE_AWAY_SAVED_NETWORK_PATH = "/home/gla68/PycharmProjects/Sport-Analytic-NN/mc_prediction_simple_dir/saved_NN/mc_saved_Away_networks_feature" + str(
+    FEATURE_TYPE) + "_batch16_iterate25-NEG_REWARD_GAMMA1_V3-Sequenced"
 
-calibration_store_dir = "/cs/oschulte/Galen/Hockey-data-entire/td_calibrate_all_feature_" + str(
-    FEATURE_TYPE) + "_" + MODEL_TYPE + "_Iter" + str(ITERATE_NUM)+"_batch"+str(BATCH_SIZE)
-# calibration_store_dir = "/cs/oschulte/Galen/Hockey-data/td_calibrate_all_feature_5_2017-6-01"
+calibration_store_dir = "/media/gla68/Windows/Hockey-data/mc_calibrate_all_feature_" + str(FEATURE_TYPE)
+
 sess_nn = tf.InteractiveSession()
-
-if MODEL_TYPE == "V1":
-    model_nn = td_prediction_simple_separated.td_prediction_simple()
-elif MODEL_TYPE == "V2":
-    model_nn = td_prediction_simple_separated.td_prediction_simple_V2()
-elif MODEL_TYPE == "V3":
-    model_nn = td_prediction_simple_separated.td_prediction_simple_V3()
-elif MODEL_TYPE == "V4":
-    model_nn = td_prediction_simple_separated.td_prediction_simple_V4()
-elif MODEL_TYPE == "V5":
-    model_nn = td_prediction_simple_separated.td_prediction_simple_V5()
-elif MODEL_TYPE == "V6":
-    model_nn = td_prediction_simple_separated.td_prediction_simple_V6()
-elif MODEL_TYPE == "V7":
-    model_nn = td_prediction_simple_separated.td_prediction_simple_V7()
-else:
-    raise ValueError("Unclear model type")
-
+model_nn = mc_prediction_simple_separated_gpu.td_prediction_simple_V3()
 saver = tf.train.Saver()
 sess_nn.run(tf.global_variables_initializer())
 
@@ -53,7 +34,7 @@ if checkpoint and checkpoint.model_checkpoint_path:
     saver.restore(sess_nn, checkpoint.model_checkpoint_path)
     print("Successfully loaded:", checkpoint.model_checkpoint_path)
 else:
-    raise Exception("can't restore network: " + SIMPLE_SAVED_NETWORK_PATH)
+    raise Exception("can't restore network")
 
 for calibration_dir_game in os.listdir(calibration_store_dir):
     for file_name in os.listdir(calibration_store_dir + "/" + calibration_dir_game):
@@ -83,7 +64,7 @@ for calibration_dir_game in os.listdir(calibration_store_dir):
     else:
         data_name = "model_predict_away"
 
-    sio.savemat(calibration_store_dir + "/" + calibration_dir_game + "/" + "home_identifier",
+    sio.savemat(calibration_store_dir + "/" + calibration_dir_game+"/" + "home_identifier",
                 {"home_identifier": home_identifier})
     sio.savemat(calibration_store_dir + "/" + calibration_dir_game + "/" + data_name,
                 {data_name: np.asarray(readout_t1_batch)})

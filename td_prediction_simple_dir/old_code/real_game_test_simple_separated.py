@@ -1,11 +1,10 @@
 import os
 
-import math
+import matplotlib.pyplot as plt
 import scipy.io as sio
 import tensorflow as tf
+
 import td_prediction_simple_separated
-import matplotlib.pyplot as plt
-from scipy.stats import pearsonr
 
 FEATURE_TYPE = 5
 MODEL_TYPE = "V3"

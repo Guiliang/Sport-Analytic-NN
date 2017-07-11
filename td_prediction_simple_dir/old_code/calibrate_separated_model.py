@@ -1,11 +1,9 @@
 import ast
 
-import matplotlib.pyplot as plt
-import numpy as np
 import scipy.io as sio
 import tensorflow as tf
 
-import td_prediction_simple_dir.td_prediction_simple_separated
+import td_prediction_simple_dir.old_code.td_prediction_simple_separated
 
 FEATURE_TYPE = 5
 MOTION_TYPE = "lpr"
@@ -52,7 +50,7 @@ else:
 
 def nn_simulation():
     sess_nn = tf.InteractiveSession()
-    model_nn = td_prediction_simple_dir.td_prediction_simple_separated.td_prediction_simple_V3()
+    model_nn = td_prediction_simple_dir.old_code.td_prediction_simple_separated.td_prediction_simple_V3()
 
     simulate_data = sio.loadmat(SIMULATION_DATA_PATH)
     simulate_data = (simulate_data['simulate_data'])
@@ -94,7 +92,7 @@ def check_calibrate_target(specify_dict):
 
 def calibrate_all():
     sess_nn = tf.InteractiveSession()
-    model_nn = td_prediction_simple_dir.td_prediction_simple_separated.td_prediction_simple_V3()
+    model_nn = td_prediction_simple_dir.old_code.td_prediction_simple_separated.td_prediction_simple_V3()
     with open('dict_specify_record', 'r') as file:
         specify = file.readlines()
         for specify_line in specify:

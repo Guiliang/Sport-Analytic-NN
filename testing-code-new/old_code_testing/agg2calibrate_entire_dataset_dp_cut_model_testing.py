@@ -5,23 +5,23 @@ import unicodedata
 import ast
 
 FEATURE_TYPE = 5
-MODEL_TYPE = "V3"
-ITERATE_NUM = 50
-BATCH_SIZE = 8
+MODEL_TYPE = "V8"
+ITERATE_NUM = 75
+BATCH_SIZE = 32
 calibration_store_dir = "/cs/oschulte/Galen/Hockey-data-entire/Test100-Hockey-Training-All-feature{0}-scale-neg_reward".format(str(FEATURE_TYPE))
 # calibration_store_dir = "/cs/oschulte/Galen/Hockey-data/td_calibrate_all_feature_5_2017-6-01"
-store_name = ""
+# store_name = ""
 
 
-save_csv_name = "td_testing_cut_calibration_entire_feature_" + str(
+save_csv_name = "td_testing_cut_back_dp_calibration_entire_feature_" + str(
     FEATURE_TYPE) + "_" + MODEL_TYPE + "_Iter" + str(ITERATE_NUM) + "_batch" + str(
-    BATCH_SIZE) + "_sum_2017-6-17.csv"
-save_game_csv_name = "td_testing_cut_game_record_entire_feature_" + str(
+    BATCH_SIZE) + "_sum_2017-6-29.csv"
+save_game_csv_name = "td_testing_cut_back_dp_game_record_entire_feature_" + str(
     FEATURE_TYPE) + "_" + MODEL_TYPE + "_Iter" + str(ITERATE_NUM) + "_batch" + str(
-    BATCH_SIZE) + "_sum_2017-6-17.csv"
+    BATCH_SIZE) + "_sum_2017-6-29.csv"
 
 
-data_name = "model_cut_predict_feature_" + str(
+data_name = "model_cut_back_dp_predict_feature_" + str(
     FEATURE_TYPE) + "_" + MODEL_TYPE + "_Iter" + str(ITERATE_NUM) + "_batch" + str(BATCH_SIZE)
 
 

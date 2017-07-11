@@ -11,15 +11,15 @@ import math
 train the home team and away team together, use a feature to represent it.
 """
 
-feature_num = 27
-FEATURE_TYPE = 9
+feature_num = 26
+FEATURE_TYPE = 5
 model_train_continue = True
 ITERATE_NUM = 75
 REWARD_TYPE = "NEG_REWARD_GAMMA1"
-MODEL_TYPE = "V3"
+MODEL_TYPE = "V8"
 Random_or_Sequenced = "Sequenced"
 GAMMA = 1  # decay rate of past observations
-BATCH_SIZE = 8  # size of mini-batch, the size of mini-batch could be tricky, the larger mini-batch, the easier will it be converge, but if our training data is not comprehensive enough and stochastic gradients is not applied, model may converge to other things
+BATCH_SIZE = 32  # size of mini-batch, the size of mini-batch could be tricky, the larger mini-batch, the easier will it be converge, but if our training data is not comprehensive enough and stochastic gradients is not applied, model may converge to other things
 SPORT = "NHL"
 TEST_LENGTH = 100
 SCALE = True
@@ -707,6 +707,91 @@ class td_prediction_simple_V7(object):
             self.train_step = tf.train.AdamOptimizer(1e-6).minimize(self.cost)
 
 
+class td_prediction_simple_V8(object):
+    def __init__(self):
+        """
+        define the neural network
+        :return: network output
+        """
+
+        num_layer_1 = feature_num
+        num_layer_2 = 1000
+        num_layer_3 = 1000
+        num_layer_4 = 1000
+        num_layer_5 = 1
+
+        max_sigmoid_1 = -1 * math.sqrt(float(60) / (num_layer_1 + num_layer_2))
+        min_sigmoid_1 = 1 * math.sqrt(float(60) / (num_layer_1 + num_layer_2))
+        max_sigmoid_2 = -1 * math.sqrt(float(60) / (num_layer_2 + num_layer_3))
+        min_sigmoid_2 = 1 * math.sqrt(float(60) / (num_layer_2 + num_layer_3))
+        max_sigmoid_3 = -1 * math.sqrt(float(60) / (num_layer_3 + num_layer_4))
+        min_sigmoid_3 = 1 * math.sqrt(float(60) / (num_layer_3 + num_layer_4))
+        max_sigmoid_4 = -1 * math.sqrt(float(60) / (num_layer_4 + num_layer_5))
+        min_sigmoid_4 = 1 * math.sqrt(float(60) / (num_layer_4 + num_layer_5))
+
+        with tf.name_scope("Dense_Layer_first"):
+            self.x = tf.placeholder(tf.float32, [None, num_layer_1], name="x_1")
+            with tf.name_scope("Weight_1"):
+                self.W1 = tf.Variable(
+                    tf.random_uniform([num_layer_1, num_layer_2], minval=min_sigmoid_1, maxval=max_sigmoid_1),
+                    name="W_1")
+            with tf.name_scope("Biases_1"):
+                self.b1 = tf.Variable(tf.zeros([num_layer_2]), name="b_1")
+            with tf.name_scope("Output_1"):
+                self.y1 = tf.matmul(self.x, self.W1) + self.b1
+            with tf.name_scope("Activation_1"):
+                self.activations1 = tf.nn.tanh(self.y1, name='activation1')
+
+        with tf.name_scope("Dense_Layer_second"):
+            with tf.name_scope("Weight_2"):
+                self.W2 = tf.Variable(
+                    tf.random_uniform([num_layer_2, num_layer_3], minval=min_sigmoid_2, maxval=max_sigmoid_2),
+                    name="W_2")
+            with tf.name_scope("Biases_2"):
+                self.b2 = tf.Variable(tf.zeros([num_layer_3]), name="b_2")
+            with tf.name_scope("Output_2"):
+                self.y2 = tf.matmul(self.activations1, self.W2) + self.b2
+            with tf.name_scope("Activation_2"):
+                self.activations2 = tf.nn.tanh(self.y2, name='activation2')
+
+        with tf.name_scope("Dense_Layer_third"):
+            with tf.name_scope("Weight_3"):
+                self.W3 = tf.Variable(
+                    tf.random_uniform([num_layer_3, num_layer_4], minval=min_sigmoid_3, maxval=max_sigmoid_3),
+                    name="W_3")
+            with tf.name_scope("Biases_3"):
+                self.b3 = tf.Variable(tf.zeros([num_layer_4]), name="b_3")
+            with tf.name_scope("Output_3"):
+                self.y3 = tf.matmul(self.activations2, self.W3) + self.b3
+            with tf.name_scope("Activation_3"):
+                self.activations3 = tf.nn.tanh(self.y3, name='activation3')
+
+        with tf.name_scope("Dense_Layer_fourth"):
+            with tf.name_scope("Weight_4"):
+                self.W4 = tf.Variable(
+                    tf.random_uniform([num_layer_4, num_layer_5], minval=min_sigmoid_4, maxval=max_sigmoid_4),
+                    name="W_4")
+            with tf.name_scope("Biases_4"):
+                self.b4 = tf.Variable(tf.zeros([num_layer_5]), name="b_4")
+            with tf.name_scope("Output_4"):
+                self.read_out = tf.matmul(self.activations3, self.W4) + self.b4
+
+        # define the cost function
+        self.y = tf.placeholder("float", [None])
+
+        with tf.name_scope("cost"):
+            self.readout_action = tf.reduce_sum(self.read_out,
+                                                reduction_indices=1)  # Computes the sum of elements across dimensions of a tensor.
+            self.diff_v = tf.reduce_mean(tf.abs(self.y - self.readout_action))
+            self.cost = tf.reduce_mean(tf.square(self.y - self.readout_action))  # square means
+        tf.summary.histogram('cost', self.cost)
+
+        with tf.name_scope("train"):
+            self.train_step = tf.train.AdamOptimizer(1e-6).minimize(self.cost)
+            # self.train_step = tf.train.GradientDescentOptimizer(1e-6).minimize(self.cost)
+            # train_step = tf.train.AdadeltaOptimizer().minimize(cost)
+
+
 def get_next_test_event():
     """
     retrieve next event from sport data
@@ -731,7 +816,7 @@ def get_cut_training_batch(s_t0, state, reward, train_number, train_len):
         r_t0 = reward[train_number - 1]
         r_t1 = reward[train_number]
         train_number += 1
-        if train_number + 1 == train_len:
+        if train_number == train_len:
             if FORWARD_REWARD_MODE:
                 raise ValueError("invalid FORWARD_REWARD_MODE, haven't defined")
                 # batch_return.append((s_t0, r_t1, s_t1, 1))
@@ -988,6 +1073,8 @@ def train_start():
         nn = td_prediction_simple_V6()
     elif MODEL_TYPE == "V7":
         nn = td_prediction_simple_V7()
+    elif MODEL_TYPE == "V8":
+        nn = td_prediction_simple_V8()
     else:
         raise ValueError("Unclear model type")
     train_network(sess, nn)

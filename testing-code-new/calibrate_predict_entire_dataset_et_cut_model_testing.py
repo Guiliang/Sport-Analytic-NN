@@ -3,38 +3,28 @@ import tensorflow as tf
 import os
 import unicodedata
 import ast
-import td_prediction_simple_separated
+import td_prediction_egibility_trace_cut_testing
 import numpy as np
 
 FEATURE_TYPE = 5
 calibration = True
 ITERATE_NUM = 75
 MODEL_TYPE = "V3"
+BATCH_SIZE = 8
+DATA_SIZE = 100
+td_prediction_egibility_trace_cut_testing.feature_num = 26
+Scale = True
 
-SIMPLE_SAVED_NETWORK_PATH = "/cs/oschulte/Galen/models/saved_NN/saved_entire__networks_feature{0}_batch16_iterate{1}-NEG_REWARD_GAMMA1_{2}-Sequenced".format(
-    str(FEATURE_TYPE), str(ITERATE_NUM), MODEL_TYPE)
+SIMPLE_SAVED_NETWORK_PATH = "/cs/oschulte/Galen/models/et_dir/et_checkpoints_neg_tieC"
+calibration_store_dir = "/cs/oschulte/Galen/Hockey-data-entire/Test{0}-Hockey-Training-All-feature{1}-scale-neg_reward".format(
+    str(DATA_SIZE), str(FEATURE_TYPE))
 
-calibration_store_dir = "/cs/oschulte/Galen/Hockey-data-entire/td_calibrate_all_feature_" + str(
-    FEATURE_TYPE) + "_" + MODEL_TYPE + "_Iter" + str(ITERATE_NUM)
-# calibration_store_dir = "/cs/oschulte/Galen/Hockey-data/td_calibrate_all_feature_5_2017-6-01"
 sess_nn = tf.InteractiveSession()
 
-if MODEL_TYPE == "V1":
-    model_nn = td_prediction_simple_separated.td_prediction_simple()
-elif MODEL_TYPE == "V2":
-    model_nn = td_prediction_simple_separated.td_prediction_simple_V2()
-elif MODEL_TYPE == "V3":
-    model_nn = td_prediction_simple_separated.td_prediction_simple_V3()
-elif MODEL_TYPE == "V4":
-    model_nn = td_prediction_simple_separated.td_prediction_simple_V4()
-elif MODEL_TYPE == "V5":
-    model_nn = td_prediction_simple_separated.td_prediction_simple_V5()
-elif MODEL_TYPE == "V6":
-    model_nn = td_prediction_simple_separated.td_prediction_simple_V6()
-elif MODEL_TYPE == "V7":
-    model_nn = td_prediction_simple_separated.td_prediction_simple_V7()
-else:
-    raise ValueError("Unclear model type")
+model_nn = td_prediction_egibility_trace_cut_testing.Model(sess_nn,
+                                                           td_prediction_egibility_trace_cut_testing.model_path,
+                                                           td_prediction_egibility_trace_cut_testing.summary_path,
+                                                           td_prediction_egibility_trace_cut_testing.checkpoint_path)
 
 saver = tf.train.Saver()
 sess_nn.run(tf.global_variables_initializer())
@@ -48,14 +38,14 @@ else:
 
 for calibration_dir_game in os.listdir(calibration_store_dir):
     for file_name in os.listdir(calibration_store_dir + "/" + calibration_dir_game):
-        if "training_data_dict_all_value" in file_name:
+        if "state" in file_name:
             calibrate_value_name = calibration_store_dir + "/" + calibration_dir_game + "/" + file_name
         elif "training_data_dict_all_name" in file_name:
             calibrate_name_name = calibration_store_dir + "/" + calibration_dir_game + "/" + file_name
         else:
             continue
 
-    calibrate_values = (sio.loadmat(calibrate_value_name))["training_data_dict_all_value"]
+    calibrate_values = (sio.loadmat(calibrate_value_name))["state"]
     calibrate_names = (sio.loadmat(calibrate_name_name))["training_data_dict_all_name"]
 
     home_identifier = []
@@ -67,9 +57,14 @@ for calibration_dir_game in os.listdir(calibration_store_dir):
         else:
             home_identifier.append(0)
 
-    readout_t1_batch = model_nn.read_out.eval(feed_dict={model_nn.x: calibrate_values})  # get value of s
+    readout_t1_batch = []
+    for calibrate_value in calibrate_values:
+        readout_value = model_nn.V.eval(feed_dict={model_nn.s_t0: [calibrate_value]})  # get value of s
+        readout_t1_batch.append(readout_value[0][0])
 
-    data_name = "model_predict"
+    data_name = "model_et_cut_predict_feature_" + str(
+        FEATURE_TYPE) + "_" + MODEL_TYPE + "_Iter" + str(ITERATE_NUM) + "_batch" + str(BATCH_SIZE)
+
     sio.savemat(calibration_store_dir + "/" + calibration_dir_game + "/" + "home_identifier",
                 {"home_identifier": home_identifier})
     sio.savemat(calibration_store_dir + "/" + calibration_dir_game + "/" + data_name,
