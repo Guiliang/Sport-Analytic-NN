@@ -13,13 +13,18 @@ ITERATE_NUM = 50
 MODEL_TYPE = "V3"
 BATCH_SIZE = 32
 td_prediction_simple_cut_together.feature_num = 26
-pre_initialize = True
+pre_initialize = False
 if pre_initialize:
     pre_initialize_situation = "-pre_initialize"
     pre_initialize_save = "_pre_initialize"
 else:
     pre_initialize_situation = ""
     pre_initialize_save = ""
+learning_rate = 1e-5
+if learning_rate == 1e-5:
+    learning_rate_write = 5
+elif learning_rate == 1e-4:
+    learning_rate_write = 4
 
 if Scale:
     SIMPLE_SAVED_NETWORK_PATH = "/cs/oschulte/Galen/models/saved_NN/Scale-cut_saved_entire_together_networks_feature{0}_batch{1}_iterate{2}-NEG_REWARD_GAMMA1_{3}-Sequenced{4}".format(
@@ -85,7 +90,7 @@ for calibration_dir_game in os.listdir(calibration_store_dir):
     readout_t1_batch = model_nn.read_out.eval(feed_dict={model_nn.x: calibrate_values})  # get value of s
 
     data_name = "model_cut_together_predict_feature_" + str(
-        FEATURE_TYPE) + "_" + MODEL_TYPE + "_Iter" + str(ITERATE_NUM) + "_batch" + str(BATCH_SIZE) + pre_initialize_save
+        FEATURE_TYPE) + "_" + MODEL_TYPE + "_Iter" + str(ITERATE_NUM)+"_lr"+str(learning_rate_write) + "_batch" + str(BATCH_SIZE) + pre_initialize_save
 
     sio.savemat(calibration_store_dir + "/" + calibration_dir_game + "/" + "home_identifier",
                 {"home_identifier": home_identifier})

@@ -24,6 +24,8 @@ BATCH_SIZE = 32  # size of mini-batch, the size of mini-batch could be tricky, t
 SPORT = "NHL"
 TEST_LENGTH = 100
 Scale = True
+learning_rate = 1e-5
+save_mother_dir = "/local-scratch"
 
 if Random_or_Sequenced == "Random":
     Random_select = True
@@ -44,30 +46,30 @@ if Scale:
         TEST_LENGTH) + "-Hockey-Training-All-feature" + str(
         FEATURE_TYPE) + "-scale-neg_reward"
 
-    LOG_DIR = "/cs/oschulte/Galen/models/log_NN/Scale-Test" + str(
+    LOG_DIR = save_mother_dir + "/oschulte/Galen/models/log_NN/Scale-Test" + str(
         TEST_LENGTH) + "-cut_log_entire_" + str(Home_model_or_away_model) + "_train_feature" + str(
         FEATURE_TYPE) + "_batch" + str(BATCH_SIZE) + "_iterate" + str(
-        ITERATE_NUM) + "-" + str(REWARD_TYPE) + "_" + MODEL_TYPE + "-" + Random_or_Sequenced
-    SAVED_NETWORK = "/cs/oschulte/Galen/models/saved_NN/Scale-Test" + str(
+        ITERATE_NUM) + "-lr" + str(learning_rate) + "-" + str(REWARD_TYPE) + "_" + MODEL_TYPE + "-" + Random_or_Sequenced
+    SAVED_NETWORK = save_mother_dir + "/oschulte/Galen/models/saved_NN/Scale-Test" + str(
         TEST_LENGTH) + "-cut_saved_entire_" + str(
         Home_model_or_away_model) + "_networks_feature" + str(
         FEATURE_TYPE) + "_batch" + str(BATCH_SIZE) + "_iterate" + str(
-        ITERATE_NUM) + "-" + str(REWARD_TYPE) + "_" + MODEL_TYPE + "-" + Random_or_Sequenced
+        ITERATE_NUM) + "-lr" + str(learning_rate) + "-" + str(REWARD_TYPE) + "_" + MODEL_TYPE + "-" + Random_or_Sequenced
 
 else:
     DATA_STORE = "/cs/oschulte/Galen/Hockey-data-entire/Test" + str(
         TEST_LENGTH) + "-Hockey-Training-All-feature" + str(
         FEATURE_TYPE) + "-neg_reward"
 
-    LOG_DIR = "/cs/oschulte/Galen/models/log_NN/Test" + str(
+    LOG_DIR = save_mother_dir + "/oschulte/Galen/models/log_NN/Test" + str(
         TEST_LENGTH) + "-cut_log_entire_" + str(Home_model_or_away_model) + "_train_feature" + str(
         FEATURE_TYPE) + "_batch" + str(BATCH_SIZE) + "_iterate" + str(
-        ITERATE_NUM) + "-" + str(REWARD_TYPE) + "_" + MODEL_TYPE + "-" + Random_or_Sequenced
-    SAVED_NETWORK = "/cs/oschulte/Galen/models/saved_NN/Test" + str(
+        ITERATE_NUM) + "-lr" + str(learning_rate) + "-" + str(REWARD_TYPE) + "_" + MODEL_TYPE + "-" + Random_or_Sequenced
+    SAVED_NETWORK = save_mother_dir + "/oschulte/Galen/models/saved_NN/Test" + str(
         TEST_LENGTH) + "-cut_saved_entire_" + str(
         Home_model_or_away_model) + "_networks_feature" + str(
         FEATURE_TYPE) + "_batch" + str(BATCH_SIZE) + "_iterate" + str(
-        ITERATE_NUM) + "-" + str(REWARD_TYPE) + "_" + MODEL_TYPE + "-" + Random_or_Sequenced
+        ITERATE_NUM) + "-lr" + str(learning_rate) + "-" + str(REWARD_TYPE) + "_" + MODEL_TYPE + "-" + Random_or_Sequenced
 FORWARD_REWARD_MODE = False
 
 
@@ -321,7 +323,7 @@ class td_prediction_simple_V3(object):
         tf.summary.histogram('cost', self.cost)
 
         with tf.name_scope("train"):
-            self.train_step = tf.train.AdamOptimizer(1e-6).minimize(self.cost)
+            self.train_step = tf.train.AdamOptimizer(learning_rate).minimize(self.cost)
             # self.train_step = tf.train.GradientDescentOptimizer(1e-6).minimize(self.cost)
             # train_step = tf.train.AdadeltaOptimizer().minimize(cost)
 
@@ -1002,7 +1004,9 @@ def train_network(sess, model, print_parameters=False):
                     # print info
                     if terminal or ((train_number - 1) / BATCH_SIZE) % 5 == 1:
                         print ("TIMESTEP:", train_number, "Game:", game_number)
-                        print(str(readout_t1_batch.min()), str(readout_t1_batch.max()))
+                        v_home_avg = sum(readout_t1_batch[:, 0]) / len(readout_t1_batch[:, 0])
+                        v_away_avg = sum(readout_t1_batch[:, 1]) / len(readout_t1_batch[:, 1])
+                        print "home average:{0}, away average:{1}".format(str(v_home_avg), str(v_away_avg))
 
                         if MODEL_TYPE == "V5":
                             print ("cost of the network is: " + str(cost_out) + " with learning rate: " + str(

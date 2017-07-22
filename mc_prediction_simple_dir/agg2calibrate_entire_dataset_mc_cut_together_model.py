@@ -10,16 +10,23 @@ ITERATE_NUM = 50
 BATCH_SIZE = 32
 calibration_store_dir = "/cs/oschulte/Galen/Hockey-data-entire/Hockey-Training-All-feature{0}-scale-neg_reward".format(
     str(FEATURE_TYPE))
-pre_initialize = True
+pre_initialize = False
 if pre_initialize:
     pre_initialize_save = "_pre_initialize"
 else:
     pre_initialize_save = ""
+isHome = True
+if isHome:
+    isHome_id = float(1)
+    home_or_away = "home_"
+else:
+    isHome_id = float(0)
+    home_or_away = "away_"
 
-save_csv_name = "td_mc_cut_together_calibration_entire_feature_" + str(
+save_csv_name = home_or_away + "mc_cut_together_calibration_entire_feature_" + str(
     FEATURE_TYPE) + "_" + MODEL_TYPE + "_Iter" + str(ITERATE_NUM) + "_batch" + str(
     BATCH_SIZE) + pre_initialize_save + "_sum_2017-7-06.csv"
-save_game_csv_name = "td_mc_cut_together_game_record_entire_feature_" + str(
+save_game_csv_name = home_or_away + "mc_cut_together_game_record_entire_feature_" + str(
     FEATURE_TYPE) + "_" + MODEL_TYPE + "_Iter" + str(ITERATE_NUM) + "_batch" + str(
     BATCH_SIZE) + pre_initialize_save + "_sum_2017-7-06.csv"
 
@@ -116,7 +123,7 @@ def agg2calibrate_model(check_target):
                 raise ValueError("Unsupported FEATURE_TYPE:{}".format(str(FEATURE_TYPE)))
 
             if float(check_target.get("GD")) == float(goal_diff) and float(check_target.get("MD")) == float(
-                    manpower_diff) and float(check_target.get("P")) == float(period):
+                    manpower_diff) and float(check_target.get("P")) == float(period) and home == isHome_id:
                 game_found_flag = True
                 # if ISHOME and home_identifier[calibrate_name_index]:  # TODO delete home_identifier[calibrate_name_index]
                 try:

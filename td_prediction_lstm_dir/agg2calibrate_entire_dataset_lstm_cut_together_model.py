@@ -6,25 +6,37 @@ import ast
 
 FEATURE_TYPE = 5
 MODEL_TYPE = "v3"
-ITERATE_NUM = 50
+ITERATE_NUM = 30
 BATCH_SIZE = 8
+
+learning_rate = 1e-5
+if learning_rate == 1e-5:
+    learning_rate_write = 5
+elif learning_rate == 1e-4:
+    learning_rate_write = 4
+isHome = True
+if isHome:
+    isHome_id = float(1)
+    home_or_away = "home_"
+else:
+    isHome_id = float(0)
+    home_or_away = "away_"
 
 calibration_store_dir = "/cs/oschulte/Galen/Hockey-data-entire/Hybrid-RNN-Hockey-Training-All-feature{0}-scale-neg_reward_length-dynamic".format(
     str(FEATURE_TYPE))
 
-save_csv_name = "td_lstm_cut_together_calibration_entire_feature_" + str(
-    FEATURE_TYPE) + "_" + MODEL_TYPE + "_Iter" + str(ITERATE_NUM) + "_batch" + str(
-    BATCH_SIZE) + "_sum_2017-7-06.csv"
-save_game_csv_name = "td_lstm_cut_together_game_record_entire_feature_" + str(
-    FEATURE_TYPE) + "_" + MODEL_TYPE + "_Iter" + str(ITERATE_NUM) + "_batch" + str(
-    BATCH_SIZE) + "_sum_2017-7-06.csv"
+save_csv_name = home_or_away + "td_lstm_cut_together_calibration_entire_feature_" + str(
+    FEATURE_TYPE) + "_" + MODEL_TYPE + "_Iter" + str(ITERATE_NUM) + "lr" + str(learning_rate_write) + "_batch" + str(
+    BATCH_SIZE) + "_sum_2017-7-11.csv"
+save_game_csv_name = home_or_away + "td_lstm_cut_together_game_record_entire_feature_" + str(
+    FEATURE_TYPE) + "_" + MODEL_TYPE + "_Iter" + str(ITERATE_NUM) + "lr" + str(learning_rate_write) + "_batch" + str(
+    BATCH_SIZE) + "_sum_2017-7-11.csv"
 
 # data_together_name = "model_mc_cut_together_predict_feature_" + str(
 #     FEATURE_TYPE) + "_" + MODEL_TYPE + "_Iter" + str(ITERATE_NUM) + "_batch" + str(BATCH_SIZE)
 
-data_together_name = "model_cut_together_predict_Feature{0}_Iter{1}_Batch{2}_MaxLength10_Type{3}".format(str(FEATURE_TYPE), str(ITERATE_NUM), str(BATCH_SIZE), str(MODEL_TYPE))
-
-"model_cut_together_predict_Feature5_Iter50_Batch8_MaxLength10_Typev3.mat"
+data_together_name = "model_cut_together_predict_Feature{0}_Iter{1}_lr{2}_Batch{3}_MaxLength10_Type{4}".format(
+    str(FEATURE_TYPE), str(ITERATE_NUM),str(learning_rate_write), str(BATCH_SIZE), str(MODEL_TYPE))
 
 def generate_episode_store(calibrate_names):
     episode_num = 0
@@ -47,8 +59,8 @@ def generate_episode_store(calibrate_names):
             episode_record_calibration_home.update({episode_num: []})
             episode_record_calibration_away.update({episode_num: []})
 
-    if not episode_cut_dict.get(len(calibrate_names)-1):
-        episode_cut_dict.update({len(calibrate_names)-1: episode_num})
+    if not episode_cut_dict.get(len(calibrate_names) - 1):
+        episode_cut_dict.update({len(calibrate_names) - 1: episode_num})
 
     return episode_cut_dict, episode_record_prediction_home, episode_record_prediction_away, episode_record_calibration_home, episode_record_calibration_away
 
@@ -79,7 +91,8 @@ def agg2calibrate_model(check_target):
         summation_cut_goal_home = (((sio.loadmat(summation_cut_goal_home_name))["summation_cut_goal_home"]).tolist())[0]
         summation_cut_goal_away = (((sio.loadmat(summation_cut_goal_away_name))["summation_cut_goal_away"]).tolist())[0]
 
-        episode_cut_dict, episode_record_prediction_home, episode_record_prediction_away, episode_record_calibration_home, episode_record_calibration_away = generate_episode_store(calibrate_names=calibrate_names)
+        episode_cut_dict, episode_record_prediction_home, episode_record_prediction_away, episode_record_calibration_home, episode_record_calibration_away = generate_episode_store(
+            calibrate_names=calibrate_names)
 
         # calibration_value_game_record = []
         # model_predict_value_game_record = []
@@ -111,7 +124,7 @@ def agg2calibrate_model(check_target):
                 raise ValueError("Unsupported FEATURE_TYPE:{}".format(str(FEATURE_TYPE)))
 
             if float(check_target.get("GD")) == float(goal_diff) and float(check_target.get("MD")) == float(
-                    manpower_diff) and float(check_target.get("P")) == float(period):
+                    manpower_diff) and float(check_target.get("P")) == float(period) and home == isHome_id:
                 game_found_flag = True
                 # if ISHOME and home_identifier[calibrate_name_index]:  # TODO delete home_identifier[calibrate_name_index]
                 try:
@@ -134,28 +147,36 @@ def agg2calibrate_model(check_target):
 
         for episode_record_calibration_away_index in range(0, len(episode_record_calibration_away)):
             try:
-                calibration_away_value_record.append(sum(episode_record_calibration_away[episode_record_calibration_away_index])/len(episode_record_calibration_away[episode_record_calibration_away_index]))
+                calibration_away_value_record.append(
+                    sum(episode_record_calibration_away[episode_record_calibration_away_index]) / len(
+                        episode_record_calibration_away[episode_record_calibration_away_index]))
             except:
                 # calibration_away_value_record.append(float(0))
                 continue
 
         for episode_record_calibration_home_index in range(0, len(episode_record_calibration_home)):
             try:
-                calibration_home_value_record.append(sum(episode_record_calibration_home[episode_record_calibration_home_index])/len(episode_record_calibration_home[episode_record_calibration_home_index]))
+                calibration_home_value_record.append(
+                    sum(episode_record_calibration_home[episode_record_calibration_home_index]) / len(
+                        episode_record_calibration_home[episode_record_calibration_home_index]))
             except:
                 # calibration_home_value_record.append(float(0))
                 continue
 
         for episode_record_prediction_away_index in range(0, len(episode_record_prediction_away)):
             try:
-                model_predict_away_value_record.append(sum(episode_record_prediction_away[episode_record_prediction_away_index])/len(episode_record_prediction_away[episode_record_prediction_away_index]))
+                model_predict_away_value_record.append(
+                    sum(episode_record_prediction_away[episode_record_prediction_away_index]) / len(
+                        episode_record_prediction_away[episode_record_prediction_away_index]))
             except:
                 # model_predict_away_value_record.append(float(0))
                 continue
 
         for episode_record_prediction_home_index in range(0, len(episode_record_prediction_home)):
             try:
-                model_predict_home_value_record.append(sum(episode_record_prediction_home[episode_record_prediction_home_index])/len(episode_record_prediction_home[episode_record_prediction_home_index]))
+                model_predict_home_value_record.append(
+                    sum(episode_record_prediction_home[episode_record_prediction_home_index]) / len(
+                        episode_record_prediction_home[episode_record_prediction_home_index]))
             except:
                 # model_predict_home_value_record.append(float(0))
                 continue
@@ -180,22 +201,26 @@ def agg2calibrate_model(check_target):
     # model_predict_value_record = [value[0] for value in model_predict_value_record]
     # calibration_value_record = [value[0] for value in calibration_value_record]
     try:
-        model_predict_home_value_record_average = float(sum(model_predict_home_value_record)) / len(model_predict_home_value_record)
+        model_predict_home_value_record_average = float(sum(model_predict_home_value_record)) / len(
+            model_predict_home_value_record)
     except:
         model_predict_home_value_record_average = 0
 
     try:
-        model_predict_away_value_record_average = float(sum(model_predict_away_value_record)) / len(model_predict_away_value_record)
+        model_predict_away_value_record_average = float(sum(model_predict_away_value_record)) / len(
+            model_predict_away_value_record)
     except:
         model_predict_away_value_record_average = 0
 
     try:
-        calibration_home_value_record_average = float(sum(calibration_home_value_record)) / len(calibration_home_value_record)
+        calibration_home_value_record_average = float(sum(calibration_home_value_record)) / len(
+            calibration_home_value_record)
     except:
         calibration_home_value_record_average = 0
 
     try:
-        calibration_away_value_record_average = float(sum(calibration_away_value_record)) / len(calibration_away_value_record)
+        calibration_away_value_record_average = float(sum(calibration_away_value_record)) / len(
+            calibration_away_value_record)
     except:
         calibration_away_value_record_average = 0
 
@@ -208,16 +233,16 @@ def agg2calibrate_model(check_target):
     print "calibration_away_value_record_average with " + str(check_target) + " is " + str(
         calibration_away_value_record_average)
 
-    return model_predict_home_value_record_average, model_predict_away_value_record_average, calibration_home_value_record_average,calibration_away_value_record_average , found_game_name_record
+    return model_predict_home_value_record_average, model_predict_away_value_record_average, calibration_home_value_record_average, calibration_away_value_record_average, found_game_name_record
 
 
 def start_calibration():
     store_dict_list = []
     game_name_dict = {}
     for goal_diff in [-3, -2, -1, 0, 1, 2, 3]:
-    # for goal_diff in [0]:
+        # for goal_diff in [0]:
         for manpower in [-1, 0, 1]:
-        # for manpower in [0]:
+            # for manpower in [0]:
             for period in [1, 2, 3]:
                 store_dict = {"Goal Different": goal_diff, "Manpower": manpower, "Period": period}
                 check_target = {"GD": goal_diff, "MD": manpower, "P": period}

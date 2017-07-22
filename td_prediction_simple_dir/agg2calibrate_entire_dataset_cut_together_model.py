@@ -15,13 +15,20 @@ if pre_initialize:
     pre_initialize_save = "_pre_initialize"
 else:
     pre_initialize_save = ""
+isHome = True
+if isHome:
+    isHome_id = float(1)
+    home_or_away = "home_"
+else:
+    isHome_id = float(0)
+    home_or_away = "away_"
 
-save_csv_name = "td_cut_together_calibration_entire_feature_" + str(
+save_csv_name = home_or_away + "td_cut_together_calibration_entire_feature_" + str(
     FEATURE_TYPE) + "_" + MODEL_TYPE + "_Iter" + str(ITERATE_NUM) + "_batch" + str(
-    BATCH_SIZE) +pre_initialize_save + "_sum_2017-7-06.csv"
-save_game_csv_name = "td_cut_together_game_record_entire_feature_" + str(
+    BATCH_SIZE) +pre_initialize_save + "_sum_2017-7-12.csv"
+save_game_csv_name = home_or_away + "td_cut_together_game_record_entire_feature_" + str(
     FEATURE_TYPE) + "_" + MODEL_TYPE + "_Iter" + str(ITERATE_NUM) + "_batch" + str(
-    BATCH_SIZE) + pre_initialize_save + "_sum_2017-7-06.csv"
+    BATCH_SIZE) + pre_initialize_save + "_sum_2017-7-12.csv"
 
 data_together_name = "model_cut_together_predict_feature_" + str(
     FEATURE_TYPE) + "_" + MODEL_TYPE + "_Iter" + str(ITERATE_NUM) + "_batch" + str(
@@ -65,6 +72,10 @@ def agg2calibrate_model(check_target):
     found_game_name_record = []
 
     for calibration_dir_game in os.listdir(calibration_store_dir):
+        calibrate_name_name = ""
+        model_predict_together_name = ""
+        summation_cut_goal_home_name = ""
+        summation_cut_goal_away_name = ""
         game_found_flag = False
         for file_name in os.listdir(calibration_store_dir + "/" + calibration_dir_game):
             if "training_data_dict_all_name" in file_name:
@@ -117,7 +128,7 @@ def agg2calibrate_model(check_target):
                 raise ValueError("Unsupported FEATURE_TYPE:{}".format(str(FEATURE_TYPE)))
 
             if float(check_target.get("GD")) == float(goal_diff) and float(check_target.get("MD")) == float(
-                    manpower_diff) and float(check_target.get("P")) == float(period):
+                    manpower_diff) and float(check_target.get("P")) == float(period) and home == isHome_id:
                 game_found_flag = True
                 game_found_num += 1
                 # if ISHOME and home_identifier[calibrate_name_index]:  # TODO delete home_identifier[calibrate_name_index]

@@ -3,18 +3,17 @@ import tensorflow as tf
 import os
 import unicodedata
 import ast
-import td_prediction_RNN_cut_together_testing
+import td_prediction_simple_cut_together
 import numpy as np
 
 FEATURE_TYPE = 5
 calibration = True
 Scale = True
 ITERATE_NUM = 50
-MODEL_TYPE = "v1"
+MODEL_TYPE = "V3"
 BATCH_SIZE = 32
-td_prediction_RNN_cut_together_testing.feature_num = 26
+td_prediction_simple_cut_together.feature_num = 26
 pre_initialize = False
-DATA_SIZE = 100
 if pre_initialize:
     pre_initialize_situation = "-pre_initialize"
     pre_initialize_save = "_pre_initialize"
@@ -22,16 +21,22 @@ else:
     pre_initialize_situation = ""
     pre_initialize_save = ""
 
+learning_rate = 1e-4
+if learning_rate == 1e-5:
+    learning_rate_write = 5
+elif learning_rate == 1e-4:
+    learning_rate_write = 4
+
 if Scale:
-    SIMPLE_SAVED_NETWORK_PATH = "/cs/oschulte/Galen/models/saved_NN/Test{0}-Scale-fix_rnn_cut_together_saved_networks_feature{1}_batch{2}_iterate{3}_{4}{5}".format(
-        str(DATA_SIZE), str(FEATURE_TYPE), str(BATCH_SIZE), str(ITERATE_NUM), MODEL_TYPE, pre_initialize_situation)
-    calibration_store_dir = "/cs/oschulte/Galen/Hockey-data-entire/Test{0}-RNN-Hockey-Training-All-feature{1}-scale-neg_reward_length-10".format(
-        str(DATA_SIZE), str(FEATURE_TYPE))
+    SIMPLE_SAVED_NETWORK_PATH = "/cs/oschulte/Galen/models/Sarsa_saved_NN/Sarsa_Scale-cut_saved_entire_together_networks_feature{0}_batch{1}_iterate{2}_lr{3}-NEG_REWARD_GAMMA1_{4}-Sequenced{5}".format(
+        str(FEATURE_TYPE), str(BATCH_SIZE), str(ITERATE_NUM), str(learning_rate), MODEL_TYPE, pre_initialize_situation)
+    calibration_store_dir = "/cs/oschulte/Galen/Hockey-data-entire/Hockey-Training-All-feature{0}-scale-neg_reward".format(
+        str(FEATURE_TYPE))
 else:
-    SIMPLE_SAVED_NETWORK_PATH = "/cs/oschulte/Galen/models/saved_NN/Test{0}-fix_rnn_cut_together_saved_networks_feature{1}_batch{2}_iterate{3}_{4}{5}".format(
-        str(DATA_SIZE), str(FEATURE_TYPE), str(BATCH_SIZE), str(ITERATE_NUM), MODEL_TYPE, pre_initialize_situation)
-    calibration_store_dir = "/cs/oschulte/Galen/Hockey-data-entire/Test{0}-RNN-Hockey-Training-All-feature{1}-scale-neg_reward_length-10".format(
-        str(DATA_SIZE), str(FEATURE_TYPE))
+    SIMPLE_SAVED_NETWORK_PATH = "/cs/oschulte/Galen/models/Sarsa_saved_NN/Sarsa_cut_saved_entire_together_networks_feature{0}_batch{1}_iterate{2}_lr{3}-NEG_REWARD_GAMMA1_{4}-Sequenced{5}".format(
+        str(FEATURE_TYPE), str(BATCH_SIZE), str(ITERATE_NUM), str(learning_rate), MODEL_TYPE, pre_initialize_situation)
+    calibration_store_dir = "/cs/oschulte/Galen/Hockey-data-entire/Hockey-Training-All-feature{0}-neg_reward".format(
+        str(FEATURE_TYPE))
 
 sess_nn = tf.InteractiveSession()
 
@@ -39,8 +44,8 @@ sess_nn = tf.InteractiveSession()
 #     model_nn = td_prediction_simple_cut_together_testing.td_prediction_simple()
 # elif MODEL_TYPE == "V2":
 #     model_nn = td_prediction_simple_cut_together_testing.td_prediction_simple_V2()
-if MODEL_TYPE == "v1":
-    model_nn = td_prediction_RNN_cut_together_testing.create_network_RNN()
+if MODEL_TYPE == "V3":
+    model_nn = td_prediction_simple_cut_together.td_prediction_simple_V3()
 # elif MODEL_TYPE == "V4":
 #     model_nn = td_prediction_simple_cut_together_testing.td_prediction_simple_V4()
 # elif MODEL_TYPE == "V5":
@@ -64,14 +69,14 @@ else:
 
 for calibration_dir_game in os.listdir(calibration_store_dir):
     for file_name in os.listdir(calibration_store_dir + "/" + calibration_dir_game):
-        if "rnn_state" in file_name:
+        if "state" in file_name:
             calibrate_value_name = calibration_store_dir + "/" + calibration_dir_game + "/" + file_name
         elif "training_data_dict_all_name" in file_name:
             calibrate_name_name = calibration_store_dir + "/" + calibration_dir_game + "/" + file_name
         else:
             continue
 
-    calibrate_values = (sio.loadmat(calibrate_value_name))["rnn_state"]
+    calibrate_values = (sio.loadmat(calibrate_value_name))["state"]
     calibrate_names = (sio.loadmat(calibrate_name_name))["training_data_dict_all_name"]
 
     home_identifier = []
@@ -83,10 +88,10 @@ for calibration_dir_game in os.listdir(calibration_store_dir):
         else:
             home_identifier.append(0)
 
-    readout_t1_batch = model_nn.read_out.eval(feed_dict={model_nn.rnn_input: calibrate_values})  # get value of s
+    readout_t1_batch = model_nn.read_out.eval(feed_dict={model_nn.x: calibrate_values})  # get value of s
 
-    data_name = "model_cut_fix_rnn_together_predict_feature_" + str(
-        FEATURE_TYPE) + "_" + MODEL_TYPE + "_Iter" + str(ITERATE_NUM) + "_batch" + str(BATCH_SIZE) + pre_initialize_save
+    data_name = "model_Sarsa_cut_together_predict_feature_" + str(
+        FEATURE_TYPE) + "_" + MODEL_TYPE + "_Iter" + str(ITERATE_NUM)+"lr"+str(learning_rate_write) + "_batch" + str(BATCH_SIZE) + pre_initialize_save
 
     sio.savemat(calibration_store_dir + "/" + calibration_dir_game + "/" + "home_identifier",
                 {"home_identifier": home_identifier})

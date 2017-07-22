@@ -62,6 +62,8 @@ else:
     raise Exception("can't restore network: " + SIMPLE_SAVED_NETWORK_PATH)
 
 for calibration_dir_game in os.listdir(calibration_store_dir):
+    calibrate_value_name = ""
+    calibrate_name_name = ""
     for file_name in os.listdir(calibration_store_dir + "/" + calibration_dir_game):
         if "state" in file_name:
             calibrate_value_name = calibration_store_dir + "/" + calibration_dir_game + "/" + file_name

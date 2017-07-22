@@ -14,15 +14,21 @@ MODEL_TYPE = "V3"
 BATCH_SIZE = 32
 DATA_SIZE = 100
 td_prediction_simple_cut_together_testing.feature_num = 26
+learning_rate = 1e-5
+
+if learning_rate == 1e-5:
+    learning_rate_write = 5
+elif learning_rate == 1e-4:
+    learning_rate_write = 4
 
 if Scale:
-    SIMPLE_SAVED_NETWORK_PATH = "/cs/oschulte/Galen/models/saved_NN/Scale-Test{0}-cut_saved_entire_together_networks_feature{1}_batch{2}_iterate{3}-NEG_REWARD_GAMMA1_{4}-Sequenced".format(
-        str(DATA_SIZE), str(FEATURE_TYPE), str(BATCH_SIZE), str(ITERATE_NUM), MODEL_TYPE)
+    SIMPLE_SAVED_NETWORK_PATH = "/cs/oschulte/Galen/models/saved_NN/Scale-Test{0}-cut_saved_entire_together_networks_feature{1}_batch{2}_iterate{3}-lr{4}-NEG_REWARD_GAMMA1_{5}-Sequenced".format(
+        str(DATA_SIZE), str(FEATURE_TYPE), str(BATCH_SIZE), str(ITERATE_NUM), str(learning_rate), MODEL_TYPE)
     calibration_store_dir = "/cs/oschulte/Galen/Hockey-data-entire/Test{0}-Hockey-Training-All-feature{1}-scale-neg_reward".format(
         str(DATA_SIZE), str(FEATURE_TYPE))
 else:
-    SIMPLE_SAVED_NETWORK_PATH = "/cs/oschulte/Galen/models/saved_NN/Test{0}-cut_saved_entire_together_networks_feature{1}_batch{2}_iterate{3}-NEG_REWARD_GAMMA1_{4}-Sequenced".format(
-        str(DATA_SIZE), str(FEATURE_TYPE), str(BATCH_SIZE), str(ITERATE_NUM), MODEL_TYPE)
+    SIMPLE_SAVED_NETWORK_PATH = "/cs/oschulte/Galen/models/saved_NN/Test{0}-cut_saved_entire_together_networks_feature{1}_batch{2}_iterate{3}-lr{4}-NEG_REWARD_GAMMA1_{5}-Sequenced".format(
+        str(DATA_SIZE), str(FEATURE_TYPE), str(BATCH_SIZE), str(ITERATE_NUM), str(learning_rate), MODEL_TYPE)
     calibration_store_dir = "/cs/oschulte/Galen/Hockey-data-entire/Test{0}-Hockey-Training-All-feature{1}-neg_reward".format(
         str(DATA_SIZE), str(FEATURE_TYPE))
 
@@ -79,7 +85,7 @@ for calibration_dir_game in os.listdir(calibration_store_dir):
     readout_t1_batch = model_nn.read_out.eval(feed_dict={model_nn.x: calibrate_values})  # get value of s
 
     data_name = "model_cut_together_predict_feature_" + str(
-        FEATURE_TYPE) + "_" + MODEL_TYPE + "_Iter" + str(ITERATE_NUM) + "_batch" + str(BATCH_SIZE)
+        FEATURE_TYPE) + "_" + MODEL_TYPE + "_Iter" + str(ITERATE_NUM)+"_lr"+str(learning_rate_write) + "_batch" + str(BATCH_SIZE)
 
     sio.savemat(calibration_store_dir + "/" + calibration_dir_game + "/" + "home_identifier",
                 {"home_identifier": home_identifier})
