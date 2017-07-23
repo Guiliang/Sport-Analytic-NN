@@ -13,6 +13,7 @@ MODEL_TYPE = "v3"
 ITERATE_NUM = 30
 BATCH_SIZE = 8
 ISHOME = True
+HIS_ACTION_TYPE = ['reception', 'pass', 'reception']
 pre_initialize = False
 if pre_initialize:
     pre_initialize_situation = "-pre_initialize"
@@ -36,8 +37,8 @@ SIMPLE_SAVED_NETWORK_PATH = "/cs/oschulte/Galen/models/hybrid_sl_saved_NN/Scale-
     str(FEATURE_TYPE), str(BATCH_SIZE), str(ITERATE_NUM), str(learning_rate), str(MODEL_TYPE))
 
 if ISHOME:
-    SIMULATION_DATA_PATH = "/cs/oschulte/Galen/Hockey-data-entire/Simulation-data-feature{0}/entire_spatial_simulation/LSTM_Home_entire_spatial_simulation-{1}-feature{0}.mat".format(
-        str(FEATURE_TYPE), str(ACTION_TYPE))
+    SIMULATION_DATA_PATH = "/cs/oschulte/Galen/Hockey-data-entire/Simulation-data-feature{0}/entire_spatial_simulation/LSTM_Home_entire_spatial_simulation-{1}-{2}-feature{0}.mat".format(
+        str(FEATURE_TYPE), str(ACTION_TYPE), str(HIS_ACTION_TYPE))
 
 
 def nn_simulation(SIMULATION_DATA_PATH, SIMPLE_SAVED_NETWORK_PATH):
