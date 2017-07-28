@@ -26,7 +26,7 @@ BATCH_SIZE = 32  # size of mini-batch, the size of mini-batch could be tricky, t
 learning_rate = 1e-5
 SPORT = "NHL"
 Scale = True
-pre_initialize = True
+pre_initialize = False
 if pre_initialize:
     pre_initialize_situation = "-pre_initialize"
 else:

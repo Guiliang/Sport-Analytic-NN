@@ -10,7 +10,7 @@ import numpy as np
 MODEL_TYPE = "v3"
 MAX_TRACE_LENGTH = 10
 FEATURE_NUMBER = 25
-BATCH_SIZE = 8
+BATCH_SIZE = 32
 GAMMA = 1
 H_SIZE = 512
 # DROPOUT_KEEP_PROB = 0.8
@@ -19,7 +19,7 @@ USE_HIDDEN_STATE = False
 model_train_continue = True
 SCALE = True
 FEATURE_TYPE = 5
-ITERATE_NUM = 30
+ITERATE_NUM = 50
 learning_rate = 1e-5
 SPORT = "NHL"
 REWARD_TYPE = "NEG_REWARD_GAMMA1_V3"

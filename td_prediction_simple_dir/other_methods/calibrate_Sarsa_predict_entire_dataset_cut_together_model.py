@@ -3,7 +3,7 @@ import tensorflow as tf
 import os
 import unicodedata
 import ast
-import td_prediction_simple_cut_together
+import td_prediction_simple_dir.td_prediction_simple_cut_together
 import numpy as np
 
 FEATURE_TYPE = 5
@@ -12,7 +12,7 @@ Scale = True
 ITERATE_NUM = 50
 MODEL_TYPE = "V3"
 BATCH_SIZE = 32
-td_prediction_simple_cut_together.feature_num = 26
+td_prediction_simple_dir.td_prediction_simple_cut_together.feature_num = 26
 pre_initialize = False
 if pre_initialize:
     pre_initialize_situation = "-pre_initialize"
@@ -45,7 +45,7 @@ sess_nn = tf.InteractiveSession()
 # elif MODEL_TYPE == "V2":
 #     model_nn = td_prediction_simple_cut_together_testing.td_prediction_simple_V2()
 if MODEL_TYPE == "V3":
-    model_nn = td_prediction_simple_cut_together.td_prediction_simple_V3()
+    model_nn = td_prediction_simple_dir.td_prediction_simple_cut_together.td_prediction_simple_V3()
 # elif MODEL_TYPE == "V4":
 #     model_nn = td_prediction_simple_cut_together_testing.td_prediction_simple_V4()
 # elif MODEL_TYPE == "V5":

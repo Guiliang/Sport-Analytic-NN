@@ -12,21 +12,19 @@ import math
 train the home team and away team together, use a feature to represent it.
 """
 
-feature_num = 26
+feature_num = 12
 FEATURE_TYPE = 5
 model_train_continue = True
 ITERATE_NUM = 50
 REWARD_TYPE = "NEG_REWARD_GAMMA1"
-save_mother_dir = "/cs"
 MODEL_TYPE = "V3"
-Home_model_or_away_model = "together"
 Random_or_Sequenced = "Sequenced"
 GAMMA = 1  # decay rate of past observations
 BATCH_SIZE = 32  # size of mini-batch, the size of mini-batch could be tricky, the larger mini-batch, the easier will it be converge, but if our training data is not comprehensive enough and stochastic gradients is not applied, model may converge to other things
-learning_rate = 1e-5
 SPORT = "NHL"
-Scale = True
+SCALE = True
 pre_initialize = False
+learning_rate = 1e-5
 if pre_initialize:
     pre_initialize_situation = "-pre_initialize"
 else:
@@ -39,43 +37,34 @@ elif Random_or_Sequenced == "Sequenced":
 else:
     raise ValueError("Random_or_Sequenced setting wrong")
 
-if Scale:
-    DATA_STORE = "/cs/oschulte/Galen/Hockey-data-entire/Hockey-Training-All-feature" + str(
+save_mother_dir = "/local-scratch"
+
+if SCALE:
+    DATA_STORE = "/cs/oschulte/Galen/Hockey-data-entire/State-Hockey-Training-All-feature" + str(
         FEATURE_TYPE) + "-scale-neg_reward"
-
-    LOG_DIR = save_mother_dir + "/oschulte/Galen/models/log_NN/Scale-cut_log_entire_" + str(
-        Home_model_or_away_model) + "_train_feature" + str(
+    LOG_DIR = save_mother_dir + "/oschulte/Galen/models/log_NN/State-mc-Scale-cut_log_entire_together_train_feature" + str(
         FEATURE_TYPE) + "_batch" + str(BATCH_SIZE) + "_iterate" + str(
-        ITERATE_NUM) + "_lr" + str(
-        learning_rate) + "-" + str(
+        ITERATE_NUM) + "_lr" + str(learning_rate) + "-" + str(
         REWARD_TYPE) + "_" + MODEL_TYPE + "-" + Random_or_Sequenced + pre_initialize_situation
-    SAVED_NETWORK = save_mother_dir + "/oschulte/Galen/models/saved_NN/Scale-cut_saved_entire_" + str(
-        Home_model_or_away_model) + "_networks_feature" + str(
+    SAVED_NETWORK = save_mother_dir + "/oschulte/Galen/models/saved_NN/State-mc-Scale-cut_saved_entire_together_networks_feature" + str(
         FEATURE_TYPE) + "_batch" + str(BATCH_SIZE) + "_iterate" + str(
-        ITERATE_NUM) + "_lr" + str(
-        learning_rate) + "-" + str(
+        ITERATE_NUM) + "_lr" + str(learning_rate) + "-" + str(
         REWARD_TYPE) + "_" + MODEL_TYPE + "-" + Random_or_Sequenced + pre_initialize_situation
-
 else:
-    DATA_STORE = "/cs/oschulte/Galen/Hockey-data-entire/Hockey-Training-All-feature" + str(
+    DATA_STORE = "/cs/oschulte/Galen/Hockey-data-entire/State-Hockey-Training-All-feature" + str(
         FEATURE_TYPE) + "-neg_reward"
-
-    LOG_DIR = save_mother_dir + "/oschulte/Galen/models/log_NN/cut_log_entire_" + str(
-        Home_model_or_away_model) + "_train_feature" + str(
+    LOG_DIR = save_mother_dir + "/oschulte/Galen/models/log_NN/State-mc-cut_log_entire_together_train_feature" + str(
         FEATURE_TYPE) + "_batch" + str(BATCH_SIZE) + "_iterate" + str(
-        ITERATE_NUM) + "_lr" + str(
-        learning_rate) + "-" + str(
+        ITERATE_NUM) + "_lr" + str(learning_rate) + "-" + str(
         REWARD_TYPE) + "_" + MODEL_TYPE + "-" + Random_or_Sequenced + pre_initialize_situation
-    SAVED_NETWORK = save_mother_dir + "/oschulte/Galen/models/saved_NN/cut_saved_entire_" + str(
-        Home_model_or_away_model) + "_networks_feature" + str(
+    SAVED_NETWORK = save_mother_dir + "/oschulte/Galen/models/saved_NN/State-mc-cut_saved_entire_together_networks_feature" + str(
         FEATURE_TYPE) + "_batch" + str(BATCH_SIZE) + "_iterate" + str(
-        ITERATE_NUM) + "_lr" + str(
-        learning_rate) + "-" + str(
+        ITERATE_NUM) + "_lr" + str(learning_rate) + "-" + str(
         REWARD_TYPE) + "_" + MODEL_TYPE + "-" + Random_or_Sequenced + pre_initialize_situation
-FORWARD_REWARD_MODE = False
 
 DIR_GAMES_ALL = os.listdir(DATA_STORE)
 number_of_total_game = len(DIR_GAMES_ALL)
+FORWARD_REWARD_MODE = False
 
 
 # class td_prediction_simple(object):
@@ -318,13 +307,13 @@ class td_prediction_simple_V3(object):
                 self.read_out = tf.matmul(self.activations3, self.W4) + self.b4
 
         # define the cost function
-        self.y = tf.placeholder("float", [None, 2])
+        self.y = tf.placeholder("float", [None, num_layer_5])
 
         with tf.name_scope("cost"):
-            self.readout_diff = tf.reduce_sum(tf.abs(self.y - self.read_out), reduction_indices=1)
-            self.diff_v = tf.reduce_mean(self.readout_diff)
-            self.readout_square = tf.reduce_sum(tf.square(self.y - self.read_out), reduction_indices=1)
-            self.cost = tf.reduce_mean(self.readout_square)  # square means
+            self.readout_action = self.read_out
+            self.cost = tf.reduce_mean(tf.square(self.y - self.readout_action))
+            self.diff_v = tf.reduce_mean(tf.abs(self.y - self.readout_action))
+
         tf.summary.histogram('cost', self.cost)
 
         with tf.name_scope("train"):
@@ -333,108 +322,94 @@ class td_prediction_simple_V3(object):
             # train_step = tf.train.AdadeltaOptimizer().minimize(cost)
 
 
-# class td_prediction_simple_V4(object):
-#     def __init__(self):
-#         """
-#         define the neural network
-#         :return: network output
-#         """
-#
-#         # 7 is the num of units is layer 1
-#         # 1000 is the num of units in layer 2
-#         # 1 is the num of unit in layer 3
-#
-#         num_layer_1 = feature_num
-#         num_layer_2 = 10000
-#         num_layer_3 = 10000
-#         num_layer_4 = 10000
-#         num_layer_5 = 10000
-#         num_layer_6 = 1
-#
-#         max_sigmoid_1 = -1 * math.sqrt(float(6) / (num_layer_1 + num_layer_2))
-#         min_sigmoid_1 = 1 * math.sqrt(float(6) / (num_layer_1 + num_layer_2))
-#         max_sigmoid_2 = -1 * math.sqrt(float(6) / (num_layer_2 + num_layer_3))
-#         min_sigmoid_2 = 1 * math.sqrt(float(6) / (num_layer_2 + num_layer_3))
-#         max_sigmoid_3 = -1 * math.sqrt(float(6) / (num_layer_3 + num_layer_4))
-#         min_sigmoid_3 = 1 * math.sqrt(float(6) / (num_layer_3 + num_layer_4))
-#         max_sigmoid_4 = -1 * math.sqrt(float(6) / (num_layer_4 + num_layer_5))
-#         min_sigmoid_4 = 1 * math.sqrt(float(6) / (num_layer_4 + num_layer_5))
-#         max_sigmoid_5 = -1 * math.sqrt(float(6) / (num_layer_5 + num_layer_6))
-#         min_sigmoid_5 = 1 * math.sqrt(float(6) / (num_layer_5 + num_layer_6))
-#
-#         with tf.name_scope("Dense_Layer_first"):
-#             self.x = tf.placeholder(tf.float32, [None, num_layer_1], name="x_1")
-#             with tf.name_scope("Weight_1"):
-#                 self.W1 = tf.Variable(
-#                     tf.random_uniform([num_layer_1, num_layer_2], minval=min_sigmoid_1, maxval=max_sigmoid_1),
-#                     name="W_1")
-#             with tf.name_scope("Biases_1"):
-#                 self.b1 = tf.Variable(tf.zeros([num_layer_2]), name="b_1")
-#             with tf.name_scope("Output_1"):
-#                 self.y1 = tf.matmul(self.x, self.W1) + self.b1
-#             with tf.name_scope("Activation_1"):
-#                 self.activations1 = tf.nn.tanh(self.y1, name='activation1')
-#
-#         with tf.name_scope("Dense_Layer_second"):
-#             with tf.name_scope("Weight_2"):
-#                 self.W2 = tf.Variable(
-#                     tf.random_uniform([num_layer_2, num_layer_3], minval=min_sigmoid_2, maxval=max_sigmoid_2),
-#                     name="W_2")
-#             with tf.name_scope("Biases_2"):
-#                 self.b2 = tf.Variable(tf.zeros([num_layer_3]), name="b_2")
-#             with tf.name_scope("Output_2"):
-#                 self.y2 = tf.matmul(self.activations1, self.W2) + self.b2
-#             with tf.name_scope("Activation_2"):
-#                 self.activations2 = tf.nn.tanh(self.y2, name='activation2')
-#
-#         with tf.name_scope("Dense_Layer_third"):
-#             with tf.name_scope("Weight_3"):
-#                 self.W3 = tf.Variable(
-#                     tf.random_uniform([num_layer_3, num_layer_4], minval=min_sigmoid_3, maxval=max_sigmoid_3),
-#                     name="W_3")
-#             with tf.name_scope("Biases_3"):
-#                 self.b3 = tf.Variable(tf.zeros([num_layer_4]), name="b_3")
-#             with tf.name_scope("Output_3"):
-#                 self.y3 = tf.matmul(self.activations2, self.W3) + self.b3
-#             with tf.name_scope("Activation_3"):
-#                 self.activations3 = tf.nn.tanh(self.y3, name='activation3')
-#
-#         with tf.name_scope("Dense_Layer_fourth"):
-#             with tf.name_scope("Weight_4"):
-#                 self.W4 = tf.Variable(
-#                     tf.random_uniform([num_layer_4, num_layer_5], minval=min_sigmoid_4, maxval=max_sigmoid_4),
-#                     name="W_4")
-#             with tf.name_scope("Biases_4"):
-#                 self.b4 = tf.Variable(tf.zeros([num_layer_5]), name="b_4")
-#             with tf.name_scope("Output_4"):
-#                 self.y4 = tf.matmul(self.activations3, self.W4) + self.b4
-#             with tf.name_scope("Activation_4"):
-#                 self.activations4 = tf.nn.tanh(self.y4, name='activation4')
-#
-#         with tf.name_scope("Dense_Layer_fifth"):
-#             with tf.name_scope("Weight_5"):
-#                 self.W5 = tf.Variable(
-#                     tf.random_uniform([num_layer_5, num_layer_6], minval=min_sigmoid_5, maxval=max_sigmoid_5),
-#                     name="W_5")
-#             with tf.name_scope("Biases_5"):
-#                 self.b5 = tf.Variable(tf.zeros([num_layer_6]), name="b_5")
-#             with tf.name_scope("Output_5"):
-#                 self.read_out = tf.matmul(self.activations4, self.W5) + self.b5
-#
-#         # define the cost function
-#         self.y = tf.placeholder("float", [None])
-#
-#         with tf.name_scope("cost"):
-#             self.readout_action = tf.reduce_sum(self.read_out,
-#                                                 reduction_indices=1)  # Computes the sum of elements across dimensions of a tensor.
-#             self.diff_v = tf.reduce_mean(tf.abs(self.y - self.readout_action))
-#             self.cost = tf.reduce_mean(tf.square(self.y - self.readout_action))  # square means
-#         tf.summary.histogram('cost', self.cost)
-#
-#         with tf.name_scope("train"):
-#             self.train_step = tf.train.AdamOptimizer(1e-6).minimize(self.cost)
-#             # self.train_step = tf.train.GradientDescentOptimizer(1e-6).minimize(self.cost)
-#             # train_step = tf.train.AdadeltaOptimizer().minimize(cost)
+class td_prediction_simple_V4(object):
+    def __init__(self):
+        """
+        define the neural network
+        :return: network output
+        """
+
+        # 7 is the num of units is layer 1
+        # 1000 is the num of units in layer 2
+        # 1 is the num of unit in layer 3
+
+        num_layer_1 = feature_num
+        num_layer_2 = 10000
+        num_layer_3 = 10000
+        num_layer_4 = 10000
+        num_layer_5 = 2
+
+        max_sigmoid_1 = -1 * math.sqrt(float(6) / (num_layer_1 + num_layer_2))
+        min_sigmoid_1 = 1 * math.sqrt(float(6) / (num_layer_1 + num_layer_2))
+        max_sigmoid_2 = -1 * math.sqrt(float(6) / (num_layer_2 + num_layer_3))
+        min_sigmoid_2 = 1 * math.sqrt(float(6) / (num_layer_2 + num_layer_3))
+        max_sigmoid_3 = -1 * math.sqrt(float(6) / (num_layer_3 + num_layer_4))
+        min_sigmoid_3 = 1 * math.sqrt(float(6) / (num_layer_3 + num_layer_4))
+        max_sigmoid_4 = -1 * math.sqrt(float(6) / (num_layer_4 + num_layer_5))
+        min_sigmoid_4 = 1 * math.sqrt(float(6) / (num_layer_4 + num_layer_5))
+
+        with tf.name_scope("Dense_Layer_first"):
+            self.x = tf.placeholder(tf.float32, [None, num_layer_1], name="x_1")
+            with tf.name_scope("Weight_1"):
+                self.W1 = tf.Variable(
+                    tf.random_uniform([num_layer_1, num_layer_2], minval=min_sigmoid_1, maxval=max_sigmoid_1),
+                    name="W_1")
+            with tf.name_scope("Biases_1"):
+                self.b1 = tf.Variable(tf.zeros([num_layer_2]), name="b_1")
+            with tf.name_scope("Output_1"):
+                self.y1 = tf.matmul(self.x, self.W1) + self.b1
+            with tf.name_scope("Activation_1"):
+                self.activations1 = tf.nn.tanh(self.y1, name='activation1')
+
+        with tf.name_scope("Dense_Layer_second"):
+            with tf.name_scope("Weight_2"):
+                self.W2 = tf.Variable(
+                    tf.random_uniform([num_layer_2, num_layer_3], minval=min_sigmoid_2, maxval=max_sigmoid_2),
+                    name="W_2")
+            with tf.name_scope("Biases_2"):
+                self.b2 = tf.Variable(tf.zeros([num_layer_3]), name="b_2")
+            with tf.name_scope("Output_2"):
+                self.y2 = tf.matmul(self.activations1, self.W2) + self.b2
+            with tf.name_scope("Activation_2"):
+                self.activations2 = tf.nn.tanh(self.y2, name='activation2')
+
+        with tf.name_scope("Dense_Layer_third"):
+            with tf.name_scope("Weight_3"):
+                self.W3 = tf.Variable(
+                    tf.random_uniform([num_layer_3, num_layer_4], minval=min_sigmoid_3, maxval=max_sigmoid_3),
+                    name="W_3")
+            with tf.name_scope("Biases_3"):
+                self.b3 = tf.Variable(tf.zeros([num_layer_4]), name="b_3")
+            with tf.name_scope("Output_3"):
+                self.y3 = tf.matmul(self.activations2, self.W3) + self.b3
+            with tf.name_scope("Activation_3"):
+                self.activations3 = tf.nn.tanh(self.y3, name='activation3')
+
+        with tf.name_scope("Dense_Layer_fourth"):
+            with tf.name_scope("Weight_4"):
+                self.W4 = tf.Variable(
+                    tf.random_uniform([num_layer_4, num_layer_5], minval=min_sigmoid_4, maxval=max_sigmoid_4),
+                    name="W_4")
+            with tf.name_scope("Biases_4"):
+                self.b4 = tf.Variable(tf.zeros([num_layer_5]), name="b_4")
+            with tf.name_scope("Output_4"):
+                self.read_out = tf.matmul(self.activations3, self.W4) + self.b4
+
+        # define the cost function
+        self.y = tf.placeholder("float", [None, num_layer_5])
+
+        with tf.name_scope("cost"):
+            self.readout_action = self.read_out
+            self.cost = tf.reduce_mean(tf.square(self.y - self.readout_action))
+            self.diff_v = tf.reduce_mean(tf.abs(self.y - self.readout_action))
+        tf.summary.histogram('cost', self.cost)
+
+        with tf.name_scope("train"):
+            self.train_step = tf.train.AdamOptimizer(learning_rate=learning_rate).minimize(self.cost)
+            # self.train_step = tf.train.GradientDescentOptimizer(1e-6).minimize(self.cost)
+            # train_step = tf.train.AdadeltaOptimizer().minimize(cost)
+
+
 #
 #
 # class td_prediction_simple_V5(object):
@@ -724,6 +699,91 @@ class td_prediction_simple_V3(object):
 #             self.train_step = tf.train.AdamOptimizer(1e-6).minimize(self.cost)
 
 
+class td_prediction_simple_V8(object):
+    def __init__(self):
+        """
+        define the neural network
+        :return: network output
+        """
+
+        num_layer_1 = feature_num
+        num_layer_2 = 1000
+        num_layer_3 = 1000
+        num_layer_4 = 1000
+        num_layer_5 = 2
+
+        max_sigmoid_1 = -1 * math.sqrt(float(60) / (num_layer_1 + num_layer_2))
+        min_sigmoid_1 = 1 * math.sqrt(float(60) / (num_layer_1 + num_layer_2))
+        max_sigmoid_2 = -1 * math.sqrt(float(60) / (num_layer_2 + num_layer_3))
+        min_sigmoid_2 = 1 * math.sqrt(float(60) / (num_layer_2 + num_layer_3))
+        max_sigmoid_3 = -1 * math.sqrt(float(60) / (num_layer_3 + num_layer_4))
+        min_sigmoid_3 = 1 * math.sqrt(float(60) / (num_layer_3 + num_layer_4))
+        max_sigmoid_4 = -1 * math.sqrt(float(60) / (num_layer_4 + num_layer_5))
+        min_sigmoid_4 = 1 * math.sqrt(float(60) / (num_layer_4 + num_layer_5))
+
+        with tf.name_scope("Dense_Layer_first"):
+            self.x = tf.placeholder(tf.float32, [None, num_layer_1], name="x_1")
+            with tf.name_scope("Weight_1"):
+                self.W1 = tf.Variable(
+                    tf.random_uniform([num_layer_1, num_layer_2], minval=min_sigmoid_1, maxval=max_sigmoid_1),
+                    name="W_1")
+            with tf.name_scope("Biases_1"):
+                self.b1 = tf.Variable(tf.zeros([num_layer_2]), name="b_1")
+            with tf.name_scope("Output_1"):
+                self.y1 = tf.matmul(self.x, self.W1) + self.b1
+            with tf.name_scope("Activation_1"):
+                self.activations1 = tf.nn.tanh(self.y1, name='activation1')
+
+        with tf.name_scope("Dense_Layer_second"):
+            with tf.name_scope("Weight_2"):
+                self.W2 = tf.Variable(
+                    tf.random_uniform([num_layer_2, num_layer_3], minval=min_sigmoid_2, maxval=max_sigmoid_2),
+                    name="W_2")
+            with tf.name_scope("Biases_2"):
+                self.b2 = tf.Variable(tf.zeros([num_layer_3]), name="b_2")
+            with tf.name_scope("Output_2"):
+                self.y2 = tf.matmul(self.activations1, self.W2) + self.b2
+            with tf.name_scope("Activation_2"):
+                self.activations2 = tf.nn.tanh(self.y2, name='activation2')
+
+        with tf.name_scope("Dense_Layer_third"):
+            with tf.name_scope("Weight_3"):
+                self.W3 = tf.Variable(
+                    tf.random_uniform([num_layer_3, num_layer_4], minval=min_sigmoid_3, maxval=max_sigmoid_3),
+                    name="W_3")
+            with tf.name_scope("Biases_3"):
+                self.b3 = tf.Variable(tf.zeros([num_layer_4]), name="b_3")
+            with tf.name_scope("Output_3"):
+                self.y3 = tf.matmul(self.activations2, self.W3) + self.b3
+            with tf.name_scope("Activation_3"):
+                self.activations3 = tf.nn.tanh(self.y3, name='activation3')
+
+        with tf.name_scope("Dense_Layer_fourth"):
+            with tf.name_scope("Weight_4"):
+                self.W4 = tf.Variable(
+                    tf.random_uniform([num_layer_4, num_layer_5], minval=min_sigmoid_4, maxval=max_sigmoid_4),
+                    name="W_4")
+            with tf.name_scope("Biases_4"):
+                self.b4 = tf.Variable(tf.zeros([num_layer_5]), name="b_4")
+            with tf.name_scope("Output_4"):
+                self.read_out = tf.matmul(self.activations3, self.W4) + self.b4
+
+        # define the cost function
+        self.y = tf.placeholder("float", [None, num_layer_5])
+
+        with tf.name_scope("cost"):
+            self.readout_action = self.read_out
+            self.cost = tf.reduce_mean(tf.square(self.y - self.readout_action))
+            self.diff_v = tf.reduce_mean(tf.abs(self.y - self.readout_action))
+
+        tf.summary.histogram('cost', self.cost)
+
+        with tf.name_scope("train"):
+            self.train_step = tf.train.AdamOptimizer(learning_rate=learning_rate).minimize(self.cost)
+            # self.train_step = tf.train.GradientDescentOptimizer(1e-6).minimize(self.cost)
+            # train_step = tf.train.AdadeltaOptimizer().minimize(cost)
+
+
 def get_next_test_event():
     """
     retrieve next event from sport data
@@ -735,7 +795,11 @@ def get_next_test_event():
     return state, reward, terminal
 
 
-def get_cut_training_batch(s_t0, state, reward, train_number, train_len):
+def get_mc_training_batch(state,
+                          summation_cut_goal_home,
+                          summation_cut_away_home,
+                          train_number,
+                          train_len):
     """
     combine training data to a batch
     :return: [last_state_of_batch, batch, time_series]
@@ -743,82 +807,27 @@ def get_cut_training_batch(s_t0, state, reward, train_number, train_len):
     batch_return = []
     current_batch_length = 0
     while current_batch_length < BATCH_SIZE:
-        s_t1 = state[train_number]
-        # r_t1 = reward[train_number]
-        r_t0 = reward[train_number - 1]
-        r_t1 = reward[train_number]
+        s_t = state[train_number]
+        t_home = summation_cut_goal_home[train_number]
+        t_away = summation_cut_away_home[train_number]
         train_number += 1
-        if train_number + 1 == train_len:
+        if train_number == train_len:
             if FORWARD_REWARD_MODE:
                 raise ValueError("invalid FORWARD_REWARD_MODE, haven't defined")
                 # batch_return.append((s_t0, r_t1, s_t1, 1))
             else:
-                if r_t0 == float(0):
-                    r_t0_combine = [float(0), float(0)]
-                    batch_return.append((s_t0, r_t0_combine, s_t1, 0, 0))
+                batch_return.append((s_t, t_home, t_away, 1))
 
-                    if r_t1 == float(0):
-                        r_t1_combine = [float(0), float(0)]
-                    elif r_t1 == float(-1):
-                        r_t1_combine = [float(0), float(1)]
-                    elif r_t1 == float(1):
-                        r_t1_combine = [float(1), float(0)]
-                    else:
-                        raise ValueError("incorrect r_t1")
-                    batch_return.append((s_t1, r_t1_combine, s_t1, 1, 0))
-                elif r_t0 == float(-1):
-                    r_t0_combine = [float(0), float(1)]
-                    batch_return.append((s_t0, r_t0_combine, s_t1, 0, 0))
-
-                    if r_t1 == float(0):
-                        r_t1_combine = [float(0), float(0)]
-                    elif r_t1 == float(-1):
-                        r_t1_combine = [float(0), float(1)]
-                    elif r_t1 == float(1):
-                        r_t1_combine = [float(1), float(0)]
-                    else:
-                        raise ValueError("incorrect r_t1")
-                    batch_return.append((s_t1, r_t1_combine, s_t1, 1, 0))
-                elif r_t0 == float(1):
-                    r_t0_combine = [float(1), float(0)]
-                    batch_return.append((s_t0, r_t0_combine, s_t1, 0, 0))
-
-                    if r_t1 == float(0):
-                        r_t1_combine = [float(0), float(0)]
-                    elif r_t1 == float(-1):
-                        r_t1_combine = [float(0), float(1)]
-                    elif r_t1 == float(1):
-                        r_t1_combine = [float(1), float(0)]
-                    else:
-                        raise ValueError("incorrect r_t1")
-                    batch_return.append((s_t1, r_t1_combine, s_t1, 1, 0))
-                else:
-                    raise ValueError("invalid reward, haven't match to 0,1 or -1")
             break
         if FORWARD_REWARD_MODE:
             raise ValueError("invalid FORWARD_REWARD_MODE, haven't defined")
             # batch_return.append((s_t0, r_t1, s_t1, 0))
         else:
-            if r_t0 == float(0):
-                r_t0_combine = [float(0), float(0)]
-                batch_return.append((s_t0, r_t0_combine, s_t1, 0, 0))
 
-            elif r_t0 == float(-1):
-                r_t0_combine = [float(0), float(1)]
-                batch_return.append((s_t0, r_t0_combine, s_t1, 0, 1))
-                s_t0 = s_t1
-                break
-            elif r_t0 == float(1):
-                r_t0_combine = [float(1), float(0)]
-                batch_return.append((s_t0, r_t0_combine, s_t1, 0, 1))
-                s_t0 = s_t1
-                break
-            else:
-                raise ValueError("invalid reward, haven't match to 0,1 or -1")
+            batch_return.append((s_t, t_home, t_away, 0))
         current_batch_length += 1
-        s_t0 = s_t1
 
-    return s_t0, batch_return, train_number
+    return train_number, batch_return
 
 
 def get_training_batch_all(s_t0, state, reward):
@@ -865,10 +874,10 @@ def build_training_batch(state, reward):
     return batch_return
 
 
-# def write_list_txt(data_list):
-#     with open(LOG_DIR + '/avg_cost_record.txt', 'wb') as f:
-#         for data in data_list:
-#             f.write(str(data) + "\n")
+def write_list_txt(data_list):
+    with open(LOG_DIR + '/avg_cost_record.txt', 'wb') as f:
+        for data in data_list:
+            f.write(data)
 
 
 def write_game_average_csv(data_record):
@@ -910,7 +919,7 @@ def parameter_setting(sess, model):
                      1.39359727e-16, -3.49618233e-17, -2.50003516e-17, -5.40357297e-17,
                      - 3.44255010e-16, 0.00000000e+00, -5.74655023e-17, 1.35808063e-16,
                      7.71782879e-17, 4.28205636e-13]
-    reward_average = [[0.46184131, 0.42449702]]
+    reward_average = [[0.46184131, -0.42449702]]
     diff_v = 1
     iterate_pre_init = 0
 
@@ -951,6 +960,8 @@ def train_network(sess, model, print_parameters=False):
             if pre_initialize:
                 parameter_setting(sess=sess, model=model)
 
+    cost_all_record = []
+
     # iterate over the training data
     # for i in range(0, ITERATE_NUM):
     while True:
@@ -978,13 +989,20 @@ def train_network(sess, model, print_parameters=False):
                     reward_name = filename
                 elif filename.startswith("state"):
                     state_name = filename
+                elif filename.startswith("summation_cut_goal_home"):
+                    summation_cut_goal_home_name = filename
+                elif filename.startswith("summation_cut_goal_away"):
+                    summation_cut_goal_away_name = filename
 
             reward = sio.loadmat(DATA_STORE + "/" + dir_game + "/" + reward_name)
+            summation_cut_goal_home = sio.loadmat(DATA_STORE + "/" + dir_game + "/" + summation_cut_goal_home_name)
+            summation_cut_goal_away = sio.loadmat(DATA_STORE + "/" + dir_game + "/" + summation_cut_goal_away_name)
             try:
                 reward = (reward['reward'][0]).tolist()
+                summation_cut_goal_home = (summation_cut_goal_home['summation_cut_goal_home'][0]).tolist()
+                summation_cut_goal_away = (summation_cut_goal_away['summation_cut_goal_away'][0]).tolist()
             except:
-                print "\n" + dir_game
-                continue
+                raise ValueError("read goal failure")
             reward_count = sum(reward)
             state = sio.loadmat(DATA_STORE + "/" + dir_game + "/" + state_name)
             state = state['state']
@@ -997,58 +1015,35 @@ def train_network(sess, model, print_parameters=False):
             train_number = 0
 
             # start training
-            s_t0 = state[0]
-            r_t0 = reward[0]
-            train_number += 1
 
             if not Random_select:
                 while True:
                     try:
 
-                        s_tl, batch_return, train_number = get_cut_training_batch(s_t0, state,
-                                                                                  reward,
-                                                                                  train_number,
-                                                                                  train_len)
+                        train_number, batch = get_mc_training_batch(state,
+                                                                    summation_cut_goal_home,
+                                                                    summation_cut_goal_away,
+                                                                    train_number,
+                                                                    train_len)
                     except:
                         print "\n game:" + dir_game + " train number:" + str(train_number)
                         raise IndexError("get_training_batch wrong")
 
-                    # get the batch variables
+                    s_t = [d[0] for d in batch]
+                    t_home = [d[1] for d in batch]
+                    t_away = [d[2] for d in batch]
+                    y_batch = zip(t_home, t_away)
 
-                    batch = batch_return
-                    s_t_home_batch = [d[0] for d in batch]
-                    r_t_home_batch = [d[1] for d in batch]
-                    s_t1_home_batch = [d[2] for d in batch]
-                    s_t_batch = s_t_home_batch
-                    r_t_batch = r_t_home_batch
-                    s_t1_batch = s_t1_home_batch
-
-                    y_batch = []
-
-                    readout_t1_batch = model.read_out.eval(feed_dict={model.x: s_t1_batch})  # get value of s
-
-                    for i in range(0, len(batch)):
-                        terminal = batch[i][3]
-                        cut = batch[i][4]
-                        # if terminal, only equals reward
-                        if terminal or cut:
-                            y_home = float((r_t_batch[i])[0])
-                            y_away = float((r_t_batch[i])[1])
-                            y_batch.append([y_home, y_away])
-                            break
-                        else:
-                            y_home = float((r_t_batch[i])[0]) + GAMMA * ((readout_t1_batch[i]).tolist())[0]
-                            y_away = float((r_t_batch[i])[1]) + GAMMA * ((readout_t1_batch[i]).tolist())[1]
-                            y_batch.append([y_home, y_away])
+                    terminal = batch[-1][3]
 
                     if MODEL_TYPE == "V5":
                         [global_step, learning_rate, diff_v, cost_out, summary_train, _] = sess.run(
                             [model.global_step, model.learning_rate, model.diff_v, model.cost, merge, model.train_step],
-                            feed_dict={model.y: y_batch, model.x: s_t_batch})
+                            feed_dict={model.y: y_batch, model.x: s_t})
                     else:
-                        [diff_v, cost_out, summary_train, _] = sess.run(
-                            [model.diff_v, model.cost, merge, model.train_step],
-                            feed_dict={model.y: y_batch, model.x: s_t_batch})
+                        [read_out, diff_v, cost_out, summary_train, _] = sess.run(
+                            [model.read_out, model.diff_v, model.cost, merge, model.train_step],
+                            feed_dict={model.y: y_batch, model.x: s_t})
 
                     if diff_v > 0.01:
                         converge_flag = False
@@ -1057,30 +1052,32 @@ def train_network(sess, model, print_parameters=False):
                     game_cost_record.append(cost_out)
                     train_writer.add_summary(summary_train, global_step=global_counter)
                     # update the old values
-                    s_t0 = s_tl
 
                     # print info
                     if terminal or ((train_number - 1) / BATCH_SIZE) % 5 == 1:
                         print ("TIMESTEP:", train_number, "Game:", game_number)
-                        print(str(readout_t1_batch.min()), str(readout_t1_batch.max()))
 
                         if MODEL_TYPE == "V5":
                             print ("cost of the network is: " + str(cost_out) + " with learning rate: " + str(
                                 learning_rate) + " and global step: " + str(global_step))
                         else:
-                            print ("cost of the network is: " + str(cost_out))
+                            print ("cost of the network is: " + str(cost_out) + ", the difference is: " + str(diff_v))
 
                     if terminal:
                         # save progress after a game
                         saver.save(sess, SAVED_NETWORK + '/' + SPORT + '-game-', global_step=game_number)
                         break
-
                 cost_per_game_average = sum(game_cost_record) / len(game_cost_record)
                 write_game_average_csv([{"iteration": str(game_number / number_of_total_game + 1), "game": game_number,
                                          "cost_per_game_average": cost_per_game_average}])
             else:
                 raise ValueError("Haven't define for random yet")
 
+        cost_per_iter_average = sum(cost_per_iter_record) / float(len(cost_per_iter_record))
+        cost_all_record.append(
+            "Iter:" + str(game_number / number_of_total_game) + " avg_cost:" + str(cost_per_iter_average))
+
+    # write_list_txt(cost_per_iter_record)
     train_writer.close()
 
 
@@ -1097,14 +1094,16 @@ def train_start():
     #     nn = td_prediction_simple_V2()
     if MODEL_TYPE == "V3":
         nn = td_prediction_simple_V3()
-    # elif MODEL_TYPE == "V4":
-    #     nn = td_prediction_simple_V4()
+    elif MODEL_TYPE == "V4":
+        nn = td_prediction_simple_V4()
     # elif MODEL_TYPE == "V5":
     #     nn = td_prediction_simple_V5()
     # elif MODEL_TYPE == "V6":
     #     nn = td_prediction_simple_V6()
     # elif MODEL_TYPE == "V7":
     #     nn = td_prediction_simple_V7()
+    elif MODEL_TYPE == "V8":
+        nn = td_prediction_simple_V8()
     else:
         raise ValueError("Unclear model type")
     train_network(sess, nn)

@@ -23,7 +23,7 @@ GAMMA = 1  # decay rate of past observations
 BATCH_SIZE = 32  # size of mini-batch, the size of mini-batch could be tricky, the larger mini-batch, the easier will it be converge, but if our training data is not comprehensive enough and stochastic gradients is not applied, model may converge to other things
 SPORT = "NHL"
 SCALE = True
-pre_initialize = True
+pre_initialize = False
 learning_rate = 1e-5
 if pre_initialize:
     pre_initialize_situation = "-pre_initialize"
@@ -51,7 +51,7 @@ if SCALE:
         ITERATE_NUM) + "_lr" + str(learning_rate) + "-" + str(
         REWARD_TYPE) + "_" + MODEL_TYPE + "-" + Random_or_Sequenced + pre_initialize_situation
 else:
-    DATA_STORE = save_mother_dir + "/oschulte/Galen/Hockey-data-entire/Hockey-Training-All-feature" + str(
+    DATA_STORE = "/cs/oschulte/Galen/Hockey-data-entire/Hockey-Training-All-feature" + str(
         FEATURE_TYPE) + "-neg_reward"
     LOG_DIR = save_mother_dir + "/oschulte/Galen/models/log_NN/mc-cut_log_entire_together_train_feature" + str(
         FEATURE_TYPE) + "_batch" + str(BATCH_SIZE) + "_iterate" + str(

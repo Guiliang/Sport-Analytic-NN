@@ -12,8 +12,10 @@ ITERATE_NUM = 30
 BATCH_SIZE = 32
 MAX_LENGTH = 10
 MODEL_TYPE = "v3"
-learning_rate = 1e-5
-if learning_rate == 1e-5:
+learning_rate = 1e-6
+if learning_rate == 1e-6:
+    learning_rate_write = 6
+elif learning_rate == 1e-5:
     learning_rate_write = 5
 elif learning_rate == 1e-4:
     learning_rate_write = 4

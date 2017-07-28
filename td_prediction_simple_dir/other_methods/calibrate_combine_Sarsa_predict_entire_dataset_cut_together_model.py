@@ -1,10 +1,12 @@
-import scipy.io as sio
-import tensorflow as tf
+import ast
 import os
 import unicodedata
-import ast
-import td_combine_Sarsa_simple_cut_together
+
 import numpy as np
+import scipy.io as sio
+import tensorflow as tf
+
+import td_combine_Sarsa_simple_cut_together
 
 FEATURE_TYPE = 5
 calibration = True

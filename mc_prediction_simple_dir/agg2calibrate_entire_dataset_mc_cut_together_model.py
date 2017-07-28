@@ -96,10 +96,11 @@ def agg2calibrate_model(check_target):
         # calibration_value_game_record = []
         # model_predict_value_game_record = []
 
-        if not len(calibrate_names) == len(model_predict_together) and len(model_predict_together) == len(
+        if len(calibrate_names) == len(model_predict_together) and len(model_predict_together) == len(
                 summation_cut_goal_home) and len(summation_cut_goal_home) == len(summation_cut_goal_away):
+            print ""
+        else:
             raise ValueError("lens of data don't consist")
-
         for calibrate_name_index in range(0, len(calibrate_names)):
             calibrate_name = calibrate_names[calibrate_name_index]
             calibrate_name_str = unicodedata.normalize('NFKD', calibrate_name).encode('ascii', 'ignore')

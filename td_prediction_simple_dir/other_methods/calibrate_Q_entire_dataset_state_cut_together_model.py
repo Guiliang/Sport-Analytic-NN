@@ -1,10 +1,10 @@
+import os
+
+import numpy as np
 import scipy.io as sio
 import tensorflow as tf
-import os
-import unicodedata
-import ast
+
 import td_Q_simple_cut_together
-import numpy as np
 
 FEATURE_TYPE = 5
 calibration = True

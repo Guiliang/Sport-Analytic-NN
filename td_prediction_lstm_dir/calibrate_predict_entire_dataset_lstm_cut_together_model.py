@@ -8,11 +8,11 @@ import numpy as np
 
 FEATURE_TYPE = 5
 calibration = True
-ITERATE_NUM = 50
-BATCH_SIZE = 8
+ITERATE_NUM = 30
+BATCH_SIZE = 32
 MAX_LENGTH = 10
 MODEL_TYPE = "v3"
-learning_rate = 1e-4
+learning_rate = 1e-5
 if learning_rate == 1e-5:
     learning_rate_write = 5
 elif learning_rate == 1e-4:
@@ -62,15 +62,15 @@ def generate_calibration_data():
         for file_name in os.listdir(calibration_store_dir + "/" + calibration_dir_game):
             if "dynamic_rnn_input" in file_name:
                 calibrate_value_name = calibration_store_dir + "/" + calibration_dir_game + "/" + file_name
-            # elif "training_data_dict_all_name" in file_name:
-            #     calibrate_name_name = calibration_store_dir + "/" + calibration_dir_game + "/" + file_name
+            elif "training_data_dict_all_name" in file_name:
+                calibrate_name_name = calibration_store_dir + "/" + calibration_dir_game + "/" + file_name
             elif "hybrid_trace_length" in file_name:
                 calibrate_trace_name = calibration_store_dir + "/" + calibration_dir_game + "/" + file_name
             else:
                 continue
 
         calibrate_values = (sio.loadmat(calibrate_value_name))["dynamic_feature_input"]
-        # calibrate_names = (sio.loadmat(calibrate_name_name))["training_data_dict_all_name"]
+        calibrate_names = (sio.loadmat(calibrate_name_name))["training_data_dict_all_name"]
         calibration_trace_length = ((sio.loadmat(calibrate_trace_name))["hybrid_trace_length"])[0]
         calibration_trace_length = handle_trace_length(calibration_trace_length)
 
@@ -78,20 +78,20 @@ def generate_calibration_data():
             if calibration_trace_length[trace_length_index] > 10:
                 calibration_trace_length[trace_length_index] = 10
 
-        # home_identifier = []
-        # for calibrate_name in calibrate_names:
-        #     calibrate_name_str = unicodedata.normalize('NFKD', calibrate_name).encode('ascii', 'ignore')
-        #     calibrate_name_dict = ast.literal_eval(calibrate_name_str)
-        #     if calibrate_name_dict.get("home"):
-        #         home_identifier.append(1)
-        #     else:
-        #         home_identifier.append(0)
+        home_identifier = []
+        for calibrate_name in calibrate_names:
+            calibrate_name_str = unicodedata.normalize('NFKD', calibrate_name).encode('ascii', 'ignore')
+            calibrate_name_dict = ast.literal_eval(calibrate_name_str)
+            if calibrate_name_dict.get("home"):
+                home_identifier.append(1)
+            else:
+                home_identifier.append(0)
 
         readout_t1_batch = model_nn.read_out.eval(feed_dict={model_nn.rnn_input: calibrate_values,
                                                              model_nn.trace_lengths: calibration_trace_length})  # get value of s
 
-        # sio.savemat(calibration_store_dir + "/" + calibration_dir_game + "/" + "home_identifier",
-        #             {"home_identifier": home_identifier})
+        sio.savemat(calibration_store_dir + "/" + calibration_dir_game + "/" + "home_identifier",
+                    {"home_identifier": home_identifier})
         sio.savemat(calibration_store_dir + "/" + calibration_dir_game + "/" + data_name,
                     {data_name: np.asarray(readout_t1_batch)})
 

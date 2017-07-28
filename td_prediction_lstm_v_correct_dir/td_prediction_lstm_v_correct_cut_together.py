@@ -9,7 +9,7 @@ import numpy as np
 
 MODEL_TYPE = "v3"
 MAX_TRACE_LENGTH = 10
-FEATURE_NUMBER = 12
+FEATURE_NUMBER = 25
 BATCH_SIZE = 32
 GAMMA = 1
 H_SIZE = 512
@@ -19,38 +19,39 @@ USE_HIDDEN_STATE = False
 model_train_continue = True
 SCALE = True
 FEATURE_TYPE = 5
-ITERATE_NUM = 30
-learning_rate = 1e-6
+ITERATE_NUM = 50
+learning_rate = 1e-5
 SPORT = "NHL"
 REWARD_TYPE = "NEG_REWARD_GAMMA1_V3"
 save_mother_dir = "/local-scratch"
+if_correct_velocity = "_v_correct_"
 
 if SCALE:
-    LOG_DIR = save_mother_dir + "/oschulte/Galen/models/hybrid_sl_log_NN/State-Scale-cut_together_log_train_feature" + str(
+    LOG_DIR = save_mother_dir + "/oschulte/Galen/models/hybrid_sl_log_NN/Scale-cut_together_log_train_feature" + str(
         FEATURE_TYPE) + "_batch" + str(
         BATCH_SIZE) + "_iterate" + str(
         ITERATE_NUM) + "_lr" + str(
-        learning_rate) + "_" + str(MODEL_TYPE)
-    SAVED_NETWORK = save_mother_dir + "/oschulte/Galen/models/hybrid_sl_saved_NN/State-Scale-cut_together_saved_networks_feature" + str(
+        learning_rate) + "_" + str(MODEL_TYPE)+if_correct_velocity
+    SAVED_NETWORK = save_mother_dir + "/oschulte/Galen/models/hybrid_sl_saved_NN/Scale-cut_together_saved_networks_feature" + str(
         FEATURE_TYPE) + "_batch" + str(
         BATCH_SIZE) + "_iterate" + str(
         ITERATE_NUM) + "_lr" + str(
-        learning_rate) + "_" + str(MODEL_TYPE)
-    DATA_STORE = "/cs/oschulte/Galen/Hockey-data-entire/State-Hybrid-RNN-Hockey-Training-All-feature" + str(
-        FEATURE_TYPE) + "-scale-neg_reward_length-dynamic"
+        learning_rate) + "_" + str(MODEL_TYPE)+if_correct_velocity
+    DATA_STORE = "/cs/oschulte/Galen/Hockey-data-entire/Hybrid-RNN-Hockey-Training-All-feature" + str(
+        FEATURE_TYPE) + "-scale-neg_reward"+if_correct_velocity+"_length-dynamic"
 else:
-    LOG_DIR = save_mother_dir + "/oschulte/Galen/models/hybrid_sl_log_NN/State-cut_together_log_train_feature" + str(
+    LOG_DIR = save_mother_dir + "/oschulte/Galen/models/hybrid_sl_log_NN/cut_together_log_train_feature" + str(
         FEATURE_TYPE) + "_batch" + str(
         BATCH_SIZE) + "_iterate" + str(
         ITERATE_NUM) + "_lr" + str(
-        learning_rate) + "_" + str(MODEL_TYPE)
-    SAVED_NETWORK = save_mother_dir + "/oschulte/Galen/models/hybrid_sl_saved_NN/State-cut_together_saved_networks_feature" + str(
+        learning_rate) + "_" + str(MODEL_TYPE)+if_correct_velocity
+    SAVED_NETWORK = save_mother_dir + "/oschulte/Galen/models/hybrid_sl_saved_NN/cut_together_saved_networks_feature" + str(
         FEATURE_TYPE) + "_batch" + str(
         BATCH_SIZE) + "_iterate" + str(
         ITERATE_NUM) + "_lr" + str(
-        learning_rate) + "_" + str(MODEL_TYPE)
-    DATA_STORE = "/cs/oschulte/Galen/Hockey-data-entire/State-Hybrid-RNN-Hockey-Training-All-feature" + str(
-        FEATURE_TYPE) + "-neg_reward_length-dynamic"
+        learning_rate) + "_" + str(MODEL_TYPE)+if_correct_velocity
+    DATA_STORE = "/cs/oschulte/Galen/Hockey-data-entire/Hybrid-RNN-Hockey-Training-All-feature" + str(
+        FEATURE_TYPE) + "-neg_reward"+if_correct_velocity+"_length-dynamic"
 
 DIR_GAMES_ALL = os.listdir(DATA_STORE)
 number_of_total_game = len(DIR_GAMES_ALL)
