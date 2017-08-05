@@ -3,18 +3,20 @@ import csv
 import math
 import matplotlib.pyplot as plt
 
-MAX_ITERATION = 30
+MAX_ITERATION = 50
 BATCH_SIZE = 32
 
 cost_data_directory_dict = {
-    'Action State TD_NN': 'log_NN/Scale-cut_log_entire_together_train_feature5_batch32_iterate50_lr1e-05-NEG_REWARD_GAMMA1_V3-Sequenced',
-    'Action State TD_c4_NN': 'log_NN/Scale-c4-cut_log_entire_together_train_feature5_batch32_iterate50_lr1e-05-NEG_REWARD_GAMMA1_V3-Sequenced',
-    'State TD_c4_NN': 'log_NN/State-Scale-c4-cut_log_entire_together_train_feature5_batch32_iterate50_lr1e-05-NEG_REWARD_GAMMA1_V3-Sequenced-pre_initialize',
-    'State TD_NN': 'log_NN/Scale-state-cut_log_entire_together_train_feature5_batch32_iterate50_lr1e-06-NEG_REWARD_GAMMA1_V3-Sequenced'
+    # 'Action State MC_NN': 'log_NN/mc-Scale-cut_log_entire_together_train_feature5_batch32_iterate50_lr1e-05-NEG_REWARD_GAMMA1_V3-Sequenced',
+    # 'Action State TD_NN': 'log_NN/Scale-cut_log_entire_together_train_feature5_batch32_iterate50_lr1e-05-NEG_REWARD_GAMMA1_V3-Sequenced',
+    # 'Action State TD_c4_NN': 'log_NN/Scale-c4-cut_log_entire_together_train_feature5_batch32_iterate50_lr1e-05-NEG_REWARD_GAMMA1_V3-Sequenced',
+    # 'State MC_NN': 'log_NN/State-mc-Scale-cut_log_entire_together_train_feature5_batch32_iterate50_lr1e-05-NEG_REWARD_GAMMA1_V3-Sequenced',
+    # 'State TD_NN': 'log_NN/Scale-state-cut_log_entire_together_train_feature5_batch32_iterate50_lr1e-05-NEG_REWARD_GAMMA1_V3-Sequenced',
+    # 'State TD_c4_NN': 'log_NN/State-Scale-c4-cut_log_entire_together_train_feature5_batch32_iterate50_lr1e-05-NEG_REWARD_GAMMA1_V3-Sequenced',
     # 'Action State FT_LSTM': 'log_NN/Scale-fix_rnn_cut_together_log_train_feature5_batch{0}_iterate50_v1'.format(str(BATCH_SIZE)),
     # 'State FT_LSTM': 'log_NN/State-Scale-fix_rnn_cut_together_log_train_feature5_batch{0}_iterate50_v1'.format(str(BATCH_SIZE)),
-    # 'State DT_LSTM': 'hybrid_sl_log_NN/State-Scale-cut_together_log_train_feature5_batch{0}_iterate30_lr1e-05_v3'.format(str(BATCH_SIZE)),
-    # 'Action State DT_LSTM': 'hybrid_sl_log_NN/Scale-cut_together_log_train_feature5_batch{0}_iterate30_lr1e-05_v3'.format(str(BATCH_SIZE))
+    'State DT_LSTM': 'hybrid_sl_log_NN/State-Scale-cut_together_log_train_feature5_batch{0}_iterate30_lr1e-05_v3'.format(str(BATCH_SIZE)),
+    'Action State DT_LSTM': 'hybrid_sl_log_NN/Scale-cut_together_log_train_feature5_batch{0}_iterate50_lr1e-05_v3'.format(str(BATCH_SIZE))
 }
 
 

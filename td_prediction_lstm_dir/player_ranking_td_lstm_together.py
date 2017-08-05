@@ -10,9 +10,11 @@ BATCH_SIZE = 32
 learning_rate = 1e-5
 pre_initialize = False
 MAX_TRACE_LENGTH = 10
+IS_POSIBILITY = True
 
 PLAYER_ID_DICT_ALL = {}
-PLAYER_INTEREST = ['G', 'A', 'P', 'PlayerName']
+PLAYER_INTEREST = ['G', 'A', 'P', 'PlayerName', 'GP', 'PlusMinus', 'PIM', 'PointPerGame', 'PPG', 'PPP', 'SHG', 'SHP',
+                   'GWG', 'OTG', 'S', 'ShootingPercentage', 'TOIPerGame', 'ShiftsPerGame', 'FaceoffWinPercentage']
 
 if learning_rate == 1e-6:
     learning_rate_write = 6
@@ -42,6 +44,7 @@ data_name = "model_cut_together_predict_Feature{0}_Iter{1}_lr{2}_Batch{3}_MaxLen
 state_data_name = "model_state_cut_together_predict_Fea{0}_Iter{1}_lr{2}_Batch{3}_MaxLength{4}_Type{5}".format(
     str(FEATURE_TYPE), str(ITERATE_NUM), str(6), str(8), str(MAX_TRACE_LENGTH), MODEL_TYPE)
 
+
 def aggregate_values():
     for calibration_dir_game in os.listdir(model_data_store_dir):
         model_state_data_name = state_model_data_store_dir + "/" + calibration_dir_game + "/" + state_data_name + ".mat"
@@ -67,20 +70,40 @@ def aggregate_values():
             player_value = PLAYER_ID_DICT_ALL.get(playerId)
             if player_value is None:
                 if ishome:
-                    PLAYER_ID_DICT_ALL.update({playerId: {"value": model_value[0] - model_value[1],
-                                                          "state value": model_state_value[0] - model_state_value[1]}})
+                    if IS_POSIBILITY:
+                        PLAYER_ID_DICT_ALL.update(
+                            {playerId: {"value": (model_value[0] - model_value[1]) / (model_value[0] + model_value[1]),
+                                        "state value": (model_state_value[0] - model_state_value[1]) / (
+                                        model_state_value[0] + model_state_value[1])}})
+                    else:
+                        PLAYER_ID_DICT_ALL.update({playerId: {"value": model_value[0] - model_value[1],
+                                                              "state value": model_state_value[0] - model_state_value[1]}})
                 else:
-                    PLAYER_ID_DICT_ALL.update({playerId: {"value": model_value[1] - model_value[0],
-                                                          "state value": model_state_value[1] - model_state_value[0]}})
+                    if IS_POSIBILITY:
+                        PLAYER_ID_DICT_ALL.update(
+                            {playerId: {"value": (model_value[1] - model_value[0]) / (model_value[0] + model_value[1]),
+                                        "state value": (model_state_value[1] - model_state_value[0]) / (
+                                        model_state_value[0] + model_state_value[1])}})
+                    else:
+                        PLAYER_ID_DICT_ALL.update({playerId: {"value": model_value[1] - model_value[0],
+                                                              "state value": model_state_value[1] - model_state_value[0]}})
             else:
                 if ishome:
-                    player_value_number = player_value.get("value") + model_value[0] - model_value[1]
-                    player_state_value_number = player_value.get("state value") + model_state_value[0] - \
-                                                model_state_value[1]
+                    if IS_POSIBILITY:
+                        player_value_number = player_value.get("value") + (model_value[0] - model_value[1])/(model_value[0] + model_value[1])
+                        player_state_value_number = player_value.get("state value") + (model_state_value[0] - model_state_value[1])/(model_state_value[0] + model_state_value[1])
+                    else:
+                        player_value_number = player_value.get("value") + model_value[0] - model_value[1]
+                        player_state_value_number = player_value.get("state value") + model_state_value[0] - \
+                                                    model_state_value[1]
                 else:
-                    player_value_number = player_value.get("value") + model_value[1] - model_value[0]
-                    player_state_value_number = player_value.get("state value") + model_state_value[1] - \
-                                                model_state_value[0]
+                    if IS_POSIBILITY:
+                        player_value_number = player_value.get("value") + (model_value[1] - model_value[0])/(model_value[0] + model_value[1])
+                        player_state_value_number = player_value.get("state value") + (model_state_value[1] - model_state_value[0])/(model_state_value[0] + model_state_value[1])
+                    else:
+                        player_value_number = player_value.get("value") + model_value[1] - model_value[0]
+                        player_state_value_number = player_value.get("state value") + model_state_value[1] - \
+                                                    model_state_value[0]
                 PLAYER_ID_DICT_ALL.update(
                     {playerId: {"value": player_value_number, "state value": player_state_value_number}})
                 # break
@@ -169,4 +192,7 @@ if __name__ == '__main__':
     playerId_skateInfo_dict = combine_playerId_to_skate_info(player_Info)
     aggregate_values()
     player_value_dict_list = transfer_save_format(playerId_skateInfo_dict)
-    write_csv("./player_ranking_dir/dt_lstm_player_ranking_test.csv", player_value_dict_list)
+    if IS_POSIBILITY:
+        write_csv("./player_ranking_dir/dt_possibility_lstm_player_ranking_test.csv", player_value_dict_list)
+    else:
+        write_csv("./player_ranking_dir/dt_lstm_player_ranking_test.csv", player_value_dict_list)

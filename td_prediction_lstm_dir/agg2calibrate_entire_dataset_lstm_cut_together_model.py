@@ -7,7 +7,7 @@ import ast
 FEATURE_TYPE = 5
 MODEL_TYPE = "v3"
 ITERATE_NUM = 30
-BATCH_SIZE = 8
+BATCH_SIZE = 32
 
 learning_rate = 1e-5
 if learning_rate == 1e-5:

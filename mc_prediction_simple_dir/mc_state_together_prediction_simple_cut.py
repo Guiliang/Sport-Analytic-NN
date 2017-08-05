@@ -15,7 +15,7 @@ train the home team and away team together, use a feature to represent it.
 feature_num = 12
 FEATURE_TYPE = 5
 model_train_continue = True
-ITERATE_NUM = 50
+ITERATE_NUM = 100
 REWARD_TYPE = "NEG_REWARD_GAMMA1"
 MODEL_TYPE = "V3"
 Random_or_Sequenced = "Sequenced"
@@ -37,7 +37,7 @@ elif Random_or_Sequenced == "Sequenced":
 else:
     raise ValueError("Random_or_Sequenced setting wrong")
 
-save_mother_dir = "/local-scratch"
+save_mother_dir = "/cs"
 
 if SCALE:
     DATA_STORE = "/cs/oschulte/Galen/Hockey-data-entire/State-Hockey-Training-All-feature" + str(

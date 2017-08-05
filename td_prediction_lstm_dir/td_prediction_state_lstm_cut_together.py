@@ -10,7 +10,7 @@ import numpy as np
 MODEL_TYPE = "v3"
 MAX_TRACE_LENGTH = 10
 FEATURE_NUMBER = 12
-BATCH_SIZE = 32
+BATCH_SIZE = 8
 GAMMA = 1
 H_SIZE = 512
 # DROPOUT_KEEP_PROB = 0.8
@@ -20,7 +20,7 @@ model_train_continue = True
 SCALE = True
 FEATURE_TYPE = 5
 ITERATE_NUM = 30
-learning_rate = 1e-6
+learning_rate = 1e-7
 SPORT = "NHL"
 REWARD_TYPE = "NEG_REWARD_GAMMA1_V3"
 save_mother_dir = "/local-scratch"

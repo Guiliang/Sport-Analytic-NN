@@ -9,7 +9,7 @@ import numpy as np
 FEATURE_TYPE = 5
 calibration = True
 ITERATE_NUM = 30
-BATCH_SIZE = 32
+BATCH_SIZE = 64
 MAX_LENGTH = 10
 MODEL_TYPE = "v3"
 learning_rate = 1e-5
@@ -59,6 +59,7 @@ def generate_calibration_data():
     for calibration_dir_game in os.listdir(calibration_store_dir):
         calibrate_value_name = ""
         calibrate_trace_name = ""
+        calibrate_name_name = ""
         for file_name in os.listdir(calibration_store_dir + "/" + calibration_dir_game):
             if "dynamic_rnn_input" in file_name:
                 calibrate_value_name = calibration_store_dir + "/" + calibration_dir_game + "/" + file_name

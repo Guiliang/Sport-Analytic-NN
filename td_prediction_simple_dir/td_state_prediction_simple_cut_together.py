@@ -23,10 +23,10 @@ Home_model_or_away_model = "together"
 Random_or_Sequenced = "Sequenced"
 GAMMA = 1  # decay rate of past observations
 BATCH_SIZE = 32  # size of mini-batch, the size of mini-batch could be tricky, the larger mini-batch, the easier will it be converge, but if our training data is not comprehensive enough and stochastic gradients is not applied, model may converge to other things
-learning_rate = 1e-6
+learning_rate = 1e-5
 SPORT = "NHL"
 Scale = True
-pre_initialize = True
+pre_initialize = False
 if pre_initialize:
     pre_initialize_situation = "-pre_initialize"
 else:

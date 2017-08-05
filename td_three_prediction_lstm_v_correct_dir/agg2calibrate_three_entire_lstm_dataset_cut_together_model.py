@@ -1,0 +1,376 @@
+import csv
+import os
+import scipy.io as sio
+import unicodedata
+import ast
+
+FEATURE_TYPE = 5
+MODEL_TYPE = "v3"
+ITERATE_NUM = 30
+BATCH_SIZE = 32
+MAX_LENGTH = 10
+if_correct_velocity = "_v_correct_"
+calibration_store_dir = "/cs/oschulte/Galen/Hockey-data-entire/Hybrid-RNN-Hockey-Training-All-feature{0}-scale" \
+                        "-neg_reward{1}_length-dynamic/".format(str(FEATURE_TYPE), if_correct_velocity)
+pre_initialize = False
+if pre_initialize:
+    pre_initialize_save = "_pre_initialize"
+else:
+    pre_initialize_save = ""
+isHome = True
+
+learning_rate = 1e-5
+if learning_rate == 1e-5:
+    learning_rate_write = 5
+elif learning_rate == 1e-4:
+    learning_rate_write = 4
+if isHome:
+    isHome_id = float(1)
+    home_or_away = "home_"
+else:
+    isHome_id = float(0)
+    home_or_away = "away_"
+
+save_csv_name = home_or_away + "td_three_lstm_cut_together_calibration_entire_feature_" + str(
+    FEATURE_TYPE) + "_" + MODEL_TYPE + "_Iter" + str(ITERATE_NUM) + "_batch" + str(
+    BATCH_SIZE) + pre_initialize_save + "_sum_2017-8-04.csv"
+save_game_csv_name = home_or_away + "td_three_lstm_cut_together_game_record_entire_feature_" + str(
+    FEATURE_TYPE) + "_" + MODEL_TYPE + "_Iter" + str(ITERATE_NUM) + "_batch" + str(
+    BATCH_SIZE) + pre_initialize_save + "_sum_2017-8-04.csv"
+
+data_together_name_load_name = "model_three_cut_together_predict_Feature{0}_Iter{1}_lr{2}_Batch{3}_MaxLength{4}_Type{5}{6}".format(
+    str(FEATURE_TYPE),
+    str(ITERATE_NUM),
+    str(learning_rate_write),
+    str(BATCH_SIZE),
+    str(MAX_LENGTH),
+    str(MODEL_TYPE),
+    if_correct_velocity)
+
+data_together_name = "model_three_cut_together_predict_Feature{0}_Iter{1}_lr{2}_Batch{3}_MaxLength{4}_Type{5}{6}.mat".format(
+    str(FEATURE_TYPE),
+    str(ITERATE_NUM),
+    str(learning_rate_write),
+    str(BATCH_SIZE),
+    str(MAX_LENGTH),
+    str(MODEL_TYPE),
+    if_correct_velocity)
+
+print data_together_name
+
+
+def generate_episode_store(calibrate_names):
+    episode_num = 0
+    episode_cut_dict = {}
+    episode_record_prediction_home = {episode_num: []}
+    episode_record_prediction_away = {episode_num: []}
+    episode_record_prediction_end = {episode_num: []}
+    episode_record_calibration_home = {episode_num: []}
+    episode_record_calibration_away = {episode_num: []}
+    episode_record_calibration_end = {episode_num: []}
+    for calibrate_name_index in range(0, len(calibrate_names)):
+        calibrate_name = calibrate_names[calibrate_name_index]
+        calibrate_name_str = unicodedata.normalize('NFKD', calibrate_name).encode('ascii', 'ignore')
+        calibrate_name_dict = ast.literal_eval(calibrate_name_str)
+        action = calibrate_name_dict.get("action")
+
+        if action == "goal":
+            episode_cut_dict.update({calibrate_name_index: episode_num})
+            episode_num += 1
+            episode_record_prediction_home.update({episode_num: []})
+            episode_record_prediction_away.update({episode_num: []})
+            episode_record_prediction_end.update({episode_num: []})
+            episode_record_calibration_home.update({episode_num: []})
+            episode_record_calibration_away.update({episode_num: []})
+            episode_record_calibration_end.update({episode_num: []})
+
+    if not episode_cut_dict.get(len(calibrate_names) - 1):
+        episode_cut_dict.update({len(calibrate_names) - 1: episode_num})
+
+    return episode_cut_dict, episode_record_prediction_home, episode_record_prediction_away, episode_record_prediction_end, episode_record_calibration_home, episode_record_calibration_away, episode_record_calibration_end
+
+
+def agg2calibrate_model(check_target):
+    model_predict_home_value_record = []
+    model_predict_away_value_record = []
+    model_predict_end_value_record = []
+    calibration_home_value_record = []
+    calibration_away_value_record = []
+    calibration_end_value_record = []
+    found_game_name_record = []
+
+    for calibration_dir_game in os.listdir(calibration_store_dir):
+        calibrate_name_name = ""
+        model_predict_together_name = ""
+        summation_cut_goal_home_name = ""
+        summation_cut_goal_away_name = ""
+        game_found_flag = False
+        for file_name in os.listdir(calibration_store_dir + "/" + calibration_dir_game):
+            if "training_data_dict_all_name" in file_name:
+                calibrate_name_name = calibration_store_dir + "/" + calibration_dir_game + "/" + file_name
+            elif data_together_name in file_name:
+                model_predict_together_name = calibration_store_dir + "/" + calibration_dir_game + "/" + file_name
+            elif "summation_cut_goal_home" in file_name:
+                summation_cut_goal_home_name = calibration_store_dir + "/" + calibration_dir_game + "/" + file_name
+            elif "summation_cut_goal_away" in file_name:
+                summation_cut_goal_away_name = calibration_store_dir + "/" + calibration_dir_game + "/" + file_name
+            else:
+                continue
+
+        calibrate_names = ((sio.loadmat(calibrate_name_name))["training_data_dict_all_name"]).tolist()
+        model_predict_together = ((sio.loadmat(model_predict_together_name))[data_together_name_load_name]).tolist()
+        summation_cut_goal_home = (((sio.loadmat(summation_cut_goal_home_name))["summation_cut_goal_home"]).tolist())[0]
+        summation_cut_goal_away = (((sio.loadmat(summation_cut_goal_away_name))["summation_cut_goal_away"]).tolist())[0]
+
+        episode_cut_dict, episode_record_prediction_home, episode_record_prediction_away, episode_record_prediction_end, episode_record_calibration_home, episode_record_calibration_away, episode_record_calibration_end = generate_episode_store(
+            calibrate_names=calibrate_names)
+
+        # calibration_value_game_record = []
+        # model_predict_value_game_record = []
+
+        if len(calibrate_names) == len(model_predict_together) and len(model_predict_together) == len(
+                summation_cut_goal_home) and len(summation_cut_goal_home) == len(summation_cut_goal_away):
+            None
+        else:
+            raise ValueError("lens of data don't consist")
+
+        game_found_num = 0
+        for calibrate_name_index in range(0, len(calibrate_names)):
+            calibrate_name = calibrate_names[calibrate_name_index]
+            calibrate_name_str = unicodedata.normalize('NFKD', calibrate_name).encode('ascii', 'ignore')
+            calibrate_name_dict = ast.literal_eval(calibrate_name_str)
+            goal_diff = calibrate_name_dict.get("scoreDifferential")
+            manpower_diff = calibrate_name_dict.get("Penalty")
+            time_remain = calibrate_name_dict.get("time remained")
+            home = calibrate_name_dict.get("home")
+            if FEATURE_TYPE == 5:
+                if time_remain > 2400:
+                    period = 1.0
+                elif time_remain > 1200:
+                    period = 2.0
+                elif time_remain > 0:
+                    period = 3.0
+                else:
+                    period = 4.0
+            elif FEATURE_TYPE == 9:
+                period = calibrate_name_dict.get("period")
+            else:
+                raise ValueError("Unsupported FEATURE_TYPE:{}".format(str(FEATURE_TYPE)))
+
+            if float(check_target.get("GD")) == float(goal_diff) and float(check_target.get("MD")) == float(
+                    manpower_diff) and float(check_target.get("P")) == float(period) and home == isHome_id:
+                game_found_flag = True
+                game_found_num += 1
+                # if ISHOME and home_identifier[calibrate_name_index]:  # TODO delete home_identifier[calibrate_name_index]
+                try:
+                    index_episode_cuts = sorted(episode_cut_dict.keys())
+                    for index_episode_cut_index in range(0, len(index_episode_cuts)):
+                        if calibrate_name_index <= index_episode_cuts[index_episode_cut_index]:
+                            episode_index = episode_cut_dict.get(index_episode_cuts[index_episode_cut_index])
+                            (episode_record_prediction_home.get(episode_index)).append(
+                                (model_predict_together[calibrate_name_index])[0])
+                            (episode_record_prediction_away.get(episode_index)).append(
+                                (model_predict_together[calibrate_name_index])[1])
+                            (episode_record_prediction_end.get(episode_index)).append(
+                                (model_predict_together[calibrate_name_index])[2])
+                            (episode_record_calibration_home.get(episode_index)).append(
+                                float(summation_cut_goal_home[calibrate_name_index]))
+                            (episode_record_calibration_away.get(episode_index)).append(
+                                -float(summation_cut_goal_away[calibrate_name_index]))
+
+                            if float(summation_cut_goal_home[calibrate_name_index]) == float(0) and float(
+                                    summation_cut_goal_away[calibrate_name_index]) == float(0):
+                                (episode_record_calibration_end.get(episode_index)).append(
+                                    float(1))
+                            else:
+                                (episode_record_calibration_end.get(episode_index)).append(
+                                    float(0))
+                            break
+                except:
+                    print "error"
+
+        for episode_record_calibration_end_index in range(0, len(episode_record_calibration_end)):
+            try:
+                calibration_end_value_record.append(
+                    sum(episode_record_calibration_end[episode_record_calibration_end_index]) / len(
+                        episode_record_calibration_end[episode_record_calibration_end_index]))
+            except:
+                # calibration_away_value_record.append(float(0))
+                continue
+
+        for episode_record_calibration_away_index in range(0, len(episode_record_calibration_away)):
+            try:
+                calibration_away_value_record.append(
+                    sum(episode_record_calibration_away[episode_record_calibration_away_index]) / len(
+                        episode_record_calibration_away[episode_record_calibration_away_index]))
+            except:
+                # calibration_away_value_record.append(float(0))
+                continue
+
+        for episode_record_calibration_home_index in range(0, len(episode_record_calibration_home)):
+            try:
+                calibration_home_value_record.append(
+                    sum(episode_record_calibration_home[episode_record_calibration_home_index]) / len(
+                        episode_record_calibration_home[episode_record_calibration_home_index]))
+            except:
+                # calibration_home_value_record.append(float(0))
+                continue
+
+        for episode_record_prediction_end_index in range(0, len(episode_record_prediction_end)):
+            try:
+                model_predict_end_value_record.append(
+                    sum(episode_record_prediction_end[episode_record_prediction_end_index]) / len(
+                        episode_record_prediction_end[episode_record_prediction_end_index]))
+            except:
+                # model_predict_away_value_record.append(float(0))
+                continue
+
+        for episode_record_prediction_away_index in range(0, len(episode_record_prediction_away)):
+            try:
+                model_predict_away_value_record.append(
+                    sum(episode_record_prediction_away[episode_record_prediction_away_index]) / len(
+                        episode_record_prediction_away[episode_record_prediction_away_index]))
+            except:
+                # model_predict_away_value_record.append(float(0))
+                continue
+
+        for episode_record_prediction_home_index in range(0, len(episode_record_prediction_home)):
+            try:
+                model_predict_home_value_record.append(
+                    sum(episode_record_prediction_home[episode_record_prediction_home_index]) / len(
+                        episode_record_prediction_home[episode_record_prediction_home_index]))
+            except:
+                # model_predict_home_value_record.append(float(0))
+                continue
+
+        if game_found_flag:
+            found_game_name_record.append(calibration_dir_game + ",{0}".format(str(game_found_num)))
+
+            # try:
+            #     calibration_value_game_average = float(sum(calibration_value_record)) / len(
+            #         calibration_value_record)
+            #     calibration_value_record.append(calibration_value_game_average)
+            # except:
+            #     calibration_value_game_average = 0.0
+            #
+            # try:
+            #     model_predict_value_game_average = float(sum(model_predict_value_record)) / len(
+            #         model_predict_value_record)
+            #     model_predict_value_record.append(model_predict_value_game_average)
+            # except:
+            #     model_predict_value_game_average = 0.0
+
+    # model_predict_value_record = [value[0] for value in model_predict_value_record]
+    # calibration_value_record = [value[0] for value in calibration_value_record]
+    try:
+        model_predict_home_value_record_average = float(sum(model_predict_home_value_record)) / len(
+            model_predict_home_value_record)
+    except:
+        model_predict_home_value_record_average = 0
+
+    try:
+        model_predict_away_value_record_average = float(sum(model_predict_away_value_record)) / len(
+            model_predict_away_value_record)
+    except:
+        model_predict_away_value_record_average = 0
+
+    try:
+        model_predict_end_value_record_average = float(sum(model_predict_end_value_record)) / len(
+            model_predict_end_value_record)
+    except:
+        model_predict_end_value_record_average = 0
+
+    try:
+        calibration_home_value_record_average = float(sum(calibration_home_value_record)) / len(
+            calibration_home_value_record)
+    except:
+        calibration_home_value_record_average = 0
+
+    try:
+        calibration_away_value_record_average = float(sum(calibration_away_value_record)) / len(
+            calibration_away_value_record)
+    except:
+        calibration_away_value_record_average = 0
+
+    try:
+        calibration_end_value_record_average = float(sum(calibration_end_value_record)) / len(
+            calibration_end_value_record)
+    except:
+        calibration_end_value_record_average = 0
+
+    print "model_predict_home_value_record_average with " + str(check_target) + " is " + str(
+        model_predict_home_value_record_average)
+    print "model_predict_away_value_record_average with " + str(check_target) + " is " + str(
+        model_predict_away_value_record_average)
+    print "model_predict_end_value_record_average with " + str(check_target) + " is " + str(
+        model_predict_end_value_record_average)
+    print "calibration_home_value_record_average with " + str(check_target) + " is " + str(
+        calibration_home_value_record_average)
+    print "calibration_away_value_record_average with " + str(check_target) + " is " + str(
+        calibration_away_value_record_average)
+    print "calibration_end_value_record_average with " + str(check_target) + " is " + str(
+        calibration_end_value_record_average)
+
+    return model_predict_home_value_record_average, model_predict_away_value_record_average, model_predict_end_value_record_average, calibration_home_value_record_average, calibration_away_value_record_average, calibration_end_value_record_average, found_game_name_record
+
+
+def start_calibration():
+    store_dict_list = []
+    game_name_dict = {}
+    for goal_diff in [-3, -2, -1, 0, 1, 2, 3]:
+        # for goal_diff in [0]:
+        for manpower in [-1, 0, 1]:
+            # for manpower in [0]:
+            for period in [1, 2, 3]:
+                store_dict = {"Goal Different": goal_diff, "Manpower": manpower, "Period": period}
+                check_target = {"GD": goal_diff, "MD": manpower, "P": period}
+                model_predict_home_value_record_average, model_predict_away_value_record_average, model_predict_end_value_record_average, calibration_home_value_record_average, calibration_away_value_record_average, calibration_end_value_record_average, found_game_list = agg2calibrate_model(
+                    check_target=check_target)
+                store_dict.update({"model_predict_home_value_record_average": model_predict_home_value_record_average})
+                store_dict.update({"model_predict_away_value_record_average": model_predict_away_value_record_average})
+                store_dict.update({"model_predict_end_value_record_average": model_predict_end_value_record_average})
+                store_dict.update({"calibration_home_value_record_average": calibration_home_value_record_average})
+                store_dict.update({"calibration_away_value_record_average": calibration_away_value_record_average})
+                store_dict.update({"calibration_end_value_record_average": calibration_end_value_record_average})
+                store_dict_list.append(store_dict)
+                game_name_dict.update({str(check_target): found_game_list})
+
+    write_csv(save_csv_name, store_dict_list)
+    game_name_pad_list = padding_dict(game_name_dict)
+    write_csv(save_game_csv_name, game_name_pad_list)
+
+
+def write_csv(csv_name, data_record):
+    with open(csv_name, 'w') as csvfile:
+        fieldnames = (data_record[0]).keys()
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+
+        writer.writeheader()
+        for record in data_record:
+            writer.writerow(record)
+
+
+def padding_dict(dict_to_pad):
+    # dict_to_pad = {}
+    values_list = dict_to_pad.values()
+
+    max_value_len = 0
+    for values in values_list:
+        if len(values) > max_value_len:
+            max_value_len = len(values)
+
+    record_dict_list = []
+    for index in range(0, max_value_len):
+        record_dict = {}
+        for key in dict_to_pad.keys():
+            try:
+                record_dict.update({key: (dict_to_pad.get(key))[index]})
+            except:
+                record_dict.update({key: ""})
+
+        record_dict_list.append(record_dict)
+    return record_dict_list
+
+
+if __name__ == '__main__':
+    start_calibration()
