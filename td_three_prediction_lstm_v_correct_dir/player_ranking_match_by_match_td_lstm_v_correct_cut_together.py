@@ -159,7 +159,7 @@ def aggregate_diff_values():
             model_value = model_data[player_Index]
 
             if player_Index - 1 >= 0:
-                training_data_dict_all_pre = training_data_dict_all[player_Index]
+                training_data_dict_all_pre = training_data_dict_all[player_Index-1]
                 training_data_dict_all_pre_str = unicodedata.normalize('NFKD', training_data_dict_all_pre).encode('ascii', 'ignore')
                 training_data_dict_all_pre_dict = ast.literal_eval(training_data_dict_all_pre_str)
 
