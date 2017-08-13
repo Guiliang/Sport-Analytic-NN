@@ -5,28 +5,22 @@ import unicodedata
 import ast
 
 FEATURE_TYPE = 5
-MODEL_TYPE = "v3"
+MODEL_TYPE = "v1"
 ITERATE_NUM = 50
 BATCH_SIZE = 32
-MAX_LENGTH = 10
-if_correct_velocity = "_v_correct_"
-calibration_store_dir = "/cs/oschulte/Galen/Hockey-data-entire/Hybrid-RNN-Hockey-Training-All-feature{0}-scale" \
-                        "-neg_reward{1}_length-dynamic/".format(str(FEATURE_TYPE), if_correct_velocity)
+calibration_store_dir = "/cs/oschulte/Galen/Hockey-data-entire/RNN-Hockey-Training-All-feature{0}-scale-neg_reward_v_correct_length-10".format(
+    str(FEATURE_TYPE))
 pre_initialize = False
 if pre_initialize:
     pre_initialize_save = "_pre_initialize"
 else:
     pre_initialize_save = ""
 isHome = True
-
 learning_rate = 1e-5
 if learning_rate == 1e-5:
     learning_rate_write = 5
 elif learning_rate == 1e-4:
     learning_rate_write = 4
-elif learning_rate == 1e-3:
-    learning_rate_write = 3
-
 if isHome:
     isHome_id = float(1)
     home_or_away = "home_"
@@ -34,32 +28,22 @@ else:
     isHome_id = float(0)
     home_or_away = "away_"
 
-save_csv_name = home_or_away + "td_three_lstm_cut_together_calibration_entire_feature_" + str(
-    FEATURE_TYPE) + "_" + MODEL_TYPE + "_Iter" + str(ITERATE_NUM) + "_lr"+str(learning_rate_write)+ "_batch" + str(
-    BATCH_SIZE) + pre_initialize_save + if_correct_velocity+"sum_2017-8-09.csv"
-save_game_csv_name = home_or_away + "td_three_lstm_cut_together_game_record_entire_feature_" + str(
-    FEATURE_TYPE) + "_" + MODEL_TYPE + "_Iter" + str(ITERATE_NUM) + "_lr"+str(learning_rate_write)+"_batch" + str(
-    BATCH_SIZE) + pre_initialize_save + if_correct_velocity+"sum_2017-8-09.csv"
+if_correct_velocity = "_v_correct_"
 
-data_together_name_load_name = "model_three_cut_together_predict_Feature{0}_Iter{1}_lr{2}_Batch{3}_MaxLength{4}_Type{5}{6}".format(
-    str(FEATURE_TYPE),
-    str(ITERATE_NUM),
-    str(learning_rate_write),
-    str(BATCH_SIZE),
-    str(MAX_LENGTH),
-    str(MODEL_TYPE),
-    if_correct_velocity)
+save_csv_name = home_or_away + "fix_rnn_td_three_cut_together_calibration_entire_feature_" + str(
+    FEATURE_TYPE) + "_" + MODEL_TYPE + "_Iter" + str(ITERATE_NUM) + "_batch" + str(
+    BATCH_SIZE) + pre_initialize_save + if_correct_velocity + "sum_2017-8-05.csv"
+save_game_csv_name = home_or_away + "fix_rnn_td_three_cut_together_game_record_entire_feature_" + str(
+    FEATURE_TYPE) + "_" + MODEL_TYPE + "_Iter" + str(ITERATE_NUM) + "_batch" + str(
+    BATCH_SIZE) + pre_initialize_save + if_correct_velocity + "sum_2017-8-05.csv"
 
-data_together_name = "model_three_cut_together_predict_Feature{0}_Iter{1}_lr{2}_Batch{3}_MaxLength{4}_Type{5}{6}.mat".format(
-    str(FEATURE_TYPE),
-    str(ITERATE_NUM),
-    str(learning_rate_write),
-    str(BATCH_SIZE),
-    str(MAX_LENGTH),
-    str(MODEL_TYPE),
-    if_correct_velocity)
+data_together_name =  "model_three_cut_fix_rnn_together_predict_feature_" + str(
+    FEATURE_TYPE) + "_" + MODEL_TYPE + "_Iter" + str(ITERATE_NUM) + "_batch" + str(
+    BATCH_SIZE) + pre_initialize_save + if_correct_velocity + ".mat"
 
-print data_together_name
+data_together_load_name = "model_three_cut_fix_rnn_together_predict_feature_" + str(
+    FEATURE_TYPE) + "_" + MODEL_TYPE + "_Iter" + str(ITERATE_NUM) + "_batch" + str(
+    BATCH_SIZE) + pre_initialize_save + if_correct_velocity
 
 
 def generate_episode_store(calibrate_names):
@@ -121,7 +105,7 @@ def agg2calibrate_model(check_target):
                 continue
 
         calibrate_names = ((sio.loadmat(calibrate_name_name))["training_data_dict_all_name"]).tolist()
-        model_predict_together = ((sio.loadmat(model_predict_together_name))[data_together_name_load_name]).tolist()
+        model_predict_together = ((sio.loadmat(model_predict_together_name))[data_together_load_name]).tolist()
         summation_cut_goal_home = (((sio.loadmat(summation_cut_goal_home_name))["summation_cut_goal_home"]).tolist())[0]
         summation_cut_goal_away = (((sio.loadmat(summation_cut_goal_away_name))["summation_cut_goal_away"]).tolist())[0]
 

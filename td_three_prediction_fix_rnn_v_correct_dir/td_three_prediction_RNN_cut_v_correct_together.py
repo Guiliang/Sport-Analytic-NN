@@ -378,8 +378,8 @@ def train_network(sess, model, print_parameters=False):
 
                 # perform gradient step
                 y_batch = np.asarray(y_batch)
-                [diff, cost_out, summary_train, _] = sess.run(
-                    [model.diff, model.cost, merge, model.train_step],
+                [read_out, diff, cost_out, summary_train, _] = sess.run(
+                    [model.read_out, model.diff, model.cost, merge, model.train_step],
                     feed_dict={model.y: y_batch, model.rnn_input: s_t0_batch})
 
                 v_diff_record.append(diff)
@@ -394,6 +394,11 @@ def train_network(sess, model, print_parameters=False):
                 # print info
                 if terminal or ((train_number - 1) / BATCH_SIZE) % 5 == 1:
                     print ("TIMESTEP:", train_number, "Game:", game_number)
+                    home_avg = sum(read_out[:, 0]) / len(read_out[:, 0])
+                    away_avg = sum(read_out[:, 1]) / len(read_out[:, 1])
+                    end_avg = sum(read_out[:, 2]) / len(read_out[:, 2])
+                    print "home average:{0}, away average:{1}, end average:{2}".format(str(home_avg), str(away_avg),
+                                                                                       str(end_avg))
                     print ("cost of the network is" + str(cost_out))
 
                 if terminal:

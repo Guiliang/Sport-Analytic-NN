@@ -3,17 +3,16 @@ import tensorflow as tf
 import os
 import unicodedata
 import ast
-import td_three_prediction_lstm_v_correct_cut_together
+import td_three_prediction_simple_c4_v_correct_cut_together
 import numpy as np
 
 FEATURE_TYPE = 5
 calibration = True
 ITERATE_NUM = 50
-MODEL_TYPE = "v3"
+MODEL_TYPE = "V3"
 BATCH_SIZE = 32
-td_three_prediction_lstm_v_correct_cut_together.feature_num = 25
+td_three_prediction_simple_c4_v_correct_cut_together.feature_num = 26 * 4
 pre_initialize = False
-MAX_LENGTH = 10
 if_correct_velocity = "_v_correct_"
 if pre_initialize:
     pre_initialize_situation = "-pre_initialize"
@@ -26,21 +25,22 @@ if learning_rate == 1e-5:
     learning_rate_write = 5
 elif learning_rate == 1e-4:
     learning_rate_write = 4
-elif learning_rate == 1e-3:
-    learning_rate_write = 3
 
-SIMPLE_SAVED_NETWORK_PATH = "/cs/oschulte/Galen/models/hybrid_sl_saved_NN/Scale-three-cut_together_saved_networks_feature{0}_batch{1}_iterate{2}_lr{3}_{4}{5}".format(
-    str(FEATURE_TYPE), str(BATCH_SIZE), str(ITERATE_NUM), str(learning_rate), str(MODEL_TYPE), if_correct_velocity)
+SIMPLE_SAVED_NETWORK_PATH = "/cs/oschulte/Galen/models/saved_NN/Scale-three-c4-cut_saved_entire_together_networks_feature" + str(
+    FEATURE_TYPE) + "_batch" + str(BATCH_SIZE) + "_iterate" + str(ITERATE_NUM) + "_lr" + str(
+    learning_rate) + "-NEG_REWARD_GAMMA1_" + MODEL_TYPE + "-Sequenced" + pre_initialize_situation + if_correct_velocity
 
-calibration_store_dir = "/cs/oschulte/Galen/Hockey-data-entire/Hybrid-RNN-Hockey-Training-All-feature{0}-scale" \
-                        "-neg_reward{1}_length-dynamic/".format(str(FEATURE_TYPE), if_correct_velocity)
+calibration_store_dir = "/cs/oschulte/Galen/Hockey-data-entire/c4-Hockey-Training-All-feature{0}-scale-neg_reward{1}".format(str(FEATURE_TYPE), if_correct_velocity)
 
-data_name = "model_three_cut_together_predict_Feature{0}_Iter{1}_lr{2}_Batch{3}_MaxLength{4}_Type{5}{6}".format(
+
+"/cs/oschulte/Galen/models/saved_NN/Scale-three-c4-cut_saved_entire_together_networks_feature5_batch32_iterate50_lr1e-05-NEG_REWARD_GAMMA1_V3-Sequenced_v_correct_"
+
+
+data_name = "model_c4_three_cut_together_predict_feature{0}_{4}_Iter{1}_lr{2}_batch{3}{5}".format(
     str(FEATURE_TYPE),
     str(ITERATE_NUM),
     str(learning_rate_write),
     str(BATCH_SIZE),
-    str(MAX_LENGTH),
     str(MODEL_TYPE),
     if_correct_velocity)
 
@@ -50,8 +50,8 @@ sess_nn = tf.InteractiveSession()
 #     model_nn = td_prediction_simple_cut_together_testing.td_prediction_simple()
 # elif MODEL_TYPE == "V2":
 #     Scale-three-cut_saved_entire_together_networks_feature5_batch32_iterate50_lr1e-05-NEG_REWARD_GAMMA1_V3-Sequencedmodel_nn = td_prediction_simple_cut_together_testing.td_prediction_simple_V2()
-if MODEL_TYPE == "v3":
-    model_nn = td_three_prediction_lstm_v_correct_cut_together.td_prediction_lstm_V3()
+if MODEL_TYPE == "V3":
+    model_nn = td_three_prediction_simple_c4_v_correct_cut_together.td_prediction_simple_V3()
 # elif MODEL_TYPE == "V4":
 #     model_nn = td_prediction_simple_cut_together_testing.td_prediction_simple_V4()
 # elif MODEL_TYPE == "V5":
@@ -77,26 +77,17 @@ else:
 def generate_calibration_data():
     for calibration_dir_game in os.listdir(calibration_store_dir):
         calibrate_value_name = ""
-        calibrate_trace_name = ""
         calibrate_name_name = ""
         for file_name in os.listdir(calibration_store_dir + "/" + calibration_dir_game):
-            if "dynamic_rnn_input" in file_name:
+            if "state_c4" in file_name:
                 calibrate_value_name = calibration_store_dir + "/" + calibration_dir_game + "/" + file_name
             elif "training_data_dict_all_name" in file_name:
                 calibrate_name_name = calibration_store_dir + "/" + calibration_dir_game + "/" + file_name
-            elif "hybrid_trace_length" in file_name:
-                calibrate_trace_name = calibration_store_dir + "/" + calibration_dir_game + "/" + file_name
             else:
                 continue
 
-        calibrate_values = (sio.loadmat(calibrate_value_name))["dynamic_feature_input"]
+        calibrate_values = (sio.loadmat(calibrate_value_name))["state"]
         calibrate_names = (sio.loadmat(calibrate_name_name))["training_data_dict_all_name"]
-        calibration_trace_length = ((sio.loadmat(calibrate_trace_name))["hybrid_trace_length"])[0]
-        calibration_trace_length = handle_trace_length(calibration_trace_length)
-
-        for trace_length_index in range(0, len(calibration_trace_length)):
-            if calibration_trace_length[trace_length_index] > 10:
-                calibration_trace_length[trace_length_index] = 10
 
         home_identifier = []
         for calibrate_name in calibrate_names:
@@ -107,8 +98,7 @@ def generate_calibration_data():
             else:
                 home_identifier.append(0)
 
-        readout_t1_batch = model_nn.read_out.eval(feed_dict={model_nn.rnn_input: calibrate_values,
-                                                             model_nn.trace_lengths: calibration_trace_length})  # get value of s
+        readout_t1_batch = model_nn.read_out.eval(feed_dict={model_nn.x: calibrate_values})  # get value of s
 
         sio.savemat(calibration_store_dir + "/" + calibration_dir_game + "/" + "home_identifier",
                     {"home_identifier": home_identifier})

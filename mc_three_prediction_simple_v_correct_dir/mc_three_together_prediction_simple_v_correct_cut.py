@@ -15,7 +15,7 @@ train the home team and away team together, use a feature to represent it.
 feature_num = 26
 FEATURE_TYPE = 5
 model_train_continue = True
-ITERATE_NUM = 100
+ITERATE_NUM = 50
 REWARD_TYPE = "NEG_REWARD_GAMMA1"
 MODEL_TYPE = "V3"
 Random_or_Sequenced = "Sequenced"

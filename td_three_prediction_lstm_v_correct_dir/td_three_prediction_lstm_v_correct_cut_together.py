@@ -10,7 +10,7 @@ import numpy as np
 MODEL_TYPE = "v3"
 MAX_TRACE_LENGTH = 10
 FEATURE_NUMBER = 25
-BATCH_SIZE = 32
+BATCH_SIZE = 8
 GAMMA = 1
 H_SIZE = 512
 # DROPOUT_KEEP_PROB = 0.8
@@ -19,7 +19,7 @@ USE_HIDDEN_STATE = False
 model_train_continue = True
 SCALE = True
 FEATURE_TYPE = 5
-ITERATE_NUM = 30
+ITERATE_NUM = 50
 learning_rate = 1e-5
 SPORT = "NHL"
 REWARD_TYPE = "NEG_REWARD_GAMMA1_V3"
@@ -368,8 +368,8 @@ def train_network(sess, model, print_parameters=False):
 
                 # perform gradient step
                 y_batch = np.asarray(y_batch)
-                [diff, index, cost_out, summary_train, _] = sess.run(
-                    [model.diff, model.index, model.cost, merge, model.train_step],
+                [diff, read_out, cost_out, summary_train, _] = sess.run(
+                    [model.diff, model.read_out, model.cost, merge, model.train_step],
                     feed_dict={model.y: y_batch,
                                model.trace_lengths: trace_t0_batch,
                                model.rnn_input: s_t0_batch})
@@ -386,6 +386,11 @@ def train_network(sess, model, print_parameters=False):
                 # print info
                 if terminal or ((train_number - 1) / BATCH_SIZE) % 5 == 1:
                     print ("TIMESTEP:", train_number, "Game:", game_number)
+                    home_avg = sum(read_out[:, 0]) / len(read_out[:, 0])
+                    away_avg = sum(read_out[:, 1]) / len(read_out[:, 1])
+                    end_avg = sum(read_out[:, 2]) / len(read_out[:, 2])
+                    print "home average:{0}, away average:{1}, end average:{2}".format(str(home_avg), str(away_avg),
+                                                                                       str(end_avg))
                     print ("cost of the network is" + str(cost_out))
 
                 if terminal:

@@ -193,6 +193,6 @@ if __name__ == '__main__':
     aggregate_values()
     player_value_dict_list = transfer_save_format(playerId_skateInfo_dict)
     if IS_POSIBILITY:
-        write_csv("./player_ranking_dir/dt_possibility_lstm_player_ranking_test.csv", player_value_dict_list)
+        write_csv("./player_ranking_dir/dt_possibility_lstm_player_ranking_test_2017-08-07.csv", player_value_dict_list)
     else:
         write_csv("./player_ranking_dir/dt_lstm_player_ranking_test.csv", player_value_dict_list)

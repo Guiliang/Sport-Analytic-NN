@@ -357,9 +357,9 @@ def train_network(sess, model, print_parameters=False):
 
                 # get the batch variables
                 s_t0_batch = [d[0] for d in batch_return]
-                a_t_batch = [np.tile(d[1], 2) for d in batch_return]
+                a_t_batch = [np.tile(d[1], 3) for d in batch_return]
                 s_t1_batch = [d[2] for d in batch_return]
-                a_t1_batch = [np.tile(d[3], 2) for d in batch_return]
+                a_t1_batch = [np.tile(d[3], 3) for d in batch_return]
                 r_t_batch = [d[4] for d in batch_return]
                 trace_t0_batch = [d[5] for d in batch_return]
                 trace_t1_batch = [d[6] for d in batch_return]
@@ -386,15 +386,15 @@ def train_network(sess, model, print_parameters=False):
                         index_list = (a_t1_batch[i].tolist())
                         indexs = [index for index, value in enumerate(index_list) if value == 1]
                         readout_action_t1 = np.take(readout_t1_batch[i], indexs)
-                        y_home = float((r_t_batch[i])[0]) + GAMMA * ((readout_action_t1[i]).tolist())[0]
-                        y_away = float((r_t_batch[i])[1]) + GAMMA * ((readout_action_t1[i]).tolist())[1]
-                        y_end = float((r_t_batch[i])[2]) + GAMMA * ((readout_action_t1[i]).tolist())[2]
+                        y_home = float((r_t_batch[i])[0]) + GAMMA * readout_action_t1[0]
+                        y_away = float((r_t_batch[i])[1]) + GAMMA * readout_action_t1[1]
+                        y_end = float((r_t_batch[i])[2]) + GAMMA * readout_action_t1[2]
                         y_batch.append([y_home, y_away, y_end])
 
                 # perform gradient step
                 y_batch = np.asarray(y_batch)
                 [diff, index, cost_out, summary_train, _] = sess.run(
-                    [model.diff, model.index, model.cost, merge, model.train_step],
+                    [model.diff_v, model.index, model.cost, merge, model.train_step],
                     feed_dict={model.y: y_batch,
                                model.trace_lengths: trace_t0_batch,
                                model.rnn_input: s_t0_batch,model.action: a_t_batch})
