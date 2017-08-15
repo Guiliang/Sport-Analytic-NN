@@ -8,13 +8,13 @@ import cv2
 import td_three_prediction_lstm_v_correct_cut_together
 
 FEATURE_TYPE = 5
-ACTION_TYPE = "shot"
+ACTION_TYPE = "goal"
 STIMULATE_TYPE = "position"
 MODEL_TYPE = "v3"
 ITERATE_NUM = 30
 BATCH_SIZE = 32
 ISHOME = True
-HIS_ACTION_TYPE = []
+HIS_ACTION_TYPE = ['shot', 'reception', 'reception']
 DRAW_TARGET = "Q_home"
 if_correct_velocity = "_v_correct_"
 pre_initialize = False
@@ -76,8 +76,8 @@ def nn_simulation(SIMULATION_DATA_PATH, SIMPLE_SAVED_NETWORK_PATH, nn_image_save
             vmin_set = 0.55
             vmax_set = 0.80
         else:
-            vmin_set = 0.510
-            vmax_set = 0.680
+            vmin_set = None
+            vmax_set = None
     elif DRAW_TARGET == "Q_away":
         value_spatial = value_spatial_away
         if ACTION_TYPE == "shot":
