@@ -514,6 +514,9 @@ def aggregate_match_diff_values(calibration_dir_game, teamId_target):
         elif file_name.startswith("home_identifier"):
             home_identifier_name = model_data_store_dir + "/" + calibration_dir_game + "/" + file_name
             home_identifier = (sio.loadmat(home_identifier_name))["home_identifier"][0]
+        elif "training_data_dict_all_name" in file_name:
+            training_data_dict_all_name = model_data_store_dir + "/" + calibration_dir_game + "/" + file_name
+            training_data_dict_all = ((sio.loadmat(training_data_dict_all_name))["training_data_dict_all_name"])
         else:
             continue
 
@@ -522,13 +525,29 @@ def aggregate_match_diff_values(calibration_dir_game, teamId_target):
         teamId = teamIds[player_Index]
         if int(teamId_target) == int(teamId):
             model_value = model_data[player_Index]
-            try:
-                model_value_pre = model_data[player_Index - 1]
-            except:
+            if player_Index - 1 >= 0:
+                training_data_dict_all_pre = training_data_dict_all[player_Index-1]
+                training_data_dict_all_pre_str = unicodedata.normalize('NFKD', training_data_dict_all_pre).encode('ascii', 'ignore')
+                training_data_dict_all_pre_dict = ast.literal_eval(training_data_dict_all_pre_str)
+
+                if training_data_dict_all_pre_dict.get('action') == "goal":
+                    model_value_pre = model_data[player_Index]
+                else:
+                    model_value_pre = model_data[player_Index - 1]
+            else:
                 model_value_pre = model_data[player_Index]
-            try:
-                model_value_nex = model_data[player_Index + 1]
-            except:
+
+            if player_Index + 1 <= len(playerIds):
+                training_data_dict_all_nex = training_data_dict_all[player_Index]
+                training_data_dict_all_nex_str = unicodedata.normalize('NFKD', training_data_dict_all_nex).encode('ascii', 'ignore')
+                training_data_dict_all_nex_dict = ast.literal_eval(training_data_dict_all_nex_str)
+
+                if training_data_dict_all_nex_dict.get('action') == "goal":
+                    model_value_nex = model_data[player_Index]
+                else:
+                    model_value_nex = model_data[player_Index - 1]
+
+            else:
                 model_value_nex = model_data[player_Index]
 
             if model_value[2] < 0:

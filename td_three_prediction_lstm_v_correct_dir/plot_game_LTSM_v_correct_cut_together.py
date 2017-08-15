@@ -2,13 +2,15 @@ import os
 import scipy.io as sio
 import unicodedata
 import matplotlib.pyplot as plt
+import numpy as np
 
 FEATURE_TYPE = 5
 ITERATE_NUM = 30
-BATCH_SIZE = 48
+BATCH_SIZE = 32
 MAX_LENGTH = 10
 MODEL_TYPE = "v3"
 DRAW_THREE = True
+IF_NORMALIZED = True
 learning_rate = 1e-4
 if learning_rate == 1e-5:
     learning_rate_write = 5
@@ -19,10 +21,17 @@ TARGET_GAMEID = str(1403)
 HOME_TEAM = 'Penguins'
 AWAY_TEAM = 'Canadiens'
 
-if DRAW_THREE:
-    save_image_dir = "./image/Three 2015-2016 NHL regular season {0} vs {1}_Iter{2}_lr{3}_Batch{4}.png".format(AWAY_TEAM, HOME_TEAM, str(ITERATE_NUM), str(learning_rate_write), str(BATCH_SIZE),)
+if IF_NORMALIZED:
+    normalize_str = "_normalized"
 else:
-    save_image_dir = "./image/2015-2016 NHL regular season {0} vs {1}_Iter{2}_lr{3}_Batch{4}.png".format(AWAY_TEAM, HOME_TEAM, str(ITERATE_NUM), str(learning_rate_write), str(BATCH_SIZE))
+    normalize_str = ""
+
+if DRAW_THREE:
+    save_image_dir = "./image/Three 2015-2016 NHL regular season {0} vs {1}_Iter{2}_lr{3}_Batch{4}{5}.png".format(
+        AWAY_TEAM, HOME_TEAM, str(ITERATE_NUM), str(learning_rate_write), str(BATCH_SIZE), normalize_str)
+else:
+    save_image_dir = "./image/2015-2016 NHL regular season {0} vs {1}_Iter{2}_lr{3}_Batch{4}{5}.png".format(
+        AWAY_TEAM, HOME_TEAM, str(ITERATE_NUM), str(learning_rate_write), str(BATCH_SIZE), normalize_str)
 
 data_path = "/cs/oschulte/Galen/Hockey-data-entire/Hockey-Match-All-data"
 data_store_dir = "/cs/oschulte/Galen/Hockey-data-entire/Hybrid-RNN-Hockey-Training-All-feature5-scale-neg_reward_v_correct__length-dynamic/"
@@ -56,6 +65,26 @@ def find_game_dir():
     return game_name.split(".")[0]
 
 
+def normalize_data(game_value_home, game_value_away, game_value_end):
+    game_value_home_normalized = []
+    game_value_away_normalized = []
+    game_value_end_normalized = []
+    for index in range(0, len(game_value_home)):
+        home_value = game_value_home[index]
+        away_value = game_value_away[index]
+        end_value = game_value_end[index]
+        if end_value < 0:
+            end_value = 0
+        if away_value < 0:
+            away_value = 0
+        if home_value < 0:
+            home_value = 0
+        game_value_home_normalized.append(float(home_value) / (home_value + away_value + end_value))
+        game_value_away_normalized.append(float(away_value) / (home_value + away_value + end_value))
+        game_value_end_normalized.append(float(end_value) / (home_value + away_value + end_value))
+    return np.asarray(game_value_home_normalized), np.asarray(game_value_away_normalized), np.asarray(game_value_end_normalized)
+
+
 def plot_game_value(game_name_dir):
     game_value = sio.loadmat(data_store_dir + game_name_dir + "/" + data_name)
     game_value = game_value[data_name]
@@ -64,6 +93,9 @@ def plot_game_value(game_name_dir):
     game_value_home = game_value[:, 0]
     game_value_away = game_value[:, 1]
     game_value_end = game_value[:, 2]
+
+    if IF_NORMALIZED:
+        game_value_home, game_value_away, game_value_end = normalize_data(game_value_home, game_value_away, game_value_end)
 
     # find the index of max home and away
     home_max_index = game_value_home.argsort()[-20:][::-1]
@@ -78,15 +110,15 @@ def plot_game_value(game_name_dir):
 
     plt.figure(figsize=(15, 6))
     if DRAW_THREE:
-        plt.plot(event_numbers, game_value_home, label="q_home")
-        plt.plot(event_numbers, game_value_away, label="q_away")
-        plt.plot(event_numbers[0:len(game_value_end)-1], game_value_end[0:len(game_value_end)-1], label="q_end")
+        plt.plot(event_numbers, game_value_home, label="Q for Home".format(HOME_TEAM))
+        plt.plot(event_numbers, game_value_away, label="Q for Away".format(AWAY_TEAM))
+        plt.plot(event_numbers[0:len(game_value_end) - 1], game_value_end[0:len(game_value_end) - 1], label="Q for Game End")
     else:
         plt.plot(event_numbers, game_value_diff, label="q_home-q_away")
-    plt.title("2015-2016 NHL regular season {0}(Away) vs {1}(Home)".format(AWAY_TEAM, HOME_TEAM))
-    plt.xlabel("event number")
-    plt.ylabel("value")
-    plt.legend(loc='upper right')
+    plt.title("2015-2016 NHL regular season {0}(Away) vs {1}(Home)".format(AWAY_TEAM, HOME_TEAM), fontsize=15)
+    plt.xlabel("event number", fontsize=13)
+    plt.ylabel("Q Value", fontsize=13)
+    plt.legend(loc='upper right', fontsize=13)
     # plt.show()
     plt.savefig(save_image_dir)
 

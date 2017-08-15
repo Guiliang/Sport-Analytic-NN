@@ -73,7 +73,7 @@ def nn_simulation(SIMULATION_DATA_PATH, SIMPLE_SAVED_NETWORK_PATH, nn_image_save
     if DRAW_TARGET == "Q_home":
         value_spatial = value_spatial_home
         if ACTION_TYPE == "shot":
-            vmin_set = 0.66
+            vmin_set = 0.55
             vmax_set = 0.80
         else:
             vmin_set = 0.510
@@ -93,8 +93,8 @@ def nn_simulation(SIMULATION_DATA_PATH, SIMPLE_SAVED_NETWORK_PATH, nn_image_save
     plt.figure(figsize=(15, 6))
     sns.set()
     ax = sns.heatmap(value_spatial, xticklabels=False, yticklabels=False, cmap="RdYlBu_r", vmin=vmin_set, vmax=vmax_set)
-    plt.xlabel('XAdjcoord', fontsize=16)
-    plt.ylabel('YAdjcoord', fontsize=16)
+    plt.xlabel('XAdjcoord', fontsize=18)
+    plt.ylabel('YAdjcoord', fontsize=18)
     try:
         plt.title("{2} action:{0}-history:{1} with DT-LSTM".format(ACTION_TYPE, str(HIS_ACTION_TYPE), DRAW_TARGET),
                   fontsize=20)
