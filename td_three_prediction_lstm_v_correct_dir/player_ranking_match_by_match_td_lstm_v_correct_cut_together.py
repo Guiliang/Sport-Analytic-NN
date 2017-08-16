@@ -18,7 +18,7 @@ MAX_TRACE_LENGTH = 10
 if_correct_velocity = "_v_correct_"
 ROUND_NUMBER = 65
 
-IS_POSIBILITY = True
+IS_POSSIBILITY = True
 IS_DIFFERENCE = True
 if IS_DIFFERENCE:
     DIFFERENCE_TYPE = "back_difference_"
@@ -88,7 +88,7 @@ def aggregate_values():
             player_value = PLAYER_ID_DICT_ALL.get(playerId)
             if player_value is None:
                 if ishome:
-                    if IS_POSIBILITY:
+                    if IS_POSSIBILITY:
                         PLAYER_ID_DICT_ALL.update(
                             {playerId: {
                                 "value all": (model_value[0] - model_value[1]) / (
@@ -99,7 +99,7 @@ def aggregate_values():
                         PLAYER_ID_DICT_ALL.update({playerId: {"value all": model_value[0] - model_value[1]}})
                         # "state value": model_state_value[0] - model_state_value[1]}})
                 else:
-                    if IS_POSIBILITY:
+                    if IS_POSSIBILITY:
                         PLAYER_ID_DICT_ALL.update(
                             {playerId: {
                                 "value all": (model_value[1] - model_value[0]) / (
@@ -111,7 +111,7 @@ def aggregate_values():
                         # "state value": model_state_value[1] - model_state_value[0]}})
             else:
                 if ishome:
-                    if IS_POSIBILITY:
+                    if IS_POSSIBILITY:
                         player_value_number = player_value.get("value all") + (model_value[0] - model_value[1]) / (
                             model_value[0] + model_value[1] + abs(model_value[2]))
                         # player_state_value_number = player_value.get("state value") + (model_state_value[0] - model_state_value[1])/(model_state_value[0] + model_state_value[1])
@@ -120,7 +120,7 @@ def aggregate_values():
                         # player_state_value_number = player_value.get("state value") + model_state_value[0] - \
                         #                             model_state_value[1]
                 else:
-                    if IS_POSIBILITY:
+                    if IS_POSSIBILITY:
                         player_value_number = player_value.get("value all") + (model_value[1] - model_value[0]) / (
                             model_value[0] + model_value[1] + abs(model_value[2]))
                         # player_state_value_number = player_value.get("state value") + (model_state_value[1] - model_state_value[0])/(model_state_value[0] + model_state_value[1])
@@ -170,7 +170,7 @@ def aggregate_diff_values():
             else:
                 model_value_pre = model_data[player_Index]
 
-            if player_Index + 1 <= len(playerIds):
+            if player_Index + 1 < len(playerIds):
                 training_data_dict_all_nex = training_data_dict_all[player_Index]
                 training_data_dict_all_nex_str = unicodedata.normalize('NFKD', training_data_dict_all_nex).encode('ascii', 'ignore')
                 training_data_dict_all_nex_dict = ast.literal_eval(training_data_dict_all_nex_str)
@@ -178,7 +178,7 @@ def aggregate_diff_values():
                 if training_data_dict_all_nex_dict.get('action') == "goal":
                     model_value_nex = model_data[player_Index]
                 else:
-                    model_value_nex = model_data[player_Index - 1]
+                    model_value_nex = model_data[player_Index + 1]
 
             else:
                 model_value_nex = model_data[player_Index]
@@ -194,7 +194,7 @@ def aggregate_diff_values():
             player_value = PLAYER_ID_DICT_ALL.get(playerId)
             if player_value is None:
                 if ishome:
-                    if IS_POSIBILITY:
+                    if IS_POSSIBILITY:
                         home_model_value = model_value[0] / (model_value[0] + model_value[1] + abs(model_value[2]))
                         away_model_value = model_value[1] / (model_value[0] + model_value[1] + abs(model_value[2]))
                         end_model_value = abs(model_value[2]) / (model_value[0] + model_value[1] + abs(model_value[2]))
@@ -252,7 +252,7 @@ def aggregate_diff_values():
                         PLAYER_ID_DICT_ALL.update({playerId: {"value all": q_value}})
                         # "state value": model_state_value[0] - model_state_value[1]}})
                 else:
-                    if IS_POSIBILITY:
+                    if IS_POSSIBILITY:
                         home_model_value = model_value[0] / (model_value[0] + model_value[1] + abs(model_value[2]))
                         away_model_value = model_value[1] / (model_value[0] + model_value[1] + abs(model_value[2]))
                         end_model_value = abs(model_value[2]) / (model_value[0] + model_value[1] + abs(model_value[2]))
@@ -312,7 +312,7 @@ def aggregate_diff_values():
                                 "value all": q_value}})
             else:
                 if ishome:
-                    if IS_POSIBILITY:
+                    if IS_POSSIBILITY:
                         home_model_value = model_value[0] / (model_value[0] + model_value[1] + abs(model_value[2]))
                         away_model_value = model_value[1] / (model_value[0] + model_value[1] + abs(model_value[2]))
                         end_model_value = abs(model_value[2]) / (model_value[0] + model_value[1] + abs(model_value[2]))
@@ -366,7 +366,7 @@ def aggregate_diff_values():
                         player_value_number = player_value.get("value all") + q_value
 
                 else:
-                    if IS_POSIBILITY:
+                    if IS_POSSIBILITY:
                         home_model_value = model_value[0] / (model_value[0] + model_value[1] + abs(model_value[2]))
                         away_model_value = model_value[1] / (model_value[0] + model_value[1] + abs(model_value[2]))
                         end_model_value = abs(model_value[2]) / (model_value[0] + model_value[1] + abs(model_value[2]))
@@ -454,7 +454,7 @@ def aggregate_match_values(game_target_dir, teamId_target):
             player_value = PLAYER_ID_DICT_ALL_BY_MATCH.get(playerId)
             if player_value is None:
                 if ishome:
-                    if IS_POSIBILITY:
+                    if IS_POSSIBILITY:
                         PLAYER_ID_DICT_ALL_BY_MATCH.update(
                             {playerId: {
                                 "value": (model_value[0] - model_value[1]) / (
@@ -465,7 +465,7 @@ def aggregate_match_values(game_target_dir, teamId_target):
                         PLAYER_ID_DICT_ALL_BY_MATCH.update({playerId: {"value": model_value[0] - model_value[1]}})
                         # "state value": model_state_value[0] - model_state_value[1]}})
                 else:
-                    if IS_POSIBILITY:
+                    if IS_POSSIBILITY:
                         PLAYER_ID_DICT_ALL_BY_MATCH.update(
                             {playerId: {
                                 "value": (model_value[1] - model_value[0]) / (
@@ -477,7 +477,7 @@ def aggregate_match_values(game_target_dir, teamId_target):
                         # "state value": model_state_value[1] - model_state_value[0]}})
             else:
                 if ishome:
-                    if IS_POSIBILITY:
+                    if IS_POSSIBILITY:
                         player_value_number = player_value.get("value") + (model_value[0] - model_value[1]) / (
                             model_value[0] + model_value[1] + abs(model_value[2]))
                         # player_state_value_number = player_value.get("state value") + (model_state_value[0] - model_state_value[1])/(model_state_value[0] + model_state_value[1])
@@ -486,7 +486,7 @@ def aggregate_match_values(game_target_dir, teamId_target):
                         # player_state_value_number = player_value.get("state value") + model_state_value[0] - \
                         #                             model_state_value[1]
                 else:
-                    if IS_POSIBILITY:
+                    if IS_POSSIBILITY:
                         player_value_number = player_value.get("value") + (model_value[1] - model_value[0]) / (
                             model_value[0] + model_value[1] + abs(model_value[2]))
                         # player_state_value_number = player_value.get("state value") + (model_state_value[1] - model_state_value[0])/(model_state_value[0] + model_state_value[1])
@@ -561,7 +561,7 @@ def aggregate_match_diff_values(calibration_dir_game, teamId_target):
             player_value = PLAYER_ID_DICT_ALL_BY_MATCH.get(playerId)
             if player_value is None:
                 if ishome:
-                    if IS_POSIBILITY:
+                    if IS_POSSIBILITY:
                         home_model_value = model_value[0] / (model_value[0] + model_value[1] + abs(model_value[2]))
                         away_model_value = model_value[1] / (model_value[0] + model_value[1] + abs(model_value[2]))
                         end_model_value = abs(model_value[2]) / (model_value[0] + model_value[1] + abs(model_value[2]))
@@ -619,7 +619,7 @@ def aggregate_match_diff_values(calibration_dir_game, teamId_target):
                         PLAYER_ID_DICT_ALL_BY_MATCH.update({playerId: {"value": q_value}})
                         # "state value": model_state_value[0] - model_state_value[1]}})
                 else:
-                    if IS_POSIBILITY:
+                    if IS_POSSIBILITY:
                         home_model_value = model_value[0] / (model_value[0] + model_value[1] + abs(model_value[2]))
                         away_model_value = model_value[1] / (model_value[0] + model_value[1] + abs(model_value[2]))
                         end_model_value = abs(model_value[2]) / (model_value[0] + model_value[1] + abs(model_value[2]))
@@ -679,7 +679,7 @@ def aggregate_match_diff_values(calibration_dir_game, teamId_target):
                                 "value": q_value}})
             else:
                 if ishome:
-                    if IS_POSIBILITY:
+                    if IS_POSSIBILITY:
                         home_model_value = model_value[0] / (model_value[0] + model_value[1] + abs(model_value[2]))
                         away_model_value = model_value[1] / (model_value[0] + model_value[1] + abs(model_value[2]))
                         end_model_value = abs(model_value[2]) / (model_value[0] + model_value[1] + abs(model_value[2]))
@@ -733,7 +733,7 @@ def aggregate_match_diff_values(calibration_dir_game, teamId_target):
                         player_value_number = player_value.get("value") + q_value
 
                 else:
-                    if IS_POSIBILITY:
+                    if IS_POSSIBILITY:
                         home_model_value = model_value[0] / (model_value[0] + model_value[1] + abs(model_value[2]))
                         away_model_value = model_value[1] / (model_value[0] + model_value[1] + abs(model_value[2]))
                         end_model_value = abs(model_value[2]) / (model_value[0] + model_value[1] + abs(model_value[2]))
@@ -940,6 +940,7 @@ def find_game_dir(target_gameId):
     gameId_directory_list = read_gameId_directory()
     for gameId_directory in gameId_directory_list:
         if target_gameId == gameId_directory[0]:
+            # print gameId_directory[1].split(".")[0]
             return gameId_directory[1].split(".")[0]
 
     raise ValueError("can't find target_gameId")
@@ -1020,7 +1021,7 @@ if __name__ == '__main__':
                 aggregate_match_diff_values(game_target_dir, teamId_target)
             else:
                 aggregate_match_values(game_target_dir, teamId_target)
-            if IS_POSIBILITY:
+            if IS_POSSIBILITY:
                 possi_write = "_possibility"
             else:
                 possi_write = ""

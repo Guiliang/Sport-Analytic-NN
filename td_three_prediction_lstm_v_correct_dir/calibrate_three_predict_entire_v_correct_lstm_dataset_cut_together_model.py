@@ -10,7 +10,7 @@ FEATURE_TYPE = 5
 calibration = True
 ITERATE_NUM = 50
 MODEL_TYPE = "v3"
-BATCH_SIZE = 8
+BATCH_SIZE = 16
 td_three_prediction_lstm_v_correct_cut_together.feature_num = 25
 pre_initialize = False
 MAX_LENGTH = 10
@@ -21,7 +21,7 @@ if pre_initialize:
 else:
     pre_initialize_situation = ""
     pre_initialize_save = ""
-learning_rate = 1e-5
+learning_rate = 1e-4
 if learning_rate == 1e-5:
     learning_rate_write = 5
 elif learning_rate == 1e-4:

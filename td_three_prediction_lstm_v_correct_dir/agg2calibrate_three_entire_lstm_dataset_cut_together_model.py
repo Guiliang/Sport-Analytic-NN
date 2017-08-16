@@ -7,7 +7,7 @@ import ast
 FEATURE_TYPE = 5
 MODEL_TYPE = "v3"
 ITERATE_NUM = 50
-BATCH_SIZE = 32
+BATCH_SIZE = 16
 MAX_LENGTH = 10
 if_correct_velocity = "_v_correct_"
 calibration_store_dir = "/cs/oschulte/Galen/Hockey-data-entire/Hybrid-RNN-Hockey-Training-All-feature{0}-scale" \
@@ -19,7 +19,7 @@ else:
     pre_initialize_save = ""
 isHome = True
 
-learning_rate = 1e-5
+learning_rate = 1e-4
 if learning_rate == 1e-5:
     learning_rate_write = 5
 elif learning_rate == 1e-4:

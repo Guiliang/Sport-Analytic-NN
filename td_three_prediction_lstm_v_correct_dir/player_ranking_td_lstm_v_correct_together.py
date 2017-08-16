@@ -17,7 +17,7 @@ if_correct_velocity = "_v_correct_"
 IS_POSIBILITY = True
 IS_DIFFERENCE = True
 if IS_DIFFERENCE:
-    DIFFERENCE_TYPE = "back_difference_"
+    DIFFERENCE_TYPE = "front_difference_"
 
 PLAYER_ID_DICT_ALL = {}
 PLAYER_INTEREST = ['G', 'A', 'P', 'PlayerName', 'GP', 'PlusMinus', 'PIM', 'PointPerGame', 'PPG', 'PPP', 'SHG', 'SHP',
@@ -165,7 +165,7 @@ def aggregate_diff_values():
             else:
                 model_value_pre = model_data[player_Index]
 
-            if player_Index + 1 <= len(playerIds):
+            if player_Index + 1 < len(playerIds):
                 training_data_dict_all_nex = training_data_dict_all[player_Index]
                 training_data_dict_all_nex_str = unicodedata.normalize('NFKD', training_data_dict_all_nex).encode('ascii', 'ignore')
                 training_data_dict_all_nex_dict = ast.literal_eval(training_data_dict_all_nex_str)
@@ -173,7 +173,7 @@ def aggregate_diff_values():
                 if training_data_dict_all_nex_dict.get('action') == "goal":
                     model_value_nex = model_data[player_Index]
                 else:
-                    model_value_nex = model_data[player_Index - 1]
+                    model_value_nex = model_data[player_Index + 1]
 
             else:
                 model_value_nex = model_data[player_Index]
@@ -518,5 +518,5 @@ if __name__ == '__main__':
     else:
         diff_write = ""
 
-    write_csv("./player_ranking_dir/dt{0}_{1}lstm_player_ranking_test_2017-08-14.csv".format(possi_write, diff_write),
+    write_csv("./player_ranking_dir/dt{0}_{1}lstm_player_ranking_test_2017-08-16.csv".format(possi_write, diff_write),
               player_value_dict_list)
