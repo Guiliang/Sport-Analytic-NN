@@ -981,8 +981,9 @@ def draw_round_by_round_coe(coefficient_record):
     plt.plot(rounds, point_coe, label="Coe with Point")
     plt.plot(rounds, value_coe, label="Coe with season Impact")
     plt.legend(loc='lower right')
-    plt.xlabel("Round", fontsize=15)
-    plt.ylabel("Coefficient", fontsize=15)
+    plt.title("Round by Round Correlation in 2015-2016 NHL season", fontsize = 14)
+    plt.xlabel("Round", fontsize=14)
+    plt.ylabel("Correlation", fontsize=14)
     # plt.show()
     plt.savefig("./player_ranking_dir/round_by_round_coe.png")
 
