@@ -7,7 +7,7 @@ project_dir = "/cs/oschulte/Galen/PycharmProjects/Sport-Analytic-NN/"
 
 calibration_result_dirs = [
     "td_three_prediction_simple_v_correct_dir/calibration_result/home_td_three_cut_together_calibration_entire_feature_5_V3_Iter50_batch32_v_correct_sum_2017-8-05.csv",
-    "td_three_prediction_lstm_v_correct_dir/calibration_result/home_td_three_lstm_cut_together_calibration_entire_feature_5_v3_Iter30_lr4_batch32_v_correct_sum_2017-8-04.csv",
+    "td_three_prediction_lstm_v_correct_dir/calibration_result/home_td_three_lstm_cut_together_calibration_entire_feature_5_v3_Iter50_lr4_batch32_v_correct_sum_2017-8-09.csv",
     "mc_three_prediction_simple_v_correct_dir/calibration_result/home_mc_three_cut_together_calibration_entire_feature_5_V3_Iter50_batch32_v_correct_sum_2017-8-05.csv",
     "td_three_prediction_fix_rnn_v_correct_dir/calibration_result/home_fix_rnn_td_three_cut_together_calibration_entire_feature_5_v1_Iter50_batch32_v_correct_sum_2017-8-05.csv",
     "td_three_prediction_simple_c4_v_correct_dir/calibration_result/home_c4_td_three_cut_together_calibration_entire_feature_5_V3_Iter50_batch32_v_correct_sum_2017-8-05.csv"
