@@ -7,18 +7,21 @@ project_dir = "/cs/oschulte/Galen/PycharmProjects/Sport-Analytic-NN/"
 
 calibration_result_dirs = [
     "td_three_prediction_simple_v_correct_dir/calibration_result/home_td_three_cut_together_calibration_entire_feature_5_V3_Iter50_batch32_v_correct_sum_2017-8-05.csv",
-    "td_three_prediction_lstm_v_correct_dir/calibration_result/home_td_three_lstm_cut_together_calibration_entire_feature_5_v3_Iter50_lr4_batch32_v_correct_sum_2017-8-09.csv",
+    "td_three_prediction_lstm_v_correct_dir/calibration_result/home_td_three_lstm_cut_together_calibration_entire_feature_5_v3_Iter50_lr5_batch32_v_correct_sum_2017-8-09.csv",
     "mc_three_prediction_simple_v_correct_dir/calibration_result/home_mc_three_cut_together_calibration_entire_feature_5_V3_Iter50_batch32_v_correct_sum_2017-8-05.csv",
     "td_three_prediction_fix_rnn_v_correct_dir/calibration_result/home_fix_rnn_td_three_cut_together_calibration_entire_feature_5_v1_Iter50_batch32_v_correct_sum_2017-8-05.csv",
     "td_three_prediction_simple_c4_v_correct_dir/calibration_result/home_c4_td_three_cut_together_calibration_entire_feature_5_V3_Iter50_batch32_v_correct_sum_2017-8-05.csv"
 ]
 
 csv_sequence = ['Goal Different', 'Manpower', 'Period', 'game_count', 'state_count',
-                'model_predict_home_value_record_average', 'calibration_home_value_record_average',
+                'model_predict_home_value_record_average', 'model_poss_predict_home_value_record_average',
+                'calibration_home_value_record_average',
                 'abs_home_difference',
-                'model_predict_away_value_record_average', 'calibration_away_value_record_average',
+                'model_predict_away_value_record_average', 'model_poss_predict_away_value_record_average',
+                'calibration_away_value_record_average',
                 'abs_away_difference',
-                'model_predict_end_value_record_average', 'calibration_end_value_record_average', 'abs_end_difference',
+                'model_predict_end_value_record_average', 'model_poss_predict_end_value_record_average',
+                'calibration_end_value_record_average', 'abs_end_difference',
                 'kld'
                 ]
 
@@ -268,11 +271,32 @@ def compute_weighted_kld(csv_read_dict_list):
     return append_dict
 
 
+def compute_possibility_csv(csv_read_dict_list):
+    for csv_row_read_dict_index in range(0, len(csv_read_dict_list)):
+        predict_home = float(csv_read_dict_list[csv_row_read_dict_index].get("model_predict_home_value_record_average"))
+        predict_away = float(csv_read_dict_list[csv_row_read_dict_index].get("model_predict_away_value_record_average"))
+        predict_end = float(csv_read_dict_list[csv_row_read_dict_index].get("model_predict_end_value_record_average"))
+        if predict_end < 0:
+            predict_end = 0
+        predict_poss_home = predict_home / (predict_home + predict_away + predict_end)
+        predict_poss_away = predict_away / (predict_home + predict_away + predict_end)
+        predict_poss_end = predict_end / (predict_home + predict_away + predict_end)
+        csv_read_dict_list[csv_row_read_dict_index].update(
+            {"model_poss_predict_home_value_record_average": predict_poss_home})
+        csv_read_dict_list[csv_row_read_dict_index].update(
+            {"model_poss_predict_away_value_record_average": predict_poss_away})
+        csv_read_dict_list[csv_row_read_dict_index].update(
+            {"model_poss_predict_end_value_record_average": predict_poss_end})
+
+    return csv_read_dict_list
+
+
 if __name__ == '__main__':
     calibration_record_all_dict_list = count_csv_calibration_game_number_state_count()
     calibration_result_dir = calibration_result_dirs[1]
     csv_read_dict_list = read_calibration_csv(calibration_result_dir)
     csv_read_dict_list = compute_abs_difference(csv_read_dict_list)
+    csv_read_dict_list = compute_possibility_csv(csv_read_dict_list)
     csv_read_dict_list = compute_kld(csv_read_dict_list)
     csv_read_dict_list = combine_dict_list(calibration_record_all_dict_list, csv_read_dict_list)
     append_average_dict = compute_average(csv_read_dict_list)
