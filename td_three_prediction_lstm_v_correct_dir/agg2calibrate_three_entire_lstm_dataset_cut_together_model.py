@@ -5,9 +5,9 @@ import unicodedata
 import ast
 
 FEATURE_TYPE = 5
-MODEL_TYPE = "v3"
+MODEL_TYPE = "v4"
 ITERATE_NUM = 50
-BATCH_SIZE = 16
+BATCH_SIZE = 32
 MAX_LENGTH = 10
 if_correct_velocity = "_v_correct_"
 calibration_store_dir = "/cs/oschulte/Galen/Hockey-data-entire/Hybrid-RNN-Hockey-Training-All-feature{0}-scale" \
@@ -19,7 +19,7 @@ else:
     pre_initialize_save = ""
 isHome = True
 
-learning_rate = 1e-4
+learning_rate = 1e-5
 if learning_rate == 1e-5:
     learning_rate_write = 5
 elif learning_rate == 1e-4:
@@ -36,10 +36,10 @@ else:
 
 save_csv_name = home_or_away + "td_three_lstm_cut_together_calibration_entire_feature_" + str(
     FEATURE_TYPE) + "_" + MODEL_TYPE + "_Iter" + str(ITERATE_NUM) + "_lr"+str(learning_rate_write)+ "_batch" + str(
-    BATCH_SIZE) + pre_initialize_save + if_correct_velocity+"sum_2017-8-09.csv"
+    BATCH_SIZE) + pre_initialize_save + if_correct_velocity+"sum_2017-8-21.csv"
 save_game_csv_name = home_or_away + "td_three_lstm_cut_together_game_record_entire_feature_" + str(
     FEATURE_TYPE) + "_" + MODEL_TYPE + "_Iter" + str(ITERATE_NUM) + "_lr"+str(learning_rate_write)+"_batch" + str(
-    BATCH_SIZE) + pre_initialize_save + if_correct_velocity+"sum_2017-8-09.csv"
+    BATCH_SIZE) + pre_initialize_save + if_correct_velocity+"sum_2017-8-21.csv"
 
 data_together_name_load_name = "model_three_cut_together_predict_Feature{0}_Iter{1}_lr{2}_Batch{3}_MaxLength{4}_Type{5}{6}".format(
     str(FEATURE_TYPE),

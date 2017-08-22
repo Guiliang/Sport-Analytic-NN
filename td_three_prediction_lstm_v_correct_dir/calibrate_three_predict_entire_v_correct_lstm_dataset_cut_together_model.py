@@ -9,8 +9,8 @@ import numpy as np
 FEATURE_TYPE = 5
 calibration = True
 ITERATE_NUM = 50
-MODEL_TYPE = "v3"
-BATCH_SIZE = 16
+MODEL_TYPE = "v4"
+BATCH_SIZE = 32
 td_three_prediction_lstm_v_correct_cut_together.feature_num = 25
 pre_initialize = False
 MAX_LENGTH = 10
@@ -21,7 +21,7 @@ if pre_initialize:
 else:
     pre_initialize_situation = ""
     pre_initialize_save = ""
-learning_rate = 1e-4
+learning_rate = 1e-5
 if learning_rate == 1e-5:
     learning_rate_write = 5
 elif learning_rate == 1e-4:
@@ -52,8 +52,8 @@ sess_nn = tf.InteractiveSession()
 #     Scale-three-cut_saved_entire_together_networks_feature5_batch32_iterate50_lr1e-05-NEG_REWARD_GAMMA1_V3-Sequencedmodel_nn = td_prediction_simple_cut_together_testing.td_prediction_simple_V2()
 if MODEL_TYPE == "v3":
     model_nn = td_three_prediction_lstm_v_correct_cut_together.td_prediction_lstm_V3()
-# elif MODEL_TYPE == "V4":
-#     model_nn = td_prediction_simple_cut_together_testing.td_prediction_simple_V4()
+elif MODEL_TYPE == "v4":
+    model_nn = td_three_prediction_lstm_v_correct_cut_together.td_prediction_lstm_V4()
 # elif MODEL_TYPE == "V5":
 #     model_nn = td_prediction_simple_cut_together_testing.td_prediction_simple_V5()
 # elif MODEL_TYPE == "V6":
