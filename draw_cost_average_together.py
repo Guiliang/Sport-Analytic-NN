@@ -13,10 +13,10 @@ cost_data_directory_dict = {
     # 'State MC_NN': 'log_NN/State-mc-Scale-cut_log_entire_together_train_feature5_batch32_iterate50_lr1e-05-NEG_REWARD_GAMMA1_V3-Sequenced',
     # 'State TD_NN': 'log_NN/Scale-state-cut_log_entire_together_train_feature5_batch32_iterate50_lr1e-05-NEG_REWARD_GAMMA1_V3-Sequenced',
     # 'State TD_c4_NN': 'log_NN/State-Scale-c4-cut_log_entire_together_train_feature5_batch32_iterate50_lr1e-05-NEG_REWARD_GAMMA1_V3-Sequenced',
-    # 'Action State FT_LSTM': 'log_NN/Scale-fix_rnn_cut_together_log_train_feature5_batch{0}_iterate50_v1'.format(str(BATCH_SIZE)),
+    'Action State FT_LSTM': 'log_NN/Scale-fix_rnn_cut_together_log_train_feature5_batch{0}_iterate50_v1'.format(str(BATCH_SIZE)),
     # 'State FT_LSTM': 'log_NN/State-Scale-fix_rnn_cut_together_log_train_feature5_batch{0}_iterate50_v1'.format(str(BATCH_SIZE)),
-    'State DT_LSTM': 'hybrid_sl_log_NN/State-Scale-cut_together_log_train_feature5_batch{0}_iterate30_lr1e-05_v3'.format(str(BATCH_SIZE)),
-    'Action State DT_LSTM': 'hybrid_sl_log_NN/Scale-cut_together_log_train_feature5_batch{0}_iterate50_lr1e-05_v3'.format(str(BATCH_SIZE))
+    # 'State DT_LSTM': 'hybrid_sl_log_NN/State-Scale-cut_together_log_train_feature5_batch{0}_iterate30_lr1e-05_v3'.format(str(BATCH_SIZE)),
+    'Action State PT-LSTM': 'hybrid_sl_log_NN/Scale-three-cut_together_saved_networks_feature5_batch32_iterate50_lr1e-05_v3_v_correct_'.format(str(BATCH_SIZE))
 }
 
 
