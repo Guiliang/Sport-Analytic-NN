@@ -21,7 +21,7 @@ if pre_initialize:
 else:
     pre_initialize_situation = ""
     pre_initialize_save = ""
-learning_rate = 1e-5
+learning_rate = 1e-4
 if learning_rate == 1e-5:
     learning_rate_write = 5
 elif learning_rate == 1e-4:
