@@ -73,30 +73,30 @@ def nn_simulation(SIMULATION_DATA_PATH, SIMPLE_SAVED_NETWORK_PATH, nn_save_image
 
     value_spatial_home = []
     value_spatial_away = []
-    value_spatial_home_dict_list = []
-    value_spatial_away_dict_list = []
+    # value_spatial_home_dict_list = []
+    # value_spatial_away_dict_list = []
 
-    y_count = 0
+    # y_count = 0
     for x_coord_states in simulate_data:
         trace_length = np.ones(len(x_coord_states)) * (len(HIS_ACTION_TYPE) + 1)
         readout_x_coord_values = model_nn.read_out.eval(
             feed_dict={model_nn.rnn_input: x_coord_states, model_nn.trace_lengths: trace_length})
 
-        y_coord = -42.5 + y_count
-        y_count += float(85) / float(simulate_data.shape[0] - 1)
+        # y_coord = -42.5 + y_count
+        # y_count += float(85) / float(simulate_data.shape[0] - 1)
 
-        for x_coord in np.linspace(-100.0, 100.0, x_coord_states.shape[0]):
-            readout_x_label = 0 + float(x_coord_states.shape[0] - 1) / 200 * (x_coord + 100)
-            value_spatial_home_dict_list.append(
-                {'x_coord': x_coord, 'y_coord': y_coord, 'q_home': readout_x_coord_values[int(readout_x_label), 0]})
-            value_spatial_away_dict_list.append(
-                {'x_coord': x_coord, 'y_coord': y_coord, 'q_home': readout_x_coord_values[int(readout_x_label), 1]})
+        # for x_coord in np.linspace(-100.0, 100.0, x_coord_states.shape[0]):
+        #     readout_x_label = 0 + float(x_coord_states.shape[0] - 1) / 200 * (x_coord + 100)
+        #     value_spatial_home_dict_list.append(
+        #         {'x_coord': x_coord, 'y_coord': y_coord, 'q_home': readout_x_coord_values[int(readout_x_label), 0]})
+        #     value_spatial_away_dict_list.append(
+        #         {'x_coord': x_coord, 'y_coord': y_coord, 'q_home': readout_x_coord_values[int(readout_x_label), 1]})
 
         value_spatial_home.append((readout_x_coord_values[:, 0]).tolist())
         value_spatial_away.append((readout_x_coord_values[:, 1]).tolist())
 
-    value_spatial_home_df = pd.DataFrame(value_spatial_home_dict_list)
-    value_spatial_away_df = pd.DataFrame(value_spatial_away_dict_list)
+    # value_spatial_home_df = pd.DataFrame(value_spatial_home_dict_list)
+    # value_spatial_away_df = pd.DataFrame(value_spatial_away_dict_list)
 
     if DRAW_TARGET == "Q_home":
         value_spatial = value_spatial_home
@@ -131,8 +131,10 @@ def nn_simulation(SIMULATION_DATA_PATH, SIMPLE_SAVED_NETWORK_PATH, nn_save_image
             "PT-LSTM {4} for {0} with history:{1}-{2}-{3}".format(ACTION_TYPE, HIS_ACTION_TYPE[0], HIS_ACTION_TYPE[1],
                                                                   HIS_ACTION_TYPE[2], DRAW_TARGET),
             fontsize=20)
-    else:
+    elif len(HIS_ACTION_TYPE) == 0:
         plt.title("PT-LSTM {1} for {0} without history".format(ACTION_TYPE, DRAW_TARGET), fontsize=20)
+    else:
+        raise ValueError("undefined HIS_ACTION_TYPE{0}:".format(HIS_ACTION_TYPE))
 
     plt.savefig(nn_save_image_dir)
 
@@ -148,9 +150,11 @@ def nn_simulation(SIMULATION_DATA_PATH, SIMPLE_SAVED_NETWORK_PATH, nn_save_image
         plt.title("PT-LSTM {2} for {0}\n with history:{1} on right rink".format(ACTION_TYPE, str(HIS_ACTION_TYPE),
                                                                                 DRAW_TARGET),
                   fontsize=30)
-    else:
+    elif len(HIS_ACTION_TYPE) == 0:
         plt.title("PT-LSTM {2} for {0}\n with history:{1} on right rink".format(ACTION_TYPE, "[]", DRAW_TARGET),
                   fontsize=30)
+    else:
+        raise ValueError("undefined HIS_ACTION_TYPE{0}:".format(HIS_ACTION_TYPE))
 
     plt.savefig(nn_half_save_image_dir)
 
