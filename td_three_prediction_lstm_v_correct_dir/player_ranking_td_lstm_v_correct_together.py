@@ -6,10 +6,10 @@ import scipy.io as sio
 
 FEATURE_TYPE = 5
 calibration = True
-ITERATE_NUM = 30
-MODEL_TYPE = "v3"
+ITERATE_NUM = 50
+MODEL_TYPE = "v4"
 BATCH_SIZE = 32
-learning_rate = 1e-5
+learning_rate = 1e-4
 pre_initialize = False
 MAX_TRACE_LENGTH = 10
 if_correct_velocity = "_v_correct_"
@@ -17,7 +17,7 @@ if_correct_velocity = "_v_correct_"
 IS_POSIBILITY = True
 IS_DIFFERENCE = True
 if IS_DIFFERENCE:
-    DIFFERENCE_TYPE = "front_difference_"
+    DIFFERENCE_TYPE = "back_difference_"
 
 PLAYER_ID_DICT_ALL = {}
 PLAYER_INTEREST = ['G', 'A', 'P', 'PlayerName', 'GP', 'PlusMinus', 'PIM', 'PointPerGame', 'PPG', 'PPP', 'SHG', 'SHP',
@@ -53,7 +53,6 @@ data_name = "model_three_cut_together_predict_Feature{0}_Iter{1}_lr{2}_Batch{3}_
     str(MAX_TRACE_LENGTH),
     str(MODEL_TYPE),
     if_correct_velocity)
-
 
 # state_data_name = "model_state_cut_together_predict_Fea{0}_Iter{1}_lr{2}_Batch{3}_MaxLength{4}_Type{5}".format(
 #     str(FEATURE_TYPE), str(ITERATE_NUM), str(6), str(8), str(MAX_TRACE_LENGTH), MODEL_TYPE)
@@ -518,5 +517,5 @@ if __name__ == '__main__':
     else:
         diff_write = ""
 
-    write_csv("./player_ranking_dir/dt{0}_{1}lstm_player_ranking_test_2017-08-16.csv".format(possi_write, diff_write),
+    write_csv("./player_ranking_dir/dt{0}_{1}lstm_player_ranking_test_2017-08-23.csv".format(possi_write, diff_write),
               player_value_dict_list)

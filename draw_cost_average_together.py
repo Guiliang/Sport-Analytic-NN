@@ -2,30 +2,36 @@ import csv
 
 import math
 import matplotlib.pyplot as plt
+import matplotlib as mpl
+
+mpl.pyplot
+label_size = 15
+mpl.rcParams['xtick.labelsize'] = label_size
+mpl.rcParams['ytick.labelsize'] = label_size
 
 MAX_ITERATION = 50
 BATCH_SIZE = 32
 
 color_and_marker_dict = {
-    'MC': ['r', (3, 0), '-'],
+    'c1-MC': ['r', (3, 0), '-'],
     'c1-Sarsa': ['y', (4, 0), '-'],
     'c4-Sarsa': ['b', (4, 1), '-'],
     'FT-LSTM': ['g', (5, 0), '-'],
-    'PT-LSTM': ['m', (5, 1), '-']
+    'DP-LSTM': ['m', (5, 1), '-']
 }
 
 cost_data_directory_dict = {
-    # 'MC': 'log_NN/mc-Scale-three-cut_log_entire_together_train_feature5_batch32_iterate50_lr1e-05-NEG_REWARD_GAMMA1_V3-Sequenced_v_correct_',
+    'c1-MC': 'log_NN/mc-Scale-three-cut_log_entire_together_train_feature5_batch32_iterate50_lr1e-05-NEG_REWARD_GAMMA1_V3-Sequenced_v_correct_',
     'c1-Sarsa': 'log_NN/Scale-three-cut_log_entire_together_train_feature5_batch32_iterate50_lr1e-05-NEG_REWARD_GAMMA1_V3-Sequenced_v_correct_',
     'c4-Sarsa': 'log_NN/Scale-three-c4-cut_log_entire_together_train_feature5_batch32_iterate50_lr1e-05-NEG_REWARD_GAMMA1_V3-Sequenced_v_correct_',
     # 'State MC_NN': 'log_NN/State-mc-Scale-cut_log_entire_together_train_feature5_batch32_iterate50_lr1e-05-NEG_REWARD_GAMMA1_V3-Sequenced',
     # 'State TD_NN': 'log_NN/Scale-state-cut_log_entire_together_train_feature5_batch32_iterate50_lr1e-05-NEG_REWARD_GAMMA1_V3-Sequenced',
     # 'State TD_c4_NN': 'log_NN/State-Scale-c4-cut_log_entire_together_train_feature5_batch32_iterate50_lr1e-05-NEG_REWARD_GAMMA1_V3-Sequenced',
-    # 'FT-LSTM': 'log_NN/Scale-fix_rnn_cut_together_log_train_feature5_batch{0}_iterate50_v1'.format(str(BATCH_SIZE)),
+    'FT-LSTM': 'log_NN/Scale-fix_rnn_cut_together_log_train_feature5_batch{0}_iterate50_v1'.format(str(BATCH_SIZE)),
     # 'State FT_LSTM': 'log_NN/Scale-three-fix_rnn_cut_together_log_train_feature5_batch32_iterate50_v1_v_correct_'.format(str(BATCH_SIZE)),
     # 'State DT_LSTM': 'hybrid_sl_log_NN/State-Scale-cut_together_log_train_feature5_batch{0}_iterate30_lr1e-05_v3'.format(str(BATCH_SIZE)),
-    # 'PT-LSTM': 'hybrid_sl_log_NN/Scale-three-cut_together_saved_networks_feature5_batch32_iterate50_lr1e-05_v3_v_correct_'.format(
-    #     str(BATCH_SIZE))
+    'DP-LSTM': 'hybrid_sl_log_NN/Scale-three-cut_together_saved_networks_feature5_batch32_iterate50_lr1e-05_v3_v_correct_'.format(
+        str(BATCH_SIZE))
 }
 
 
@@ -74,13 +80,14 @@ def plot_cost_average(iteration_average_dict, cost_data_type):
         cost_sum = cost_sum_and_game_number.get('cost_sum')
         game_number = cost_sum_and_game_number.get('game_number')
         cost_average = math.sqrt(float(cost_sum) / (game_number * 32))
-        average_cost.append(math.log10(cost_average))
+        average_cost.append(math.log(cost_average))
     color_and_marker = color_and_marker_dict.get(cost_data_type)
     plt.plot(iterations, average_cost, label=cost_data_type, marker=color_and_marker[1], color=color_and_marker[0], linestyle = color_and_marker[2])
 
 
 if __name__ == '__main__':
-    plt.figure(figsize=(9, 5))
+    plt.figure(figsize=(10, 6))
+    plt.ticklabel_format(useOffset=False)
     for cost_data_type in cost_data_directory_dict.keys():
         cost_data_directory_whole = '/cs/oschulte/Galen/models/' + cost_data_directory_dict.get(
             cost_data_type) + '/avg_cost_record.csv'
@@ -88,9 +95,10 @@ if __name__ == '__main__':
         iteration_average_dict = compute_average_over_iteration(csv_dict_list)
         plot_cost_average(iteration_average_dict, cost_data_type)
 
-    plt.legend(loc='upper right')
-    plt.title("Error Signal vs Iterations", fontsize=16)
-    plt.xlabel("Iterations", fontsize=15)
-    plt.ylabel("Error", fontsize=15)
+    plt.legend(loc='upper right',fontsize=16)
+    plt.title("Error Signal vs Epochs", fontsize=17)
+    plt.xlabel("Epochs", fontsize=16)
+    plt.ylabel("Error", fontsize=16)
+    plt.grid()
     plt.savefig("./cost_graph_dir/{0}".format(str(cost_data_directory_dict.keys())))
     plt.show()

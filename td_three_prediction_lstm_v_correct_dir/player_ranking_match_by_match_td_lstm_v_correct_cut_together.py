@@ -9,10 +9,10 @@ import matplotlib.pyplot as plt
 
 FEATURE_TYPE = 5
 calibration = True
-ITERATE_NUM = 30
-MODEL_TYPE = "v3"
+ITERATE_NUM = 50
+MODEL_TYPE = "v4"
 BATCH_SIZE = 32
-learning_rate = 1e-5
+learning_rate = 1e-4
 pre_initialize = False
 MAX_TRACE_LENGTH = 10
 if_correct_velocity = "_v_correct_"
@@ -986,7 +986,7 @@ def draw_round_by_round_coe(coefficient_record):
     plt.xlabel("Round", fontsize=14)
     plt.ylabel("Correlation", fontsize=14)
     # plt.show()
-    plt.savefig("./player_ranking_dir/round_by_round_coe.png")
+    plt.savefig("./player_ranking_dir/round_by_round_coe_2017-08-23.png")
 
 
 if __name__ == '__main__':
