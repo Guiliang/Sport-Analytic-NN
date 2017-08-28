@@ -11,6 +11,8 @@ from sklearn import tree
 # tree.export_graphviz(clf, out_file='./decision-tree/tree.dot')
 
 PLAYER_NAME = "Taylor Hall"
+MAX_DEPTH = 3
+MAX_LEAF_NODE = 8
 feature_names = []
 for trace_number in range(10, 0, -1):
     feature_names = feature_names + ['T{0}:velocity_x'.format(trace_number), 'T{0}:velocity_y'.format(trace_number),
@@ -36,18 +38,21 @@ def read_csv(csv_name):
         reader = csv.reader(csvfile)
         for row in reader:
             if len(row) == 1:
-                csv_dict_list.append(row[0])
+                csv_dict_list.append(float(row[0]))
             else:
-                csv_dict_list.append(np.asarray(row))
+                csv_dict_list.append(np.asarray([float(i) for i in row]))
     return np.asarray(csv_dict_list)
 
 
 def dt_regression():
-    data = read_csv("./decision-tree/sequence-input-{0}.csv".format(PLAYER_NAME))
-    target = read_csv("./decision-tree/sequence-value-{0}.csv".format(PLAYER_NAME))
-    regressor = DecisionTreeRegressor(random_state=0, max_depth=3, max_leaf_nodes=8)
+    data = read_csv("./decision-tree/sequence-input-{0}-2018-08-28.csv".format(PLAYER_NAME))
+    target = read_csv("./decision-tree/sequence-value-{0}-2018-08-28.csv".format(PLAYER_NAME))
+    regressor = DecisionTreeRegressor(random_state=0, max_depth=MAX_DEPTH, max_leaf_nodes=MAX_LEAF_NODE)
     clf = regressor.fit(data, target)
-    tree.export_graphviz(clf, out_file='./decision-tree/sequence-{0}-tree.dot'.format(PLAYER_NAME),
+    target_output = regressor.predict(data)
+    diff_avg = sum(abs(target_output - target))/target.size
+    print "average training difference is {0}".format(str(diff_avg))
+    tree.export_graphviz(clf, out_file='./decision-tree/sequence-{0}-tree-depth{1}-max_leaf{2}-2018-08-28.dot'.format(PLAYER_NAME,str(MAX_DEPTH),str(MAX_LEAF_NODE)),
                          feature_names=feature_names)
 
 
@@ -75,8 +80,8 @@ def de_standardization():
                             'shot': 19, 'shotagainst': 20, 'event_outcome': 21, 'home': 22, 'away': 23,
                             'angel2gate': 24}
 
-    number2compute_dict = {"time remained": [-1.4297, -1.7048, -1.1009, -1.594],
-                           "scoreDifferential": [1.0713],
+    number2compute_dict = {"time remained": [-1.1136, -1.5945, -1.4294, -0.8397, -0.8118],
+                           "scoreDifferential": [0.3804],
                            "Penalty": [1.037],
                            "goal": [11.7794]
                            }
@@ -91,5 +96,5 @@ def de_standardization():
 
 
 if __name__ == '__main__':
-    # dt_regression()
+    dt_regression()
     de_standardization()

@@ -13,11 +13,10 @@ calibration = True
 ITERATE_NUM = 50
 MODEL_TYPE = "v3"
 BATCH_SIZE = 32
-learning_rate = 1e-4
+learning_rate = 1e-5
 pre_initialize = False
 MAX_TRACE_LENGTH = 10
 if_correct_velocity = "_v_correct_"
-ROUND_NUMBER = 65
 
 model_data_store_dir = "/cs/oschulte/Galen/Hockey-data-entire/Hybrid-RNN-Hockey-Training-All-feature{0}-scale" \
                        "-neg_reward{1}_length-dynamic".format(str(FEATURE_TYPE), if_correct_velocity)
