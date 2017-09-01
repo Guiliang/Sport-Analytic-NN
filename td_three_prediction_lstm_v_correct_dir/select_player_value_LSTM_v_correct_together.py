@@ -4,8 +4,8 @@ import os
 import scipy.io as sio
 import unicodedata
 
-TARGET_PLAYER_ID = int(2)
-PLAYER_NAME = "Taylor Hall"
+TARGET_PLAYER_ID = int(414)
+PLAYER_NAME = "Patrick Kane"
 COMPUTE_IMPACT = True
 
 FEATURE_TYPE = 5
@@ -99,8 +99,7 @@ def find_player_values():
                         training_data_dict_all_pre_dict = ast.literal_eval(training_data_dict_all_pre_str)
 
                         if training_data_dict_all_pre_dict.get('action') == "goal":
-                            model_value_pre = model_data[player_Index]
-                            state_input_value_pre = state_input[player_Index]
+                            continue
                         else:
                             model_value_pre = model_data[player_Index - 1]
                             state_input_value_pre = state_input[player_Index - 1]
@@ -150,10 +149,10 @@ def check_if_zero_empty(check_list):
 
 
 if __name__ == '__main__':
-    csv_value_name = "./decision-tree/sequence-value-{0}-2018-08-28.csv".format(PLAYER_NAME)
-    csv_input_name = "./decision-tree/sequence-input-{0}-2018-08-28.csv".format(PLAYER_NAME)
-    csv_impact_value_name = "./decision-tree/sequence-impact-value-{0}-2018-08-28.csv".format(PLAYER_NAME)
-    csv_impact_input_name = "./decision-tree/sequence-impact-input-{0}-2018-08-28.csv".format(PLAYER_NAME)
+    csv_value_name = "./decision-tree/sequence-value-{0}-2018-08-29.csv".format(PLAYER_NAME)
+    csv_input_name = "./decision-tree/sequence-input-{0}-2018-08-29.csv".format(PLAYER_NAME)
+    csv_impact_value_name = "./decision-tree/sequence-impact-value-{0}-2018-08-29.csv".format(PLAYER_NAME)
+    csv_impact_input_name = "./decision-tree/sequence-impact-input-{0}-2018-08-29.csv".format(PLAYER_NAME)
     value_record, input_record, impact_value_record, impact_input_record = find_player_values()
     write_csv(csv_value_name, value_record)
     write_csv(csv_input_name, input_record)

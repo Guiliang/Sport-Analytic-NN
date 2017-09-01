@@ -16,7 +16,7 @@ learning_rate = 1e-4
 pre_initialize = False
 MAX_TRACE_LENGTH = 10
 if_correct_velocity = "_v_correct_"
-ROUND_NUMBER = 65
+ROUND_NUMBER = 1
 
 IS_POSSIBILITY = True
 IS_DIFFERENCE = True
@@ -977,10 +977,10 @@ def draw_round_by_round_coe(coefficient_record):
     point_coe = coefficient_record[:, 2]
     value_coe = coefficient_record[:, 3]
     rounds = range(1, ROUND_NUMBER + 1)
-    plt.plot(rounds, goal_coe, label="Coe with Goal")
-    plt.plot(rounds, assist_coe, label="Coe with Assist")
-    plt.plot(rounds, point_coe, label="Coe with Point")
-    plt.plot(rounds, value_coe, label="Coe with season Impact")
+    plt.plot(rounds, goal_coe, label=r'$\rho(GMI^{round}, Goals)$')
+    plt.plot(rounds, assist_coe, label=r'$\rho(GMI^{round}, Assists)$')
+    plt.plot(rounds, point_coe, label=r'$\rho(GMI^{round}, Points)$')
+    plt.plot(rounds, value_coe, label=r'$\rho(GMI^{round}, GMI^{season})$')
     plt.legend(loc='lower right')
     plt.title("Round by Round Correlation in 2015-2016 NHL season", fontsize = 14)
     plt.xlabel("Round", fontsize=14)
