@@ -8,9 +8,9 @@ import numpy as np
 
 FEATURE_TYPE = 5
 calibration = True
-ITERATE_NUM = 50
+ITERATE_NUM = 30
 MODEL_TYPE = "V3"
-BATCH_SIZE = 32
+BATCH_SIZE = 64
 td_three_prediction_simple_v_correct_cut_together.feature_num = 26
 pre_initialize = False
 if pre_initialize:
@@ -19,7 +19,7 @@ if pre_initialize:
 else:
     pre_initialize_situation = ""
     pre_initialize_save = ""
-learning_rate = 1e-5
+learning_rate = 1e-4
 if learning_rate == 1e-5:
     learning_rate_write = 5
 elif learning_rate == 1e-4:
@@ -29,6 +29,8 @@ SIMPLE_SAVED_NETWORK_PATH = "/cs/oschulte/Galen/models/saved_NN/Scale-three-cut_
     str(FEATURE_TYPE), str(BATCH_SIZE), str(ITERATE_NUM), str(learning_rate), MODEL_TYPE, pre_initialize_situation, if_correct_velocity)
 calibration_store_dir = "/cs/oschulte/Galen/Hockey-data-entire/Hockey-Training-All-feature{0}-scale-neg_reward_v_correct_".format(
     str(FEATURE_TYPE))
+
+print SIMPLE_SAVED_NETWORK_PATH
 
 sess_nn = tf.InteractiveSession()
 

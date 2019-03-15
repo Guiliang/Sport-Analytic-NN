@@ -8,12 +8,12 @@ import numpy as np
 
 FEATURE_TYPE = 5
 calibration = True
-ITERATE_NUM = 50
+ITERATE_NUM = 30
 MODEL_TYPE = "v4"
 BATCH_SIZE = 32
 td_three_prediction_lstm_v_correct_cut_together.feature_num = 25
 pre_initialize = False
-MAX_LENGTH = 10
+MAX_LENGTH = 5
 if_correct_velocity = "_v_correct_"
 if pre_initialize:
     pre_initialize_situation = "-pre_initialize"
@@ -29,8 +29,13 @@ elif learning_rate == 1e-4:
 elif learning_rate == 1e-3:
     learning_rate_write = 3
 
-SIMPLE_SAVED_NETWORK_PATH = "/cs/oschulte/Galen/models/hybrid_sl_saved_NN/Scale-three-cut_together_saved_networks_feature{0}_batch{1}_iterate{2}_lr{3}_{4}{5}".format(
-    str(FEATURE_TYPE), str(BATCH_SIZE), str(ITERATE_NUM), str(learning_rate), str(MODEL_TYPE), if_correct_velocity)
+# SIMPLE_SAVED_NETWORK_PATH = "/cs/oschulte/Galen/models/hybrid_sl_saved_NN/Scale-three-cut_together_saved_networks_feature{0}_batch{1}_iterate{2}_lr{3}_{4}{5}".format(
+#     str(FEATURE_TYPE), str(BATCH_SIZE), str(ITERATE_NUM), str(learning_rate), str(MODEL_TYPE), if_correct_velocity)
+
+SIMPLE_SAVED_NETWORK_PATH = "/Local-Scratch/oschulte/Galen/models/hybrid_sl_saved_NN/Scale-three" \
+                            "-cut_together_saved_networks_feature{0}_batch{1}_iterate{2}_lr{3}_{4}{5}_MaxTL5" \
+                            "".format(
+     str(FEATURE_TYPE), str(BATCH_SIZE), str(ITERATE_NUM), str(learning_rate), str(MODEL_TYPE), if_correct_velocity)
 
 calibration_store_dir = "/cs/oschulte/Galen/Hockey-data-entire/Hybrid-RNN-Hockey-Training-All-feature{0}-scale" \
                         "-neg_reward{1}_length-dynamic/".format(str(FEATURE_TYPE), if_correct_velocity)

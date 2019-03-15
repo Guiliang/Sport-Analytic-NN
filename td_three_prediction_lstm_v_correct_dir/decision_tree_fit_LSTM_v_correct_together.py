@@ -22,7 +22,7 @@ if COMPUTE_IMPACT:
 else:
     trace_number_total = 10
     trace_number_total_pre = 0
-for trace_number in range(trace_number_total-1, 0-1, -1):
+for trace_number in range(trace_number_total - 1, 0 - 1, -1):
     status = "pre"
     feature_names = feature_names + ['T{0}_({1}):velocity_x'.format(trace_number, status),
                                      'T{0}_({1}):velocity_y'.format(trace_number, status),
@@ -49,7 +49,7 @@ for trace_number in range(trace_number_total-1, 0-1, -1):
                                      'T{0}_({1}):home'.format(trace_number, status),
                                      'T{0}_({1}):away'.format(trace_number, status),
                                      'T{0}_({1}):angel2gate'.format(trace_number, status)]
-for trace_number in range(trace_number_total_pre-1, 0-1, -1):
+for trace_number in range(trace_number_total_pre - 1, 0 - 1, -1):
     status = "t"
     feature_names = feature_names + ['T{0}_({1}):velocity_x'.format(trace_number, status),
                                      'T{0}_({1}):velocity_y'.format(trace_number, status),
@@ -150,9 +150,8 @@ def de_standardization():
         # "yAdjCoord": [-0.6782],
         # "time remained": [-1.0068]
         "xAdjCoord": [0.0734],
-        "angel2gate": [0.1614,-0.6543],
+        "angel2gate": [0.1614, -0.6543],
         "velocity_y": [-0.3018]
-
 
     }
 

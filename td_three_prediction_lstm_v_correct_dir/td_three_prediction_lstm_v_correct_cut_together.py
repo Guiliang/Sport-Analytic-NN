@@ -19,23 +19,23 @@ USE_HIDDEN_STATE = False
 model_train_continue = True
 SCALE = True
 FEATURE_TYPE = 5
-ITERATE_NUM = 100
+ITERATE_NUM = 30
 learning_rate = 1e-4
 SPORT = "NHL"
 REWARD_TYPE = "NEG_REWARD_GAMMA1_V3"
-save_mother_dir = "/local-scratch"
+save_mother_dir = "/Local-Scratch"
 if_correct_velocity = "_v_correct_"
 
 LOG_DIR = save_mother_dir + "/oschulte/Galen/models/hybrid_sl_log_NN/Scale-three-cut_together_log_train_feature" + str(
     FEATURE_TYPE) + "_batch" + str(
     BATCH_SIZE) + "_iterate" + str(
     ITERATE_NUM) + "_lr" + str(
-    learning_rate) + "_" + str(MODEL_TYPE) + if_correct_velocity
+    learning_rate) + "_" + str(MODEL_TYPE) + if_correct_velocity + "_MaxTL" + str(MAX_TRACE_LENGTH)
 SAVED_NETWORK = save_mother_dir + "/oschulte/Galen/models/hybrid_sl_saved_NN/Scale-three-cut_together_saved_networks_feature" + str(
     FEATURE_TYPE) + "_batch" + str(
     BATCH_SIZE) + "_iterate" + str(
     ITERATE_NUM) + "_lr" + str(
-    learning_rate) + "_" + str(MODEL_TYPE) + if_correct_velocity
+    learning_rate) + "_" + str(MODEL_TYPE) + if_correct_velocity + "_MaxTL" + str(MAX_TRACE_LENGTH)
 DATA_STORE = "/cs/oschulte/Galen/Hockey-data-entire/Hybrid-RNN-Hockey-Training-All-feature" + str(
     FEATURE_TYPE) + "-scale-neg_reward" + if_correct_velocity + "_length-dynamic"
 
@@ -50,7 +50,7 @@ class td_prediction_lstm_V3:
         :return: network output
         """
         with tf.name_scope("LSTM_layer"):
-            self.rnn_input = tf.placeholder(tf.float32, [None, MAX_TRACE_LENGTH, FEATURE_NUMBER], name="x_1")
+            self.rnn_input = tf.placeholder(tf.float32, [None, 10, FEATURE_NUMBER], name="x_1")
             self.trace_lengths = tf.placeholder(tf.int32, [None], name="tl")
 
             self.lstm_cell = tf.contrib.rnn.LSTMCell(num_units=H_SIZE, state_is_tuple=True,
@@ -99,10 +99,10 @@ class td_prediction_lstm_V4:
         :return: network output
         """
         with tf.name_scope("LSTM_layer"):
-            self.rnn_input = tf.placeholder(tf.float32, [None, MAX_TRACE_LENGTH, FEATURE_NUMBER], name="x_1")
+            self.rnn_input = tf.placeholder(tf.float32, [None, 10, FEATURE_NUMBER], name="x_1")
             self.trace_lengths = tf.placeholder(tf.int32, [None], name="tl")
 
-            self.lstm_cell = tf.contrib.rnn.LSTMCell(num_units=H_SIZE*2, state_is_tuple=True,
+            self.lstm_cell = tf.contrib.rnn.LSTMCell(num_units=H_SIZE * 2, state_is_tuple=True,
                                                      initializer=tf.random_uniform_initializer(-0.05, 0.05))
 
             self.rnn_output, self.rnn_state = tf.nn.dynamic_rnn(  # while loop dynamic learning rnn
@@ -117,9 +117,9 @@ class td_prediction_lstm_V4:
             # Start indices for each sample
             self.index = tf.range(0, self.batch_size) * MAX_TRACE_LENGTH + (self.trace_lengths - 1)
             # Indexing
-            self.rnn_last = tf.gather(tf.reshape(self.outputs, [-1, H_SIZE*2]), self.index)
+            self.rnn_last = tf.gather(tf.reshape(self.outputs, [-1, H_SIZE * 2]), self.index)
 
-        num_layer_1 = H_SIZE*2
+        num_layer_1 = H_SIZE * 2
         num_layer_2 = 1000
         num_layer_3 = 3
 
@@ -186,12 +186,10 @@ def handle_trace_length(state_trace_length):
     :return:
     """
     trace_length_record = []
-    try:
-        for length in state_trace_length:
-            for sub_length in range(0, int(length)):
-                trace_length_record.append(sub_length + 1)
-    except:
-        print "error"
+    for length in state_trace_length:
+        for sub_length in range(0, int(length)):
+            trace_length_record.append(sub_length + 1)
+
     return trace_length_record
 
 
@@ -304,6 +302,50 @@ def write_csv(csv_name, data_record):
             writer.writerow(record)
 
 
+def padding_hybrid_feature_input(hybrid_feature_input):
+    current_list_length = len(hybrid_feature_input)
+    padding_list_length = 10 - current_list_length
+    for i in range(0, padding_list_length):
+        hybrid_feature_input.append(np.asarray([float(0)] * 25))
+    return np.asarray(hybrid_feature_input)
+
+
+def padding_hybrid_reward(hybrid_reward):
+    current_list_length = len(hybrid_reward)
+    padding_list_length = 10 - current_list_length
+    for i in range(0, padding_list_length):
+        hybrid_reward.append(0)
+    return np.asarray(hybrid_reward)
+
+
+def compromise_state_trace_length(state_trace_length, state_input, reward):
+    state_trace_length_output = []
+    for index in range(0, len(state_trace_length)):
+        tl = state_trace_length[index]
+        if tl >= 10:
+            tl = 10
+        if tl > MAX_TRACE_LENGTH:
+            state_input_change_list = []
+            state_input_org = state_input[index]
+            reward_change_list = []
+            reward_org = reward[index]
+            for i in range(0, MAX_TRACE_LENGTH):
+                state_input_change_list.append(state_input_org[tl - MAX_TRACE_LENGTH + i])
+                temp = reward_org[tl - MAX_TRACE_LENGTH + i]
+                # if temp != 0:
+                #     print 'find miss reward'
+                reward_change_list.append(reward_org[tl - MAX_TRACE_LENGTH + i])
+
+            state_input_update = padding_hybrid_feature_input(state_input_change_list)
+            state_input[index] = state_input_update
+            reward_update = padding_hybrid_reward(reward_change_list)
+            reward[index] = reward_update
+
+            tl = MAX_TRACE_LENGTH
+        state_trace_length_output.append(tl)
+    return state_trace_length_output, state_input, reward
+
+
 def train_network(sess, model, print_parameters=False):
     game_number = 0
     global_counter = 0
@@ -364,7 +406,6 @@ def train_network(sess, model, print_parameters=False):
             except:
                 print "\n" + dir_game
                 raise ValueError("reward wrong")
-            reward_count = sum(reward)
             state_input = sio.loadmat(DATA_STORE + "/" + dir_game + "/" + state_input_name)
             state_input = (state_input['dynamic_feature_input'])
             # state_output = sio.loadmat(DATA_STORE + "/" + dir_game + "/" + state_output_name)
@@ -372,8 +413,11 @@ def train_network(sess, model, print_parameters=False):
             state_trace_length = sio.loadmat(DATA_STORE + "/" + dir_game + "/" + state_trace_length_name)
             state_trace_length = (state_trace_length['hybrid_trace_length'])[0]
             state_trace_length = handle_trace_length(state_trace_length)
+            state_trace_length, state_input, reward = compromise_state_trace_length(state_trace_length, state_input,
+                                                                                    reward)
 
             print ("\n load file" + str(dir_game) + " success")
+            reward_count = sum(reward)
             print ("reward number" + str(reward_count))
             if len(state_input) != len(reward) or len(state_trace_length) != len(reward):
                 raise Exception('state length does not equal to reward length')

@@ -124,8 +124,8 @@ def nn_simulation(SIMULATION_DATA_PATH, SIMPLE_SAVED_NETWORK_PATH, nn_save_image
                      cmap="RdYlBu_r",
                      vmin=vmin_set,
                      vmax=vmax_set)
-    plt.xlabel('XAdjcoord', fontsize=18)
-    plt.ylabel('YAdjcoord', fontsize=18)
+    # plt.xlabel('XAdjcoord', fontsize=18)
+    # plt.ylabel('YAdjcoord', fontsize=18)
     if len(HIS_ACTION_TYPE) == 3:
         plt.title(
             "PT-LSTM {4} for {0} with history:{1}-{2}-{3}".format(ACTION_TYPE, HIS_ACTION_TYPE[0], HIS_ACTION_TYPE[1],
@@ -144,8 +144,8 @@ def nn_simulation(SIMULATION_DATA_PATH, SIMPLE_SAVED_NETWORK_PATH, nn_save_image
     ax = sns.heatmap(value_spatial_home_half, xticklabels=False, yticklabels=False,
                      cmap="RdYlBu_r", vmin=vmin_set,
                      vmax=vmax_set)
-    plt.xlabel('XAdjcoord', fontsize=26)
-    plt.ylabel('YAdjcoord', fontsize=26)
+    # plt.xlabel('XAdjcoord', fontsize=26)
+    # plt.ylabel('YAdjcoord', fontsize=26)
     if len(HIS_ACTION_TYPE) == 3:
         plt.title("PT-LSTM {2} for {0}\n with history:{1} on right rink".format(ACTION_TYPE, str(HIS_ACTION_TYPE),
                                                                                 DRAW_TARGET),
