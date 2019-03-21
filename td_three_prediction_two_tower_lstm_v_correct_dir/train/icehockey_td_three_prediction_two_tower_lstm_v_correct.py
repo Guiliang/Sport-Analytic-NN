@@ -2,9 +2,10 @@ import os
 import tensorflow as tf
 import scipy.io as sio
 import numpy as np
-from config.tt_lstm_config import TTLSTMCongfig
-from nn_structure.td_tt_lstm import td_prediction_tt_embed
-from support.data_processing_tools import handle_trace_length, compromise_state_trace_length, \
+from td_three_prediction_two_tower_lstm_v_correct_dir.config.tt_lstm_config import TTLSTMCongfig
+from td_three_prediction_two_tower_lstm_v_correct_dir.nn_structure.td_tt_lstm import td_prediction_tt_embed
+from td_three_prediction_two_tower_lstm_v_correct_dir.support.data_processing_tools import handle_trace_length, \
+    compromise_state_trace_length, \
     get_together_training_batch, write_game_average_csv
 
 tt_lstm_config_path = "./icehockey-config.yaml"
@@ -106,7 +107,8 @@ def train_network(sess, model, print_parameters=False):
                 state_trace_length=state_trace_length,
                 state_input=state_input,
                 reward=reward,
-                max_trace_length=tt_lstm_config.learn.max_trace_length
+                max_trace_length=tt_lstm_config.learn.max_trace_length,
+                features_num=tt_lstm_config.learn.features_num
             )
 
             print ("\n load file" + str(dir_game) + " success")
@@ -194,14 +196,14 @@ def train_network(sess, model, print_parameters=False):
                 # if print_flag:
                 print ("cost of the network is" + str(cost_out))
                 # if terminal or ((train_number - 1) / tt_lstm_config.learn.batch_size) % 5 == 1:
-                    # print ("TIMESTEP:", train_number, "Game:", game_number)
+                # print ("TIMESTEP:", train_number, "Game:", game_number)
                 home_avg = sum(read_out[:, 0]) / len(read_out[:, 0])
                 away_avg = sum(read_out[:, 1]) / len(read_out[:, 1])
                 end_avg = sum(read_out[:, 2]) / len(read_out[:, 2])
                 print "home average:{0}, away average:{1}, end average:{2}".format(str(home_avg), str(away_avg),
                                                                                    str(end_avg))
-                    # if print_flag:
-                    #     print ("cost of the network is" + str(cost_out))
+                # if print_flag:
+                #     print ("cost of the network is" + str(cost_out))
 
                 if terminal:
                     # save progress after a game
