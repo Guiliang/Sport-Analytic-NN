@@ -7,17 +7,17 @@ from nn_structure.td_tt_lstm import td_prediction_tt_embed
 from support.data_processing_tools import handle_trace_length, compromise_state_trace_length, \
     get_together_training_batch, write_game_average_csv
 
-tt_lstm_config_path = "./tempt-config.yaml"
+tt_lstm_config_path = "./icehockey-config.yaml"
 tt_lstm_config = TTLSTMCongfig.load(tt_lstm_config_path)
 
-LOG_DIR = tt_lstm_config.learn.save_mother_dir + "/oschulte/Galen/models/hybrid_sl_log_NN/Scale-tt-three-cut_together_log_train_feature" + str(
+LOG_DIR = tt_lstm_config.learn.save_mother_dir + "/oschulte/Galen/icehockey-models/hybrid_sl_log_NN/Scale-tt-three-cut_together_log_train_feature" + str(
     tt_lstm_config.learn.feature_type) + "_batch" + str(
     tt_lstm_config.learn.batch_size) + "_iterate" + str(
     tt_lstm_config.learn.iterate_num) + "_lr" + str(
     tt_lstm_config.learn.learning_rate) + "_" + str(
     tt_lstm_config.learn.model_type) + tt_lstm_config.learn.if_correct_velocity + "_MaxTL" + str(
     tt_lstm_config.learn.max_trace_length)
-SAVED_NETWORK = tt_lstm_config.learn.save_mother_dir + "/oschulte/Galen/models/hybrid_sl_saved_NN/Scale-tt-three-cut_together_saved_networks_feature" + str(
+SAVED_NETWORK = tt_lstm_config.learn.save_mother_dir + "/oschulte/Galen/icehockey-models/hybrid_sl_saved_NN/Scale-tt-three-cut_together_saved_networks_feature" + str(
     tt_lstm_config.learn.feature_type) + "_batch" + str(
     tt_lstm_config.learn.batch_size) + "_iterate" + str(
     tt_lstm_config.learn.iterate_num) + "_lr" + str(
