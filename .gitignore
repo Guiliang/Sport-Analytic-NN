@@ -1,0 +1,7 @@
+# Created by .ignore support plugin (hsz.mobi)
+.idea/Sport-Analytic-NN.iml
+.idea/misc.xml
+.idea/modules.xml
+.idea/workspace.xml
+td_three_prediction_two_tower_lstm_v_correct_dir/plot_graph/soccer-image/
+*.mat

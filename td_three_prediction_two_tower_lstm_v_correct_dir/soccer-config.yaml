@@ -20,6 +20,7 @@ Learn:
   reward_type : "NEG_REWARD_GAMMA1_V3"
   save_mother_dir : "/Local-Scratch"
   if_correct_velocity : "_v_correct_"
+  apply_softmax: 0
 
 Arch:
   HomeTower:

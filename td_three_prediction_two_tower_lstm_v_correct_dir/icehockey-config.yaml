@@ -3,10 +3,10 @@ Learn:
   model_type: "v4"
   max_trace_length: 10
   feature_number: 25
-  batch_size : 32
+  batch_size : 64
   gamma : 1
   output_layer_size : 3
-  dense_layer_num : 1
+  dense_layer_num : 2
   h_size : 512
   embed_size : 256
   dropout_keep_prob : 0.8
@@ -20,12 +20,13 @@ Learn:
   reward_type : "NEG_REWARD_GAMMA1_V3"
   save_mother_dir : "/Local-Scratch"
   if_correct_velocity : "_v_correct_"
+  apply_softmax: 1
 
 Arch:
   HomeTower:
-    lstm_layer_num: 1
+    lstm_layer_num: 2
     home_h_size: 256
 
   AwayTower:
-    lstm_layer_num: 1
+    lstm_layer_num: 2
     away_h_size: 256

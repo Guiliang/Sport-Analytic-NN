@@ -13,6 +13,7 @@ class td_prediction_tt_embed:
                  home_lstm_layer_num=2,
                  away_lstm_layer_num=2,
                  dense_layer_num=2,
+                 apply_softmax=False,
                  model_name="tt_lstm",
                  rnn_type="bp_last_step"):
         """
@@ -30,6 +31,7 @@ class td_prediction_tt_embed:
         self.dense_layer_num = dense_layer_num
         self.output_layer_size = output_layer_size
         self.embed_size = embed_size
+        self.apply_softmax = apply_softmax
 
         self.rnn_input_ph = None
         self.trace_lengths_ph = None
@@ -140,11 +142,12 @@ class td_prediction_tt_embed:
                     dense_input = embed_layer if i == 0 else dense_output
                     # dense_input = embed_layer
                     dense_output = tf.matmul(dense_input, self.dense_layer_weights[i]) + self.dense_layer_bias[i]
-                    if i < self.dense_layer_num-1:
+                    if i < self.dense_layer_num - 1:
                         dense_output = tf.nn.relu(dense_output, name='activation_{0}'.format(str(i)))
-
-            # self.readout = tf.nn.softmax(dense_output)
-            self.readout = dense_output
+            if self.apply_softmax:
+                self.readout = tf.nn.softmax(dense_output)
+            else:
+                self.readout = dense_output
             with tf.name_scope("cost"):
                 self.cost = tf.reduce_mean(tf.square(self.y_ph - self.readout))
                 self.diff = tf.reduce_mean(tf.abs(self.y_ph - self.readout))

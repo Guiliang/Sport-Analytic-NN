@@ -228,7 +228,8 @@ def run():
         output_layer_size=tt_lstm_config.learn.output_layer_size,
         home_lstm_layer_num=tt_lstm_config.Arch.HomeTower.lstm_layer_num,
         away_lstm_layer_num=tt_lstm_config.Arch.AwayTower.lstm_layer_num,
-        dense_layer_num=tt_lstm_config.learn.dense_layer_num, )
+        dense_layer_num=tt_lstm_config.learn.dense_layer_num,
+        apply_softmax=tt_lstm_config.learn.apply_softmax)
     model.initialize_ph()
     model.build()
     model.call()

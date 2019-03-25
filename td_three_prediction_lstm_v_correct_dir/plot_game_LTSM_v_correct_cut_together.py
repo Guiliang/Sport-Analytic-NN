@@ -27,10 +27,10 @@ else:
     normalize_str = ""
 
 if DRAW_THREE:
-    save_image_dir = "./image/Three 2015-2016 NHL regular season {0} vs {1}_Iter{2}_lr{3}_Batch{4}{5}.png".format(
+    save_image_dir = "./icehockey-image/Three 2015-2016 NHL regular season {0} vs {1}_Iter{2}_lr{3}_Batch{4}{5}.png".format(
         AWAY_TEAM, HOME_TEAM, str(ITERATE_NUM), str(learning_rate_write), str(BATCH_SIZE), normalize_str)
 else:
-    save_image_dir = "./image/2015-2016 NHL regular season {0} vs {1}_Iter{2}_lr{3}_Batch{4}{5}.png".format(
+    save_image_dir = "./icehockey-image/2015-2016 NHL regular season {0} vs {1}_Iter{2}_lr{3}_Batch{4}{5}.png".format(
         AWAY_TEAM, HOME_TEAM, str(ITERATE_NUM), str(learning_rate_write), str(BATCH_SIZE), normalize_str)
 
 data_path = "/cs/oschulte/Galen/Hockey-data-entire/Hockey-Match-All-data"

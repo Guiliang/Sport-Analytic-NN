@@ -133,7 +133,7 @@ def image_blending(value_Img_dir, save_dir, value_Img_half_dir, half_save_dir):
         value_Img_dir)
     value_Img_half = cv2.imread(
         value_Img_half_dir)
-    background = cv2.imread("./image/hockey-field.png")
+    background = cv2.imread("./icehockey-image/hockey-field.png")
     # v_rows, v_cols, v_channels = value_Img.shape
     # v_h_rows, v_h_cols, v_h_channels = value_Img_half.shape
 
@@ -184,16 +184,16 @@ if __name__ == '__main__':
     # q_value_home = nn_simulation(sess_nn, q_nn, Q_SIMULATION_DATA_PATH, Q_SIMPLE_SAVED_NETWORK_PATH)
     impact = list_minus(q_value, state_value)
 
-    nn_image_save_dir = "./image/{7} {0}-{1} with Dynamic LSTM feature{2}_batch{3}_iterate{4}_lr{5}_{6}.png".format(
+    nn_image_save_dir = "./icehockey-image/{7} {0}-{1} with Dynamic LSTM feature{2}_batch{3}_iterate{4}_lr{5}_{6}.png".format(
         ACTION_TYPE, str(HIS_ACTION_TYPE), str(FEATURE_TYPE), str(BATCH_SIZE), str(ITERATE_NUM), str(learning_rate),
         str(MODEL_TYPE), DRAW_TARGET)
-    nn_half_image_save_dir = "./image/right half {7} {0}-{1} with Dynamic LSTM feature{2}_batch{3}_iterate{4}_lr{5}_{6}.png".format(
+    nn_half_image_save_dir = "./icehockey-image/right half {7} {0}-{1} with Dynamic LSTM feature{2}_batch{3}_iterate{4}_lr{5}_{6}.png".format(
         ACTION_TYPE, str(HIS_ACTION_TYPE), str(FEATURE_TYPE), str(BATCH_SIZE), str(ITERATE_NUM), str(learning_rate),
         str(MODEL_TYPE), DRAW_TARGET)
-    blend_image_save_dir = "./image/blend {7} {0}-{1} with Dynamic LSTM feature{2}_batch{3}_iterate{4}_lr{5}_{6}.png".format(
+    blend_image_save_dir = "./icehockey-image/blend {7} {0}-{1} with Dynamic LSTM feature{2}_batch{3}_iterate{4}_lr{5}_{6}.png".format(
         ACTION_TYPE, str(HIS_ACTION_TYPE), str(FEATURE_TYPE), str(BATCH_SIZE), str(ITERATE_NUM), str(learning_rate),
         str(MODEL_TYPE), DRAW_TARGET)
-    blend_half_image_save_dir = "./image/blend right half {7} {0}-{1} with Dynamic LSTM feature{2}_batch{3}_iterate{4}_lr{5}_{6}.png".format(
+    blend_half_image_save_dir = "./icehockey-image/blend right half {7} {0}-{1} with Dynamic LSTM feature{2}_batch{3}_iterate{4}_lr{5}_{6}.png".format(
         ACTION_TYPE, str(HIS_ACTION_TYPE), str(FEATURE_TYPE), str(BATCH_SIZE), str(ITERATE_NUM), str(learning_rate),
         str(MODEL_TYPE), DRAW_TARGET)
 

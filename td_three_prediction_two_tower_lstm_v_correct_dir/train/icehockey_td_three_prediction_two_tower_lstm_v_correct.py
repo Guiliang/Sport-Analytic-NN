@@ -108,7 +108,7 @@ def train_network(sess, model, print_parameters=False):
                 state_input=state_input,
                 reward=reward,
                 max_trace_length=tt_lstm_config.learn.max_trace_length,
-                features_num=tt_lstm_config.learn.features_num
+                features_num=tt_lstm_config.learn.feature_number
             )
 
             print ("\n load file" + str(dir_game) + " success")
@@ -234,7 +234,9 @@ def run():
         output_layer_size=tt_lstm_config.learn.output_layer_size,
         home_lstm_layer_num=tt_lstm_config.Arch.HomeTower.lstm_layer_num,
         away_lstm_layer_num=tt_lstm_config.Arch.AwayTower.lstm_layer_num,
-        dense_layer_num=tt_lstm_config.learn.dense_layer_num, )
+        dense_layer_num=tt_lstm_config.learn.dense_layer_num,
+        apply_softmax=tt_lstm_config.learn.apply_softmax
+    )
     model.initialize_ph()
     model.build()
     model.call()

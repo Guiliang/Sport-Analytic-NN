@@ -81,16 +81,16 @@ def plot_value(readout_values):
 
 
 if __name__ == '__main__':
-    # nn_image_save_dir = "./image/{7} {0}-{1} with Dynamic LSTM feature{2}_batch{3}_iterate{4}_lr{5}_{6}{8}.png".format(
+    # nn_image_save_dir = "./icehockey-image/{7} {0}-{1} with Dynamic LSTM feature{2}_batch{3}_iterate{4}_lr{5}_{6}{8}.png".format(
     #     ACTION_TYPE, str(HIS_ACTION_TYPE), str(FEATURE_TYPE), str(BATCH_SIZE), str(ITERATE_NUM), str(learning_rate),
     #     str(MODEL_TYPE), DRAW_TARGET, if_correct_velocity)
-    # nn_half_image_save_dir = "./image/right half {7} {0}-{1} with Dynamic LSTM feature{2}_batch{3}_iterate{4}_lr{5}_{6}{8}.png".format(
+    # nn_half_image_save_dir = "./icehockey-image/right half {7} {0}-{1} with Dynamic LSTM feature{2}_batch{3}_iterate{4}_lr{5}_{6}{8}.png".format(
     #     ACTION_TYPE, str(HIS_ACTION_TYPE), str(FEATURE_TYPE), str(BATCH_SIZE), str(ITERATE_NUM), str(learning_rate),
     #     str(MODEL_TYPE), DRAW_TARGET, if_correct_velocity)
-    # blend_image_save_dir = "./image/blend {7} {0}-{1} with Dynamic LSTM feature{2}_batch{3}_iterate{4}_lr{5}_{6}{8}.png".format(
+    # blend_image_save_dir = "./icehockey-image/blend {7} {0}-{1} with Dynamic LSTM feature{2}_batch{3}_iterate{4}_lr{5}_{6}{8}.png".format(
     #     ACTION_TYPE, str(HIS_ACTION_TYPE), str(FEATURE_TYPE), str(BATCH_SIZE), str(ITERATE_NUM), str(learning_rate),
     #     str(MODEL_TYPE), DRAW_TARGET, if_correct_velocity)
-    # blend_half_image_save_dir = "./image/blend right half {7} {0}-{1} with Dynamic LSTM feature{2}_batch{3}_iterate{4}_lr{5}_{6}{8}.png".format(
+    # blend_half_image_save_dir = "./icehockey-image/blend right half {7} {0}-{1} with Dynamic LSTM feature{2}_batch{3}_iterate{4}_lr{5}_{6}{8}.png".format(
     #     ACTION_TYPE, str(HIS_ACTION_TYPE), str(FEATURE_TYPE), str(BATCH_SIZE), str(ITERATE_NUM), str(learning_rate),
     #     str(MODEL_TYPE), DRAW_TARGET, if_correct_velocity)
     sess_nn = tf.InteractiveSession()

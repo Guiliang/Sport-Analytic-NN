@@ -82,7 +82,7 @@ def nn_simulation(SIMULATION_DATA_PATH, SIMPLE_SAVED_NETWORK_PATH, nn_image_save
 def image_blending(value_Img_dir, save_dir):
     value_Img = cv2.imread(
         value_Img_dir)
-    background = cv2.imread("./image/hockey-field.png")
+    background = cv2.imread("./icehockey-image/hockey-field.png")
     v_rows, v_cols, v_channels = value_Img.shape
     b_rows, b_cols, b_channels = background.shape
     print (v_rows, v_cols)
@@ -109,8 +109,8 @@ def try_seaborn():
 
 
 if __name__ == '__main__':
-    nn_image_save_dir = "./image/Q_home {0} with TD simple.png".format(ACTION_TYPE)
-    blend_image_save_dir = "./image/blend Q_home {0} with TD simple.png".format(ACTION_TYPE)
+    nn_image_save_dir = "./icehockey-image/Q_home {0} with TD simple.png".format(ACTION_TYPE)
+    blend_image_save_dir = "./icehockey-image/blend Q_home {0} with TD simple.png".format(ACTION_TYPE)
     sess_nn = tf.InteractiveSession()
     model_nn = nn
     stimulate_value_home = nn_simulation(SIMULATION_DATA_PATH, SIMPLE_SAVED_NETWORK_PATH, nn_image_save_dir)

@@ -18,7 +18,7 @@ TARGET_GAMEID = str(1403)
 HOME_TEAM = 'Penguins'
 AWAY_TEAM = 'Canadiens'
 
-save_image_dir = "./image/2015-2016 NHL regular season {0} vs {1}.png".format(AWAY_TEAM, HOME_TEAM)
+save_image_dir = "./icehockey-image/2015-2016 NHL regular season {0} vs {1}.png".format(AWAY_TEAM, HOME_TEAM)
 data_path = "/cs/oschulte/Galen/Hockey-data-entire/Hockey-Match-All-data"
 data_store_dir = "/cs/oschulte/Galen/Hockey-data-entire/Hybrid-RNN-Hockey-Training-All-feature5-scale-neg_reward_length-dynamic/"
 state_data_store_dir = "/cs/oschulte/Galen/Hockey-data-entire/State-Hybrid-RNN-Hockey-Training-All-feature5-scale-neg_reward_length-dynamic/"

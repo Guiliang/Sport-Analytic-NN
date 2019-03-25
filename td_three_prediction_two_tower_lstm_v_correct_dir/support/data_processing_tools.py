@@ -200,7 +200,7 @@ def judge_feature_in_action(feature_input, actions):
 
 
 def construct_simulation_data(features_train, features_mean, features_scale,
-                              feature_type, is_home, action_type, set_dict={}):
+                              feature_type, is_home, action_type, actions, set_dict={}):
     state = []
     for feature in features_train:
         if feature == 'xAdjCoord':
@@ -235,7 +235,7 @@ def construct_simulation_data(features_train, features_mean, features_scale,
         elif feature_type >= 5 and action_type == feature:
             scale_action = float(1 - features_mean[action_type]) / features_scale[action_type]
             state.append(scale_action)
-        elif feature_type >= 5 and judge_feature_in_action(feature):
+        elif feature_type >= 5 and judge_feature_in_action(feature, actions):
             scale_action = float(0 - features_mean[feature]) / features_scale[feature]
             state.append(scale_action)
         elif feature == 'event_outcome':
