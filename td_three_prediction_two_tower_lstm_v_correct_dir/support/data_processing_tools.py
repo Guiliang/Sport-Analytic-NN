@@ -2,6 +2,9 @@ import numpy as np
 import os
 import csv
 import math
+import scipy.io as sio
+import unicodedata
+from td_three_prediction_two_tower_lstm_v_correct_dir.config.icehockey_feature_setting import select_feature_setting
 
 
 def handle_trace_length(state_trace_length):
@@ -280,3 +283,112 @@ def padding_hybrid_feature_input(hybrid_feature_input, max_trace_length, feature
     for i in range(0, padding_list_length):
         hybrid_feature_input.append(np.asarray([float(0)] * features_num))
     return hybrid_feature_input
+
+
+def start_lstm_generate_spatial_simulation(history_action_type, history_action_type_coord,
+                                           action_type, data_simulation_dir, simulation_type,
+                                           feature_type, max_trace_length, features_num, is_home=True):
+    simulated_data_all = []
+
+    features_train, features_mean, features_scale, actions = select_feature_setting(feature_type=feature_type)
+
+    for history_index in range(0, len(history_action_type) + 1):
+        state_ycoord_list = []
+        for ycoord in np.linspace(-42.5, 42.5, 171):
+            state_xcoord_list = []
+            for xcoord in np.linspace(-100.0, 100.0, 401):
+                set_dict = {'xAdjCoord': xcoord, 'yAdjCoord': ycoord}
+                state_generated = construct_simulation_data(
+                    features_train=features_train,
+                    features_mean=features_mean,
+                    features_scale=features_scale,
+                    feature_type=feature_type,
+                    is_home=is_home,
+                    action_type=action_type,
+                    actions=actions,
+                    set_dict=set_dict)
+                state_generated_list = [state_generated]
+                for inner_history in range(0, history_index):
+                    xAdjCoord = history_action_type_coord[inner_history].get('xAdjCoord')
+                    yAdjCoord = history_action_type_coord[inner_history].get('yAdjCoord')
+                    action = history_action_type[inner_history]
+                    if action != action_type:
+                        set_dict_history = {'xAdjCoord': xAdjCoord, 'yAdjCoord': yAdjCoord, action: 1, action_type: 0}
+                    else:
+                        set_dict_history = {'xAdjCoord': xAdjCoord, 'yAdjCoord': yAdjCoord, action: 1}
+                    state_generated_history = construct_simulation_data(
+                        features_train=features_train,
+                        features_mean=features_mean,
+                        features_scale=features_scale,
+                        feature_type=feature_type,
+                        is_home=is_home,
+                        action_type=action_type,
+                        actions=actions,
+                        set_dict=set_dict_history, )
+                    state_generated_list = [state_generated_history] + state_generated_list
+
+                state_generated_padding = padding_hybrid_feature_input(
+                    hybrid_feature_input=state_generated_list,
+                    max_trace_length=max_trace_length,
+                    features_num=features_num)
+                state_xcoord_list.append(state_generated_padding)
+            state_ycoord_list.append(np.asarray(state_xcoord_list))
+
+        store_data_dir = data_simulation_dir + '/' + simulation_type
+
+        if not os.path.isdir(store_data_dir):
+            os.makedirs(store_data_dir)
+        # else:
+        #     raise Exception
+        if is_home:
+            sio.savemat(
+                store_data_dir + "/LSTM_Home_" + simulation_type + "-" + action_type + '-' + str(
+                    history_action_type[0:history_index]) + "-feature" + str(
+                    feature_type) + ".mat",
+                {'simulate_data': np.asarray(state_ycoord_list)})
+        else:
+            sio.savemat(
+                store_data_dir + "/LSTM_Away_" + simulation_type + "-" + action_type + '-' + str(
+                    history_action_type[0:history_index]) + "-feature" + str(
+                    feature_type) + ".mat",
+                {'simulate_data': np.asarray(state_ycoord_list)})
+        simulated_data_all.append(np.asarray(state_ycoord_list))
+
+    return simulated_data_all
+
+
+def find_game_dir(dir_all, data_path, target_game_id):
+    game_name = None
+    for directory in dir_all:
+        game = sio.loadmat(data_path + "/" + str(directory))
+        gameId = (game['x'])['gameId'][0][0][0]
+        gameId = unicodedata.normalize('NFKD', gameId).encode('ascii', 'ignore')
+        if gameId == target_game_id:
+            game_name = directory
+            print directory
+            break
+    if game_name:
+        return game_name.split(".")[0]
+    else:
+        raise ValueError("can't find the game {0}".format(str(target_game_id)))
+
+
+def normalize_data(game_value_home, game_value_away, game_value_end):
+    game_value_home_normalized = []
+    game_value_away_normalized = []
+    game_value_end_normalized = []
+    for index in range(0, len(game_value_home)):
+        home_value = game_value_home[index]
+        away_value = game_value_away[index]
+        end_value = game_value_end[index]
+        if end_value < 0:
+            end_value = 0
+        if away_value < 0:
+            away_value = 0
+        if home_value < 0:
+            home_value = 0
+        game_value_home_normalized.append(float(home_value) / (home_value + away_value + end_value))
+        game_value_away_normalized.append(float(away_value) / (home_value + away_value + end_value))
+        game_value_end_normalized.append(float(end_value) / (home_value + away_value + end_value))
+    return np.asarray(game_value_home_normalized), np.asarray(game_value_away_normalized), np.asarray(
+        game_value_end_normalized)
