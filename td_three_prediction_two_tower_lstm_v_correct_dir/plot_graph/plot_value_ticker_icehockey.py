@@ -12,7 +12,7 @@ from td_three_prediction_two_tower_lstm_v_correct_dir.support.plot_tools import 
 if __name__ == '__main__':
     data_store_dir = "/cs/oschulte/Galen/Hockey-data-entire/Hybrid-RNN-Hockey-Training-All-feature5-scale" \
                      "-neg_reward_v_correct__length-dynamic/"
-    data_path = "/cs/oschulte/Galen/Hockey-data-entire/Hockey-Match-All-data"
+    data_path = "/cs/oschulte/Galen/Hockey-data-entire/Hockey-Match-All-data/"
     tt_lstm_config_path = '../icehockey-config.yaml'
     home_team = 'Penguins'
     away_team = 'Canadiens'
@@ -62,7 +62,8 @@ if __name__ == '__main__':
                                      model=model_nn,
                                      data_store=data_store,
                                      dir_game=game_name_dir,
-                                     config=tt_lstm_config)
+                                     config=tt_lstm_config,
+                                     sport="IceHockey")
     #
     # data_name = "model_three_cut_together_predict_Feature{0}_Iter{1}_lr{2}_Batch{3}_MaxLength{4}_Type{5}_v_correct_". \
     #     format(str(tt_lstm_config.learn.feature_type),

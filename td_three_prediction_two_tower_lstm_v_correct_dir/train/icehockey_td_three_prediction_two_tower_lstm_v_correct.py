@@ -7,6 +7,7 @@ from td_three_prediction_two_tower_lstm_v_correct_dir.nn_structure.td_tt_lstm im
 from td_three_prediction_two_tower_lstm_v_correct_dir.support.data_processing_tools import handle_trace_length, \
     compromise_state_trace_length, \
     get_together_training_batch, write_game_average_csv
+from td_three_prediction_two_tower_lstm_v_correct_dir.support.data_processing_tools import get_icehockey_game_data
 
 tt_lstm_config_path = "./icehockey-config.yaml"
 tt_lstm_config = TTLSTMCongfig.load(tt_lstm_config_path)
@@ -77,39 +78,8 @@ def train_network(sess, model, print_parameters=False):
             v_diff_record = []
             game_number += 1
             game_cost_record = []
-            game_files = os.listdir(DATA_STORE + "/" + dir_game)
-            for filename in game_files:
-                if "dynamic_rnn_reward" in filename:
-                    reward_name = filename
-                elif "dynamic_rnn_input" in filename:
-                    state_input_name = filename
-                elif "trace" in filename:
-                    state_trace_length_name = filename
-                elif "home_identifier" in filename:
-                    ha_id_name = filename
-
-            reward = sio.loadmat(DATA_STORE + "/" + dir_game + "/" + reward_name)
-            ha_id = sio.loadmat(DATA_STORE + "/" + dir_game + "/" + ha_id_name)["home_identifier"][0]
-            try:
-                reward = reward['dynamic_rnn_reward']
-            except:
-                print "\n" + dir_game
-                raise ValueError("reward wrong")
-            state_input = sio.loadmat(DATA_STORE + "/" + dir_game + "/" + state_input_name)['dynamic_feature_input']
-            # state_input = (state_input['dynamic_feature_input'])
-            # state_output = sio.loadmat(DATA_STORE + "/" + dir_game + "/" + state_output_name)
-            # state_output = state_output['hybrid_output_state']
-            state_trace_length = sio.loadmat(
-                DATA_STORE + "/" + dir_game + "/" + state_trace_length_name)['hybrid_trace_length'][0]
-            # state_trace_length = (state_trace_length['hybrid_trace_length'])[0]
-            state_trace_length = handle_trace_length(state_trace_length)
-            state_trace_length, state_input, reward = compromise_state_trace_length(
-                state_trace_length=state_trace_length,
-                state_input=state_input,
-                reward=reward,
-                max_trace_length=tt_lstm_config.learn.max_trace_length,
-                features_num=tt_lstm_config.learn.feature_number
-            )
+            state_trace_length, state_input, reward, ha_id = get_icehockey_game_data(
+                data_store=DATA_STORE, dir_game=dir_game, config=tt_lstm_config)
 
             print ("\n load file" + str(dir_game) + " success")
             reward_count = sum(reward)

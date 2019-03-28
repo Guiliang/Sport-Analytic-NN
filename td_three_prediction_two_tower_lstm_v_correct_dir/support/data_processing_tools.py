@@ -2,6 +2,7 @@ import numpy as np
 import os
 import csv
 import math
+import json
 import scipy.io as sio
 import unicodedata
 from td_three_prediction_two_tower_lstm_v_correct_dir.config.icehockey_feature_setting import select_feature_setting
@@ -64,6 +65,76 @@ def padding_hybrid_reward(hybrid_reward):
     for i in range(0, padding_list_length):
         hybrid_reward.append(0)
     return np.asarray(hybrid_reward)
+
+
+def get_soccer_game_data(data_store, dir_game, config):
+    game_files = os.listdir(data_store + "/" + dir_game)
+    for filename in game_files:
+        if "reward" in filename:
+            reward_name = filename
+        elif "state" in filename:
+            state_input_name = filename
+        elif "trace" in filename:
+            state_trace_length_name = filename
+        elif "home_away" in filename:
+            ha_id_name = filename
+
+    reward = sio.loadmat(data_store + "/" + dir_game + "/" + reward_name)['reward']
+    state_input = sio.loadmat(data_store + "/" + dir_game + "/" + state_input_name)['state']
+    ha_id = sio.loadmat(data_store + "/" + dir_game + "/" + ha_id_name)["home_away"][0].astype(int)
+    # state_input = (state_input['dynamic_feature_input'])
+    # state_output = sio.loadmat(DATA_STORE + "/" + dir_game + "/" + state_output_name)
+    # state_output = state_output['hybrid_output_state']
+    state_trace_length = sio.loadmat(
+        data_store + "/" + dir_game + "/" + state_trace_length_name)['trace_length'][0]
+    # state_trace_length = (state_trace_length['hybrid_trace_length'])[0]
+    state_trace_length = handle_trace_length(state_trace_length)
+    state_trace_length, state_input, reward = compromise_state_trace_length(
+        state_trace_length=state_trace_length,
+        state_input=state_input,
+        reward=reward,
+        max_trace_length=config.learn.max_trace_length,
+        features_num=config.learn.feature_number
+    )
+    return state_trace_length, state_input, reward, ha_id
+
+
+def get_icehockey_game_data(data_store, dir_game, config):
+    game_files = os.listdir(data_store + "/" + dir_game)
+    for filename in game_files:
+        if "dynamic_rnn_reward" in filename:
+            reward_name = filename
+        elif "dynamic_rnn_input" in filename:
+            state_input_name = filename
+        elif "trace" in filename:
+            state_trace_length_name = filename
+        elif "home_identifier" in filename:
+            ha_id_name = filename
+
+    reward = sio.loadmat(data_store + "/" + dir_game + "/" + reward_name)
+    ha_id = sio.loadmat(data_store + "/" + dir_game + "/" + ha_id_name)["home_identifier"][0]
+    try:
+        reward = reward['dynamic_rnn_reward']
+    except:
+        print "\n" + dir_game
+        raise ValueError("reward wrong")
+    state_input = sio.loadmat(data_store + "/" + dir_game + "/" + state_input_name)['dynamic_feature_input']
+    # state_input = (state_input['dynamic_feature_input'])
+    # state_output = sio.loadmat(DATA_STORE + "/" + dir_game + "/" + state_output_name)
+    # state_output = state_output['hybrid_output_state']
+    state_trace_length = sio.loadmat(
+        data_store + "/" + dir_game + "/" + state_trace_length_name)['hybrid_trace_length'][0]
+    # state_trace_length = (state_trace_length['hybrid_trace_length'])[0]
+    state_trace_length = handle_trace_length(state_trace_length)
+    state_trace_length, state_input, reward = compromise_state_trace_length(
+        state_trace_length=state_trace_length,
+        state_input=state_input,
+        reward=reward,
+        max_trace_length=config.learn.max_trace_length,
+        features_num=config.learn.feature_number
+    )
+
+    return state_trace_length, state_input, reward, ha_id
 
 
 def get_together_training_batch(s_t0, state_input, reward, train_number, train_len, state_trace_length, ha_id,
@@ -357,16 +428,31 @@ def start_lstm_generate_spatial_simulation(history_action_type, history_action_t
     return simulated_data_all
 
 
-def find_game_dir(dir_all, data_path, target_game_id):
-    game_name = None
-    for directory in dir_all:
-        game = sio.loadmat(data_path + "/" + str(directory))
-        gameId = (game['x'])['gameId'][0][0][0]
-        gameId = unicodedata.normalize('NFKD', gameId).encode('ascii', 'ignore')
-        if gameId == target_game_id:
-            game_name = directory
-            print directory
-            break
+def find_game_dir(dir_all, data_path, target_game_id, sports='IceHockey'):
+    if sports == 'IceHockey':
+        game_name = None
+        for directory in dir_all:
+            game = sio.loadmat(data_path + "/" + str(directory))
+            gameId = (game['x'])['gameId'][0][0][0]
+            gameId = unicodedata.normalize('NFKD', gameId).encode('ascii', 'ignore')
+            if gameId == target_game_id:
+                game_name = directory
+                print directory
+                break
+    elif sports == 'Soccer':
+        for directory in dir_all:
+            with open(data_path + str(directory)) as f:
+                data = json.load(f)[0]
+            gameId = str(data.get('gameId'))
+            # gameId = unicodedata.normalize('NFKD', gameId).encode('ascii', 'ignore')
+            print str(data.get('gameDate'))
+            # if gameId == target_game_id:
+            #     game_name = directory
+            #     print directory
+            #     break
+    else:
+        raise ValueError('Unknown sports game')
+
     if game_name:
         return game_name.split(".")[0]
     else:

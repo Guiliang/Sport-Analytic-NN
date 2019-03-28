@@ -102,7 +102,7 @@ def train_network(sess, model, print_parameters=False):
                 state_input=state_input,
                 reward=reward,
                 max_trace_length=tt_lstm_config.learn.max_trace_length,
-                features_num=tt_lstm_config.learn.features_num
+                features_num=tt_lstm_config.learn.feature_number
             )
 
             print ("\n load file" + str(dir_game) + " success")

@@ -4,6 +4,8 @@ import tensorflow as tf
 import scipy.io as sio
 import matplotlib.pyplot as plt
 import seaborn as sns
+from td_three_prediction_two_tower_lstm_v_correct_dir.support.data_processing_tools import get_icehockey_game_data
+from td_three_prediction_two_tower_lstm_v_correct_dir.support.data_processing_tools import get_soccer_game_data
 
 
 def image_blending(value_Img_dir, save_dir, value_Img_half_dir, half_save_dir):
@@ -35,6 +37,37 @@ def image_blending(value_Img_dir, save_dir, value_Img_half_dir, half_save_dir):
     blend_half_all = value_Img_half
     blend_half_all[120:1090, 190:1125] = blend_half_focus
     cv2.imwrite(half_save_dir, blend_half_all)
+
+
+def compute_game_values(model_path, sess_nn, model, data_store, dir_game, config, sport):
+    saver = tf.train.Saver()
+    sess_nn.run(tf.global_variables_initializer())
+    checkpoint = tf.train.get_checkpoint_state(model_path)
+    if checkpoint and checkpoint.model_checkpoint_path:
+        saver.restore(sess_nn, checkpoint.model_checkpoint_path)
+        print("Successfully loaded:", checkpoint.model_checkpoint_path)
+
+    else:
+        print model_path
+        raise Exception("can't restore network")
+
+    if sport == "IceHockey":
+        state_trace_length, state_input, reward, ha_id = get_icehockey_game_data(data_store=data_store,
+                                                                                 dir_game=dir_game,
+                                                                                 config=config, )
+    elif sport == 'Soccer':
+        state_trace_length, state_input, reward, ha_id = get_soccer_game_data(data_store=data_store,
+                                                                              dir_game=dir_game,
+                                                                              config=config, )
+    else:
+        raise ValueError("unknown sport")
+
+    [readout] = sess_nn.run([model.readout],
+                            feed_dict={model.trace_lengths_ph: state_trace_length,
+                                       model.rnn_input_ph: state_input,
+                                       model.home_away_indicator_ph: ha_id
+                                       })
+    return readout
 
 
 def nn_simulation(simulate_data,
@@ -151,12 +184,9 @@ def nn_simulation(simulate_data,
     plt.savefig(nn_half_save_image_dir)
 
 
-def plot_game_value(game_name_dir, data_store_dir,
-                    data_name, save_image_name,
+def plot_game_value(game_value, save_image_name,
                     normalize_data, home_team, away_team,
                     if_normalized=True, draw_three=True):
-    game_value = sio.loadmat(data_store_dir + game_name_dir + "/" + data_name)
-    game_value = game_value[data_name]
     # game_value_home = game_value[:, 0]/(game_value[:, 0]+game_value[:, 1])
     # game_value_away = game_value[:, 1]/(game_value[:, 0]+game_value[:, 1])
     game_value_home = game_value[:, 0]
@@ -164,7 +194,8 @@ def plot_game_value(game_name_dir, data_store_dir,
     game_value_end = game_value[:, 2]
 
     if if_normalized:
-        game_value_home, game_value_away, game_value_end = normalize_data(game_value_home, game_value_away, game_value_end)
+        game_value_home, game_value_away, game_value_end = normalize_data(game_value_home, game_value_away,
+                                                                          game_value_end)
 
     # find the index of max home and away
     home_max_index = game_value_home.argsort()[-20:][::-1]
