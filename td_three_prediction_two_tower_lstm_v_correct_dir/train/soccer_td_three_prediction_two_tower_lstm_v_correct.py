@@ -1,4 +1,5 @@
 import os
+os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 import tensorflow as tf
 import scipy.io as sio
 import numpy as np
@@ -80,7 +81,7 @@ def train_network(sess, model, print_parameters=False):
             for filename in game_files:
                 if "reward" in filename:
                     reward_name = filename
-                elif "state" in filename:
+                elif "state_add" in filename:
                     state_input_name = filename
                 elif "trace" in filename:
                     state_trace_length_name = filename

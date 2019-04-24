@@ -445,11 +445,11 @@ def find_game_dir(dir_all, data_path, target_game_id, sports='IceHockey'):
                 data = json.load(f)[0]
             gameId = str(data.get('gameId'))
             # gameId = unicodedata.normalize('NFKD', gameId).encode('ascii', 'ignore')
-            print str(data.get('gameDate'))
-            # if gameId == target_game_id:
-            #     game_name = directory
-            #     print directory
-            #     break
+            # print str(data.get('gameDate'))
+            if gameId == target_game_id:
+                game_name = directory
+                print directory
+                break
     else:
         raise ValueError('Unknown sports game')
 

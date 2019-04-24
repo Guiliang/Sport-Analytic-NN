@@ -52,6 +52,7 @@ class td_prediction_tt_embed:
         """
         define a shallow dynamic LSTM
         """
+        # with tf.device('/gpu:0'):
         with tf.name_scope(self.model_name):
             with tf.name_scope("tower-for-home"):
                 with tf.name_scope("Home-LSTM-layer"):
@@ -89,6 +90,7 @@ class td_prediction_tt_embed:
         build the network
         :return:
         """
+        # with tf.device('/gpu:0'):
         with tf.name_scope(self.model_name):
             with tf.name_scope("tower-for-home"):
                 with tf.name_scope("Home_LSTM_layer"):
@@ -114,6 +116,7 @@ class td_prediction_tt_embed:
                 with tf.name_scope("Away_LSTM_layer"):
                     rnn_output = None
                     for i in range(self.away_lstm_layer_num):
+                        print i
                         rnn_input = self.rnn_input_ph if i == 0 else rnn_output
                         rnn_output, rnn_state = tf.nn.dynamic_rnn(  # while loop dynamic learning rnn
                             inputs=rnn_input, cell=self.lstm_cell_away_all[i],
