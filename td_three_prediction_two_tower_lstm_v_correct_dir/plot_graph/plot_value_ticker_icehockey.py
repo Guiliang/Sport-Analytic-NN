@@ -7,7 +7,7 @@ from td_three_prediction_two_tower_lstm_v_correct_dir.config.tt_lstm_config impo
 from td_three_prediction_two_tower_lstm_v_correct_dir.support.print_tools import print_mark_info
 from td_three_prediction_two_tower_lstm_v_correct_dir.support.data_processing_tools import normalize_data
 from td_three_prediction_two_tower_lstm_v_correct_dir.nn_structure.td_tt_lstm import td_prediction_tt_embed
-from td_three_prediction_two_tower_lstm_v_correct_dir.support.plot_tools import compute_game_values
+from td_three_prediction_two_tower_lstm_v_correct_dir.support.plot_tools import compute_game_values, read_plot_model
 
 if __name__ == '__main__':
     data_store_dir = "/cs/oschulte/Galen/Hockey-data-entire/Hybrid-RNN-Hockey-Training-All-feature5-scale" \
@@ -56,9 +56,8 @@ if __name__ == '__main__':
 
     data_store = "/cs/oschulte/Galen/Hockey-data-entire/Hybrid-RNN-Hockey-Training-All-feature" + str(
         tt_lstm_config.learn.feature_type) + "-scale-neg_reward" + tt_lstm_config.learn.if_correct_velocity + "_length-dynamic"
-
-    game_value = compute_game_values(model_path=saved_network_path,
-                                     sess_nn=sess_nn,
+    read_plot_model(model_path=saved_network_path, sess_nn=sess_nn)
+    game_value = compute_game_values(sess_nn=sess_nn,
                                      model=model_nn,
                                      data_store=data_store,
                                      dir_game=game_name_dir,

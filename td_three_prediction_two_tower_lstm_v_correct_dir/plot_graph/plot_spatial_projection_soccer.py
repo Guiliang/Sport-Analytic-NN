@@ -7,15 +7,12 @@ from td_three_prediction_two_tower_lstm_v_correct_dir.support.data_processing_to
 from td_three_prediction_two_tower_lstm_v_correct_dir.support.plot_tools import nn_simulation
 
 if __name__ == '__main__':
-    tt_lstm_config_path = "../icehockey-config.yaml"
+    tt_lstm_config_path = "../soccer-config.yaml"
     tt_lstm_config = TTLSTMCongfig.load(tt_lstm_config_path)
     history_action_type = ['reception', 'pass', 'reception']
-    history_action_type_coord = [{'xAdjCoord': 50.18904442739472, 'yAdjCoord': 0.47699011276943787},
-                                 {'xAdjCoord': 48.06645981534736, 'yAdjCoord': 0.7993870137732708},
-                                 {'xAdjCoord': 38.898981773048014, 'yAdjCoord': 1.1692141494472155}]
-
-    # history_action_type = []
-    # history_action_type_coord = []
+    history_action_type_coord = [{'xAdjCoord': 0, 'yAdjCoord': 0},
+                                 {'xAdjCoord': 0, 'yAdjCoord': 0},
+                                 {'xAdjCoord': 0, 'yAdjCoord': 0}]
 
     feature_type = tt_lstm_config.learn.feature_type
     batch_size = tt_lstm_config.learn.batch_size
@@ -27,7 +24,7 @@ if __name__ == '__main__':
         learning_rate_write = 4
     if_correct_velocity = tt_lstm_config.learn.if_correct_velocity
     action_type = 'shot'
-    simulation_type = 'entire_spatial_simulation'
+    simulation_type = 'soccer_spatial_simulation'
     data_simulation_dir = '../simulated_data/'
     draw_target = 'Q_home'
     model_type = tt_lstm_config.learn.model_type
@@ -44,7 +41,8 @@ if __name__ == '__main__':
                                                                 simulation_type=simulation_type,
                                                                 feature_type=feature_type,
                                                                 features_num=tt_lstm_config.learn.feature_number,
-                                                                max_trace_length=tt_lstm_config.learn.max_trace_length
+                                                                max_trace_length=tt_lstm_config.learn.max_trace_length,
+                                                                sports='soccer'
                                                                 )
 
     sess_nn = tf.InteractiveSession()
@@ -84,23 +82,23 @@ if __name__ == '__main__':
         tt_lstm_config.learn.max_trace_length)
 
     for data_index in range(0, len(simulated_data_all)):
-        nn_image_save_dir = "./icehockey-image/{7} {0}-{1} with Dynamic LSTM feature{2}_batch{3}_iterate{4}_lr{5}_{6}{8}{9}.png". \
+        nn_image_save_dir = "./soccer-image/{7} {0}-{1} with Dynamic LSTM feature{2}_batch{3}_iterate{4}_lr{5}_{6}{8}{9}.png". \
             format(
             action_type, str(history_action_type[:data_index]), str(feature_type), str(batch_size),
             str(iterate_num),
             str(learning_rate),
             str(model_type), draw_target, if_correct_velocity, diff_str)
-        nn_half_image_save_dir = "./icehockey-image/right half {7} {0}-{1} with Dynamic LSTM feature{2}_batch{3}_iterate{4}_lr{5}_{6}{8}{9}.png".format(
+        nn_half_image_save_dir = "./soccer-image/right half {7} {0}-{1} with Dynamic LSTM feature{2}_batch{3}_iterate{4}_lr{5}_{6}{8}{9}.png".format(
             action_type, str(history_action_type[:data_index]), str(feature_type), str(batch_size),
             str(iterate_num),
             str(learning_rate),
             str(model_type), draw_target, if_correct_velocity, diff_str)
-        blend_image_save_dir = "./icehockey-image/blend {7} {0}-{1} with Dynamic LSTM feature{2}_batch{3}_iterate{4}_lr{5}_{6}{8}{9}.png".format(
+        blend_image_save_dir = "./soccer-image/blend {7} {0}-{1} with Dynamic LSTM feature{2}_batch{3}_iterate{4}_lr{5}_{6}{8}{9}.png".format(
             action_type, str(history_action_type[:data_index]), str(feature_type), str(batch_size),
             str(iterate_num),
             str(learning_rate),
             str(model_type), draw_target, if_correct_velocity, diff_str)
-        blend_half_image_save_dir = "./icehockey-image/blend right half {7} {0}-{1} with Dynamic LSTM feature{2}_batch{3}_iterate{4}_lr{5}_{6}{8}{9}.png".format(
+        blend_half_image_save_dir = "./soccer-image/blend right half {7} {0}-{1} with Dynamic LSTM feature{2}_batch{3}_iterate{4}_lr{5}_{6}{8}{9}.png".format(
             action_type, str(history_action_type[:data_index]), str(feature_type), str(batch_size),
             str(iterate_num),
             str(learning_rate),
@@ -116,4 +114,4 @@ if __name__ == '__main__':
                       nn_save_image_dir=nn_image_save_dir,
                       nn_half_save_image_dir=nn_half_image_save_dir)
         image_blending(nn_image_save_dir, blend_image_save_dir, nn_half_image_save_dir, blend_half_image_save_dir,
-                       background_image_dir="../resource/hockey-field.png")
+                       background_image_dir="../resource/soccer-field.png")

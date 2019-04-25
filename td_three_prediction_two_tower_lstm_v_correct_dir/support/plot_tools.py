@@ -8,12 +8,13 @@ from td_three_prediction_two_tower_lstm_v_correct_dir.support.data_processing_to
 from td_three_prediction_two_tower_lstm_v_correct_dir.support.data_processing_tools import get_soccer_game_data
 
 
-def image_blending(value_Img_dir, save_dir, value_Img_half_dir, half_save_dir):
+def image_blending(value_Img_dir, save_dir, value_Img_half_dir, half_save_dir, background_image_dir):
     value_Img = cv2.imread(
         value_Img_dir)
     value_Img_half = cv2.imread(
         value_Img_half_dir)
     background = cv2.imread("../resource/hockey-field.png")
+    background = cv2.imread(background_image_dir)
     # v_rows, v_cols, v_channels = value_Img.shape
     # v_h_rows, v_h_cols, v_h_channels = value_Img_half.shape
 
@@ -39,18 +40,20 @@ def image_blending(value_Img_dir, save_dir, value_Img_half_dir, half_save_dir):
     cv2.imwrite(half_save_dir, blend_half_all)
 
 
-def compute_game_values(model_path, sess_nn, model, data_store, dir_game, config, sport):
+def read_plot_model(sess_nn, model_path):
     saver = tf.train.Saver()
     sess_nn.run(tf.global_variables_initializer())
     checkpoint = tf.train.get_checkpoint_state(model_path)
     if checkpoint and checkpoint.model_checkpoint_path:
+        print model_path
         saver.restore(sess_nn, checkpoint.model_checkpoint_path)
         print("Successfully loaded:", checkpoint.model_checkpoint_path)
-
     else:
         print model_path
         raise Exception("can't restore network")
 
+
+def compute_game_values(sess_nn, model, data_store, dir_game, config, sport):
     if sport == "IceHockey":
         state_trace_length, state_input, reward, ha_id = get_icehockey_game_data(data_store=data_store,
                                                                                  dir_game=dir_game,
@@ -186,7 +189,7 @@ def nn_simulation(simulate_data,
 
 def plot_game_value(game_value, save_image_name,
                     normalize_data, home_team, away_team,
-                    if_normalized=True, draw_three=True):
+                    if_normalized=True, draw_three=True, game_time_all=None):
     # game_value_home = game_value[:, 0]/(game_value[:, 0]+game_value[:, 1])
     # game_value_away = game_value[:, 1]/(game_value[:, 0]+game_value[:, 1])
     game_value_home = game_value[:, 0]
@@ -208,19 +211,23 @@ def plot_game_value(game_value, save_image_name,
 
     event_numbers = [d for d in range(1, len(game_value_diff) + 1)]
 
+    if game_time_all is not None:
+        x = game_time_all
+    else:
+        x = event_numbers
     plt.figure(figsize=(15, 6))
     if draw_three:
-        plt.plot(event_numbers, game_value_home, label="Q for Home".format(home_team))
-        plt.plot(event_numbers, game_value_away, label="Q for Away".format(away_team))
-        plt.plot(event_numbers[0:len(game_value_end) - 1], game_value_end[0:len(game_value_end) - 1],
+        plt.plot(x, game_value_home, label="Q for Home".format(home_team))
+        plt.plot(x, game_value_away, label="Q for Away".format(away_team))
+        plt.plot(x[0:len(game_value_end) - 1], game_value_end[0:len(game_value_end) - 1],
                  label="Q for Game End")
     else:
-        plt.plot(event_numbers, game_value_diff, label="q_home-q_away")
-    plt.title("2015-2016 NHL regular season {0}(Away) vs {1}(Home)".format(away_team, home_team), fontsize=15)
-    plt.xlabel("event number", fontsize=13)
-    plt.ylabel("Q Value", fontsize=13)
-    plt.legend(loc='upper right', fontsize=13)
-    # plt.show()
-    plt.savefig(save_image_name)
+        plt.plot(x, game_value_diff, label="q_home-q_away")
+    # plt.title("2015-2016 NHL regular season {0}(Away) vs {1}(Home)".format(away_team, home_team), fontsize=15)
+    plt.xlabel("event number", fontsize=15)
+    plt.ylabel("Q Value", fontsize=15)
+    plt.legend(loc='upper left', fontsize=15)
+    plt.show()
+    # plt.savefig(save_image_name)
 
     return home_max_index, away_max_index, home_maxs, away_maxs

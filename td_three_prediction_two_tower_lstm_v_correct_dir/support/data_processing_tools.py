@@ -67,6 +67,23 @@ def padding_hybrid_reward(hybrid_reward):
     return np.asarray(hybrid_reward)
 
 
+def get_game_time(data_path, directory):
+    with open(data_path + str(directory)) as f:
+        data = json.load(f)[0]
+    # print "game time is:" + str(data.get('gameDate'))
+    events = data.get('events')
+    time_all = 95
+    game_time_all = []
+    for event in events:
+        time_remain = float(event.get('gameTimeRemain'))
+        if time_all is None:
+            time_all = time_remain
+        game_time = (time_all - time_remain)
+        game_time_all.append(game_time)
+    game_time_all.sort(reverse=False)
+    return game_time_all
+
+
 def get_soccer_game_data(data_store, dir_game, config):
     game_files = os.listdir(data_store + "/" + dir_game)
     for filename in game_files:
@@ -358,16 +375,33 @@ def padding_hybrid_feature_input(hybrid_feature_input, max_trace_length, feature
 
 def start_lstm_generate_spatial_simulation(history_action_type, history_action_type_coord,
                                            action_type, data_simulation_dir, simulation_type,
-                                           feature_type, max_trace_length, features_num, is_home=True):
-    simulated_data_all = []
+                                           feature_type, max_trace_length, features_num, is_home=True,
+                                           sports='ice-hockey'):
+    if sports == 'ice-hockey':
+        x_min = -42.5
+        x_max = 42.5
+        x_section_num = 171
+        y_min = -100
+        y_max = 100
+        y_section_num = 401
+    elif sports == 'soccer':
+        x_min = 0
+        x_max = 100
+        x_section_num = 200
+        y_min = 0
+        y_max = 100
+        y_section_num = 200
+    else:
+        raise ValueError('unknown sport')
 
+    simulated_data_all = []
     features_train, features_mean, features_scale, actions = select_feature_setting(feature_type=feature_type)
 
     for history_index in range(0, len(history_action_type) + 1):
         state_ycoord_list = []
-        for ycoord in np.linspace(-42.5, 42.5, 171):
+        for ycoord in np.linspace(x_min, x_max, x_section_num):
             state_xcoord_list = []
-            for xcoord in np.linspace(-100.0, 100.0, 401):
+            for xcoord in np.linspace(y_min, y_max, y_section_num):
                 set_dict = {'xAdjCoord': xcoord, 'yAdjCoord': ycoord}
                 state_generated = construct_simulation_data(
                     features_train=features_train,
@@ -428,7 +462,30 @@ def start_lstm_generate_spatial_simulation(history_action_type, history_action_t
     return simulated_data_all
 
 
-def find_game_dir(dir_all, data_path, target_game_id, sports='IceHockey'):
+def find_soccer_game_dir_by_team(dir_all, data_path, team="Arsenal"):
+    number = 0
+    for directory in dir_all:
+        number += 1
+        print number
+        try:
+            with open(data_path + str(directory)) as f:
+                data = json.load(f)[0]
+        except:
+            print "can't read dir {0}".format(str(directory))
+            continue
+        gameId = str(data.get('gameId'))
+        # gameId = unicodedata.normalize('NFKD', gameId).encode('ascii', 'ignore')
+        homename = str(data.get('homeTeamName').encode('utf-8'))
+        awayname = str(data.get('awayTeamName').encode('utf-8'))
+        if team in homename or team in awayname:
+            print "game time is:" + str(data.get('gameDate'))
+            print "Home:{0} v.s. Away:{1}".format(homename, awayname)
+            print gameId
+            print directory
+            # break
+
+
+def find_game_dir(dir_all, data_path, target_game_id, sports):
     if sports == 'IceHockey':
         game_name = None
         for directory in dir_all:
@@ -445,7 +502,10 @@ def find_game_dir(dir_all, data_path, target_game_id, sports='IceHockey'):
                 data = json.load(f)[0]
             gameId = str(data.get('gameId'))
             # gameId = unicodedata.normalize('NFKD', gameId).encode('ascii', 'ignore')
-            print str(data.get('gameDate'))
+            print "game time is:" + str(data.get('gameDate'))
+            homename = str(data.get('homeTeamName'))
+            awayname = str(data.get('awayTeamName'))
+            print "Home:{0} v.s. Away:{1}".format(homename, awayname)
             if gameId == target_game_id:
                 game_name = directory
                 print directory
