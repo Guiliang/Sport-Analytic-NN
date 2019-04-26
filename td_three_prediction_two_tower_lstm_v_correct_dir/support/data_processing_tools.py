@@ -5,7 +5,8 @@ import math
 import json
 import scipy.io as sio
 import unicodedata
-from td_three_prediction_two_tower_lstm_v_correct_dir.config.icehockey_feature_setting import select_feature_setting
+import td_three_prediction_two_tower_lstm_v_correct_dir.config.icehockey_feature_setting as icehockey_feature_setting
+import td_three_prediction_two_tower_lstm_v_correct_dir.config.soccer_feature_setting as soccer_feature_setting
 
 
 def handle_trace_length(state_trace_length):
@@ -384,6 +385,8 @@ def start_lstm_generate_spatial_simulation(history_action_type, history_action_t
         y_min = -100
         y_max = 100
         y_section_num = 401
+        features_train, features_mean, features_scale, actions = icehockey_feature_setting.select_feature_setting(
+            feature_type=feature_type)
     elif sports == 'soccer':
         x_min = 0
         x_max = 100
@@ -391,11 +394,12 @@ def start_lstm_generate_spatial_simulation(history_action_type, history_action_t
         y_min = 0
         y_max = 100
         y_section_num = 200
+        features_train, features_mean, features_scale, actions = soccer_feature_setting.select_feature_setting(
+            feature_type=feature_type)
     else:
         raise ValueError('unknown sport')
 
     simulated_data_all = []
-    features_train, features_mean, features_scale, actions = select_feature_setting(feature_type=feature_type)
 
     for history_index in range(0, len(history_action_type) + 1):
         state_ycoord_list = []

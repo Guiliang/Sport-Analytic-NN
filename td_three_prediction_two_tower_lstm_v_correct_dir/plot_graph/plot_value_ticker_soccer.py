@@ -89,4 +89,5 @@ if __name__ == '__main__':
                                                                                normalize_data=normalize_data,
                                                                                home_team=home_team,
                                                                                away_team=away_team)
+        break
         # print_mark_info(data_store_dir, game_name_dir, home_max_index, away_max_index, home_maxs, away_maxs)

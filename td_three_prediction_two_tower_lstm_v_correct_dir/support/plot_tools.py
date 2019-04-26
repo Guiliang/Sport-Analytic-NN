@@ -82,17 +82,6 @@ def nn_simulation(simulate_data,
                   nn_save_image_dir,
                   nn_half_save_image_dir,
                   draw_target='Q_home'):
-    saver = tf.train.Saver()
-    sess_nn.run(tf.global_variables_initializer())
-
-    checkpoint = tf.train.get_checkpoint_state(model_path)
-    if checkpoint and checkpoint.model_checkpoint_path:
-        saver.restore(sess_nn, checkpoint.model_checkpoint_path)
-        print("Successfully loaded:", checkpoint.model_checkpoint_path)
-
-    else:
-        print model_path
-        raise Exception("can't restore network")
 
     value_spatial_home = []
     value_spatial_away = []
@@ -216,6 +205,8 @@ def plot_game_value(game_value, save_image_name,
     else:
         x = event_numbers
     plt.figure(figsize=(15, 6))
+    plt.xticks(size=15)
+    plt.yticks(size=15)
     if draw_three:
         plt.plot(x, game_value_home, label="Q for Home".format(home_team))
         plt.plot(x, game_value_away, label="Q for Away".format(away_team))
@@ -224,10 +215,10 @@ def plot_game_value(game_value, save_image_name,
     else:
         plt.plot(x, game_value_diff, label="q_home-q_away")
     # plt.title("2015-2016 NHL regular season {0}(Away) vs {1}(Home)".format(away_team, home_team), fontsize=15)
-    plt.xlabel("event number", fontsize=15)
-    plt.ylabel("Q Value", fontsize=15)
+    plt.xlabel("Game Time", fontsize=15)
+    plt.ylabel("Q Values", fontsize=15)
     plt.legend(loc='upper left', fontsize=15)
-    plt.show()
-    # plt.savefig(save_image_name)
+    # plt.show()
+    plt.savefig(save_image_name)
 
     return home_max_index, away_max_index, home_maxs, away_maxs

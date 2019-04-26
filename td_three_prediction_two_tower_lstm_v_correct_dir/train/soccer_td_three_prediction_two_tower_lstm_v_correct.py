@@ -81,7 +81,7 @@ def train_network(sess, model, print_parameters=False):
             for filename in game_files:
                 if "reward" in filename:
                     reward_name = filename
-                elif "state_add" in filename:
+                elif "state" in filename:
                     state_input_name = filename
                 elif "trace" in filename:
                     state_trace_length_name = filename

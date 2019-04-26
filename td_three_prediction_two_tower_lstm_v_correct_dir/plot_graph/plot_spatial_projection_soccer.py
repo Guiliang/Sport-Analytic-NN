@@ -4,15 +4,18 @@ from td_three_prediction_two_tower_lstm_v_correct_dir.nn_structure import td_tt_
 from td_three_prediction_two_tower_lstm_v_correct_dir.config.tt_lstm_config import TTLSTMCongfig
 from td_three_prediction_two_tower_lstm_v_correct_dir.support.data_processing_tools import \
     start_lstm_generate_spatial_simulation
-from td_three_prediction_two_tower_lstm_v_correct_dir.support.plot_tools import nn_simulation
+from td_three_prediction_two_tower_lstm_v_correct_dir.support.plot_tools import nn_simulation,read_plot_model
 
 if __name__ == '__main__':
     tt_lstm_config_path = "../soccer-config.yaml"
     tt_lstm_config = TTLSTMCongfig.load(tt_lstm_config_path)
-    history_action_type = ['reception', 'pass', 'reception']
-    history_action_type_coord = [{'xAdjCoord': 0, 'yAdjCoord': 0},
-                                 {'xAdjCoord': 0, 'yAdjCoord': 0},
-                                 {'xAdjCoord': 0, 'yAdjCoord': 0}]
+    # history_action_type = ['reception', 'pass', 'reception']
+    # history_action_type_coord = [{'xAdjCoord': 0, 'yAdjCoord': 0},
+    #                              {'xAdjCoord': 0, 'yAdjCoord': 0},
+    #                              {'xAdjCoord': 0, 'yAdjCoord': 0}]
+
+    history_action_type = []
+    history_action_type_coord = []
 
     feature_type = tt_lstm_config.learn.feature_type
     batch_size = tt_lstm_config.learn.batch_size
@@ -73,13 +76,15 @@ if __name__ == '__main__':
     #                      tt_lstm_config.learn.if_correct_velocity + "_MaxTL" + \
     #                      str(tt_lstm_config.learn.max_trace_length)
 
-    saved_network_path = tt_lstm_config.learn.save_mother_dir + "/oschulte/Galen/icehockey-models/hybrid_sl_saved_NN/Scale-tt-three-cut_together_saved_networks_feature" + str(
+    saved_network_path = tt_lstm_config.learn.save_mother_dir + "/oschulte/Galen/soccer-models/hybrid_sl_saved_NN/Scale-tt-three-cut_together_saved_networks_feature" + str(
         tt_lstm_config.learn.feature_type) + "_batch" + str(
         tt_lstm_config.learn.batch_size) + "_iterate" + str(
         tt_lstm_config.learn.iterate_num) + "_lr" + str(
         tt_lstm_config.learn.learning_rate) + "_" + str(
         tt_lstm_config.learn.model_type) + tt_lstm_config.learn.if_correct_velocity + "_MaxTL" + str(
         tt_lstm_config.learn.max_trace_length)
+
+    read_plot_model(sess_nn, saved_network_path)
 
     for data_index in range(0, len(simulated_data_all)):
         nn_image_save_dir = "./soccer-image/{7} {0}-{1} with Dynamic LSTM feature{2}_batch{3}_iterate{4}_lr{5}_{6}{8}{9}.png". \

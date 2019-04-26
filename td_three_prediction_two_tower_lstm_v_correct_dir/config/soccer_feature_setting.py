@@ -1,5 +1,6 @@
 def select_feature_setting(feature_type):
     if feature_type == 5:
+        # TODO: I am incorrect, fix me if possible
         interested_raw_features = ['angle', 'distance', 'duration', 'gameTimeRemain', 'periodId', 'home_away',
                                    'interrupted', 'manPower', 'outcome', 'scoreDiff', 'x', 'y']
         actions = ['caught-offside', 'pass_from_fk', 'cross_from_fk', 'pass_from_corner',
@@ -45,14 +46,14 @@ def select_feature_setting(feature_type):
 
         complete_feature_space = interested_raw_features + interested_compute_features + actions
 
-        features_mean_dir = {}
+        features_mean_dic = {}
         for index in range(0, len(complete_feature_space)):
-            features_mean_dir.update({complete_feature_space[index]: features_mean[index]})
+            features_mean_dic.update({complete_feature_space[index]: features_mean[index]})
 
-        features_scale_dir = {}
+        features_scale_dic = {}
         for index in range(0, len(complete_feature_space)):
-            features_mean_dir.update({complete_feature_space[index]: features_scale[index]})
+            features_scale_dic.update({complete_feature_space[index]: features_scale[index]})
 
         features_train = interested_raw_features + interested_compute_features + actions
 
-        return features_train, features_mean_dir, features_scale_dir, actions
+        return features_train, features_mean_dic, features_scale_dic, actions
