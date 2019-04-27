@@ -292,37 +292,39 @@ def judge_feature_in_action(feature_input, actions):
 
 
 def construct_simulation_data(features_train, features_mean, features_scale,
-                              feature_type, is_home, action_type, actions, set_dict={}):
+                              feature_type, is_home, action_type, actions, set_dict={}, gate_x_coord=None,
+                              gate_y_coord=None):
     state = []
     for feature in features_train:
-        if feature == 'xAdjCoord':
+        if feature == 'xAdjCoord' or feature == 'x':
             xAdjCoord = set_dict.get('xAdjCoord')
-            scale_xAdjCoord = float(xAdjCoord - features_mean['xAdjCoord']) / features_scale['xAdjCoord']
+            scale_xAdjCoord = float(xAdjCoord - features_mean[feature]) / features_scale[feature]
             state.append(scale_xAdjCoord)
-        elif feature == 'yAdjCoord':
+        elif feature == 'yAdjCoord' or feature == 'y':
             yAdjCoord = set_dict.get('yAdjCoord')
-            scale_yAdjCoord = float(yAdjCoord - features_mean['yAdjCoord']) / features_scale['yAdjCoord']
+            scale_yAdjCoord = float(yAdjCoord - features_mean[feature]) / features_scale[feature]
             state.append(scale_yAdjCoord)
         elif feature in set_dict:
             temp = set_dict[feature]
             scale_temp = float(temp - features_mean[feature]) / features_scale[feature]
             state.append(scale_temp)
         elif feature_type < 5 and feature == 'event_id':
-            actions = {'block': 0,
-                       'carry': 1,
-                       'check': 2,
-                       'dumpin': 3,
-                       'dumpout': 4,
-                       'goal': 5,
-                       'lpr': 6,
-                       'offside': 7,
-                       'pass': 8,
-                       'puckprotection': 9,
-                       'reception': 10,
-                       'shot': 11,
-                       'shotagainst': 12}
-            scale_actions = float(actions[action_type] - features_mean['event_id']) / features_scale['event_id']
-            state.append(scale_actions)
+            raise ValueError("feature type<5 in inapplicable")
+        #     actions = {'block': 0,
+        #                'carry': 1,
+        #                'check': 2,
+        #                'dumpin': 3,
+        #                'dumpout': 4,
+        #                'goal': 5,
+        #                'lpr': 6,
+        #                'offside': 7,
+        #                'pass': 8,
+        #                'puckprotection': 9,
+        #                'reception': 10,
+        #                'shot': 11,
+        #                'shotagainst': 12}
+        #     scale_actions = float(actions[action_type] - features_mean['event_id']) / features_scale['event_id']
+        #     state.append(scale_actions)
 
         elif feature_type >= 5 and action_type == feature:
             scale_action = float(1 - features_mean[action_type]) / features_scale[action_type]
@@ -330,12 +332,12 @@ def construct_simulation_data(features_train, features_mean, features_scale,
         elif feature_type >= 5 and judge_feature_in_action(feature, actions):
             scale_action = float(0 - features_mean[feature]) / features_scale[feature]
             state.append(scale_action)
-        elif feature == 'event_outcome':
-            scale_event_outcome = float(1 - features_mean['event_outcome']) / features_scale['event_outcome']
+        elif feature == 'event_outcome' or feature == 'outcome':
+            scale_event_outcome = float(1 - features_mean[feature]) / features_scale[feature]
             state.append(scale_event_outcome)
-        elif feature == 'angel2gate':
-            gate_x_coord = 89
-            gate_y_coord = 0
+        elif feature == 'angel2gate' or feature == 'angle':
+            xAdjCoord = set_dict.get('xAdjCoord')
+            yAdjCoord = set_dict.get('yAdjCoord')
             y_diff = abs(yAdjCoord - gate_y_coord)
             x_diff = gate_x_coord - xAdjCoord
             z = math.sqrt(math.pow(y_diff, 2) + math.pow(x_diff, 2))
@@ -344,7 +346,7 @@ def construct_simulation_data(features_train, features_mean, features_scale,
             except:
                 print ("exception point with x:{0} and y:{1}".format(str(xAdjCoord), str(yAdjCoord)))
                 angel2gate = math.pi
-            scale_angel2gate = float(angel2gate - features_mean['angel2gate']) / features_scale['angel2gate']
+            scale_angel2gate = float(angel2gate - features_mean[feature]) / features_scale[feature]
             state.append(scale_angel2gate)
         elif feature == 'home':
             if is_home:
@@ -360,7 +362,29 @@ def construct_simulation_data(features_train, features_mean, features_scale,
             else:
                 scale_away = float(1 - features_mean['away']) / features_scale['away']
                 state.append(scale_away)
+        elif feature == 'distance_x':
+            xAdjCoord = set_dict.get('xAdjCoord')
+            distance_x = gate_x_coord - xAdjCoord
+            assert distance_x >= 0
+            scale_distance_x = float(distance_x - features_mean[feature]) / features_scale[feature]
+            state.append(scale_distance_x)
+        elif feature == 'distance_y':
+            yAdjCoord = set_dict.get('yAdjCoord')
+            distance_y = abs(gate_y_coord - yAdjCoord)
+            # assert distance_y >= 0
+            scale_distance_y = float(distance_y - features_mean[feature]) / features_scale[feature]
+            state.append(scale_distance_y)
+        elif feature == 'distance_to_goal':
+            xAdjCoord = set_dict.get('xAdjCoord')
+            distance_x = gate_x_coord - xAdjCoord
+            yAdjCoord = set_dict.get('yAdjCoord')
+            distance_y = abs(gate_y_coord - yAdjCoord)
+            distance_to_goal = (distance_x**2 + distance_y**2)**(1/2)
+            # assert distance_y >= 0
+            scale_distance_to_goal = float(distance_to_goal - features_mean[feature]) / features_scale[feature]
+            state.append(scale_distance_to_goal)
         else:
+            # print feature
             state.append(0)
 
     return np.asarray(state)
@@ -387,6 +411,8 @@ def start_lstm_generate_spatial_simulation(history_action_type, history_action_t
         y_section_num = 401
         features_train, features_mean, features_scale, actions = icehockey_feature_setting.select_feature_setting(
             feature_type=feature_type)
+        gate_x_coord = 89
+        gate_y_coord = 0
     elif sports == 'soccer':
         x_min = 0
         x_max = 100
@@ -396,6 +422,8 @@ def start_lstm_generate_spatial_simulation(history_action_type, history_action_t
         y_section_num = 200
         features_train, features_mean, features_scale, actions = soccer_feature_setting.select_feature_setting(
             feature_type=feature_type)
+        gate_x_coord = 100
+        gate_y_coord = 0
     else:
         raise ValueError('unknown sport')
 
@@ -415,7 +443,9 @@ def start_lstm_generate_spatial_simulation(history_action_type, history_action_t
                     is_home=is_home,
                     action_type=action_type,
                     actions=actions,
-                    set_dict=set_dict)
+                    set_dict=set_dict,
+                    gate_x_coord=gate_x_coord,
+                    gate_y_coord=gate_y_coord, )
                 state_generated_list = [state_generated]
                 for inner_history in range(0, history_index):
                     xAdjCoord = history_action_type_coord[inner_history].get('xAdjCoord')
@@ -433,7 +463,10 @@ def start_lstm_generate_spatial_simulation(history_action_type, history_action_t
                         is_home=is_home,
                         action_type=action_type,
                         actions=actions,
-                        set_dict=set_dict_history, )
+                        set_dict=set_dict_history,
+                        gate_x_coord=gate_x_coord,
+                        gate_y_coord=gate_y_coord,
+                    )
                     state_generated_list = [state_generated_history] + state_generated_list
 
                 state_generated_padding = padding_hybrid_feature_input(
@@ -464,6 +497,18 @@ def start_lstm_generate_spatial_simulation(history_action_type, history_action_t
         simulated_data_all.append(np.asarray(state_ycoord_list))
 
     return simulated_data_all
+
+
+def read_feature_within_events(directory, data_path, feature_name):
+    with open(data_path + str(directory)) as f:
+        data = json.load(f)[0]
+    events = data.get('events')
+    features_all = []
+    for event in events:
+        action = str(event.get(feature_name).encode('utf-8'))
+        features_all.append(action)
+
+    return features_all
 
 
 def find_soccer_game_dir_by_team(dir_all, data_path, team="Arsenal"):
