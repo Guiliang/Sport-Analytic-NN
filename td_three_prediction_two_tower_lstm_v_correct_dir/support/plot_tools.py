@@ -91,6 +91,7 @@ def nn_simulation(simulate_data,
     # y_count = 0
     for x_coord_states in simulate_data:
         trace_length = np.ones(len(x_coord_states)) * (len(history_action_type) + 1)
+        # trace_length = np.ones(len(x_coord_states)) * 2
         if "home" in draw_target:
             home_away_indicator = np.ones(len(x_coord_states))
         else:

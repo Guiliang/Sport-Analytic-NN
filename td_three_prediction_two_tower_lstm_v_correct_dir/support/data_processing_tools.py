@@ -90,7 +90,7 @@ def get_soccer_game_data(data_store, dir_game, config):
     for filename in game_files:
         if "reward" in filename:
             reward_name = filename
-        elif "state" in filename:
+        elif "state_add" in filename:
             state_input_name = filename
         elif "trace" in filename:
             state_trace_length_name = filename
@@ -332,22 +332,25 @@ def construct_simulation_data(features_train, features_mean, features_scale,
         elif feature_type >= 5 and judge_feature_in_action(feature, actions):
             scale_action = float(0 - features_mean[feature]) / features_scale[feature]
             state.append(scale_action)
-        elif feature == 'event_outcome' or feature == 'outcome':
+        elif feature == 'event_outcome': # ignore the outcome for soccer
             scale_event_outcome = float(1 - features_mean[feature]) / features_scale[feature]
             state.append(scale_event_outcome)
-        elif feature == 'angel2gate' or feature == 'angle':
-            xAdjCoord = set_dict.get('xAdjCoord')
-            yAdjCoord = set_dict.get('yAdjCoord')
-            y_diff = abs(yAdjCoord - gate_y_coord)
-            x_diff = gate_x_coord - xAdjCoord
-            z = math.sqrt(math.pow(y_diff, 2) + math.pow(x_diff, 2))
-            try:
-                angel2gate = math.acos(float(x_diff) / z)
-            except:
-                print ("exception point with x:{0} and y:{1}".format(str(xAdjCoord), str(yAdjCoord)))
-                angel2gate = math.pi
-            scale_angel2gate = float(angel2gate - features_mean[feature]) / features_scale[feature]
-            state.append(scale_angel2gate)
+        elif feature == 'outcome':
+            scale_event_outcome = float(0 - features_mean[feature]) / features_scale[feature]
+            state.append(scale_event_outcome)
+        # elif feature == 'angel2gate' or feature == 'angle': # TODO: temporally ignore angle
+        #     xAdjCoord = set_dict.get('xAdjCoord')
+        #     yAdjCoord = set_dict.get('yAdjCoord')
+        #     y_diff = abs(yAdjCoord - gate_y_coord)
+        #     x_diff = gate_x_coord - xAdjCoord
+        #     z = math.sqrt(math.pow(y_diff, 2) + math.pow(x_diff, 2))
+        #     try:
+        #         angel2gate = math.acos(float(x_diff) / z)
+        #     except:
+        #         print ("exception point with x:{0} and y:{1}".format(str(xAdjCoord), str(yAdjCoord)))
+        #         angel2gate = math.pi
+        #     scale_angel2gate = float(angel2gate - features_mean[feature]) / features_scale[feature]
+        #     state.append(scale_angel2gate)
         elif feature == 'home':
             if is_home:
                 scale_home = float(1 - features_mean['home']) / features_scale['home']
