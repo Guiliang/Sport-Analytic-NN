@@ -189,6 +189,7 @@ def get_together_training_batch(s_t0, state_input, reward, train_number, train_l
             trace_length_index_t0 = s_length_t0 - 1
             r_t0 = np.asarray([s_reward_t0[trace_length_index_t0]])
             r_t1 = np.asarray([s_reward_t1[trace_length_index_t1]])
+	    print 'terminating'
             if r_t0 == [float(0)]:
                 r_t0_combine = [float(0), float(0), float(0)]
                 batch_return.append(

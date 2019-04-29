@@ -1,3 +1,7 @@
+import sys
+print sys.path
+sys.path.append('/Local-Scratch/PycharmProjects/Sport-Analytic-NN/')
+
 import os
 os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 import tensorflow as tf
@@ -9,7 +13,7 @@ from td_three_prediction_two_tower_lstm_v_correct_dir.support.data_processing_to
     compromise_state_trace_length, \
     get_together_training_batch, write_game_average_csv
 
-tt_lstm_config_path = "./soccer-config.yaml"
+tt_lstm_config_path = "../soccer-config.yaml"
 tt_lstm_config = TTLSTMCongfig.load(tt_lstm_config_path)
 
 LOG_DIR = tt_lstm_config.learn.save_mother_dir + "/oschulte/Galen/soccer-models/hybrid_sl_log_NN/Scale-tt-three-cut_together_log_train_feature" + str(
@@ -26,7 +30,7 @@ SAVED_NETWORK = tt_lstm_config.learn.save_mother_dir + "/oschulte/Galen/soccer-m
     tt_lstm_config.learn.learning_rate) + "_" + str(
     tt_lstm_config.learn.model_type) + tt_lstm_config.learn.if_correct_velocity + "_MaxTL" + str(
     tt_lstm_config.learn.max_trace_length)
-DATA_STORE = "/cs/oschulte/miyunLuo/Documents/data/"
+DATA_STORE = "/cs/oschulte/Galen/Soccer-data/"
 
 DIR_GAMES_ALL = os.listdir(DATA_STORE)
 number_of_total_game = len(DIR_GAMES_ALL)
@@ -68,7 +72,8 @@ def train_network(sess, model, print_parameters=False):
             converge_flag = True
         for dir_game in DIR_GAMES_ALL:
 
-            if checkpoint and checkpoint.model_checkpoint_path:
+            if tt_lstm_config.learn.model_train_continue:
+	    #if checkpoint and checkpoint.model_checkpoint_path:
                 if tt_lstm_config.learn.model_train_continue:  # go the check point data
                     game_starting_point += 1
                     if game_number_checkpoint + 1 > game_starting_point:
@@ -113,6 +118,7 @@ def train_network(sess, model, print_parameters=False):
                 raise Exception('state length does not equal to reward length')
 
             train_len = len(state_input)
+	    print train_len
             train_number = 0
             s_t0 = state_input[train_number]
             train_number += 1
@@ -201,8 +207,11 @@ def train_network(sess, model, print_parameters=False):
                 #     print ("cost of the network is" + str(cost_out))
 
                 if terminal:
+		    print 'game{0} finishing'.format(str(game_number))
+	            if (game_number-1)%1000==0:
                     # save progress after a game
-                    saver.save(sess, SAVED_NETWORK + '/' + tt_lstm_config.learn.sport + '-game-',
+		        print 'saving game', game_number
+                    	saver.save(sess, SAVED_NETWORK + '/' + tt_lstm_config.learn.sport + '-game-',
                                global_step=game_number)
                     v_diff_record_average = sum(v_diff_record) / len(v_diff_record)
                     game_diff_record_dict.update({dir_game: v_diff_record_average})
