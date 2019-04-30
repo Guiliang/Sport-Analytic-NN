@@ -70,7 +70,7 @@ def padding_hybrid_reward(hybrid_reward):
 
 def get_game_time(data_path, directory):
     with open(data_path + str(directory)) as f:
-        data = json.load(f)[0]
+        data = json.load(f)
     # print "game time is:" + str(data.get('gameDate'))
     events = data.get('events')
     time_all = 95
@@ -90,7 +90,7 @@ def get_soccer_game_data(data_store, dir_game, config):
     for filename in game_files:
         if "reward" in filename:
             reward_name = filename
-        elif "state_add" in filename:
+        elif "state" in filename:
             state_input_name = filename
         elif "trace" in filename:
             state_trace_length_name = filename
@@ -337,7 +337,7 @@ def construct_simulation_data(features_train, features_mean, features_scale,
             scale_event_outcome = float(1 - features_mean[feature]) / features_scale[feature]
             state.append(scale_event_outcome)
         elif feature == 'outcome':
-            scale_event_outcome = float(0 - features_mean[feature]) / features_scale[feature]
+            scale_event_outcome = float(0.5 - features_mean[feature]) / features_scale[feature]
             state.append(scale_event_outcome)
         # elif feature == 'angel2gate' or feature == 'angle': # TODO: temporally ignore angle
         #     xAdjCoord = set_dict.get('xAdjCoord')

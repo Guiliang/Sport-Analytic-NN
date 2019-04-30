@@ -4,7 +4,7 @@ from td_three_prediction_two_tower_lstm_v_correct_dir.nn_structure import td_tt_
 from td_three_prediction_two_tower_lstm_v_correct_dir.config.tt_lstm_config import TTLSTMCongfig
 from td_three_prediction_two_tower_lstm_v_correct_dir.support.data_processing_tools import \
     start_lstm_generate_spatial_simulation
-from td_three_prediction_two_tower_lstm_v_correct_dir.support.plot_tools import nn_simulation,read_plot_model
+from td_three_prediction_two_tower_lstm_v_correct_dir.support.plot_tools import nn_simulation, read_plot_model
 
 if __name__ == '__main__':
     tt_lstm_config_path = "../soccer-config.yaml"
@@ -26,6 +26,7 @@ if __name__ == '__main__':
     elif learning_rate == 1e-4:
         learning_rate_write = 4
     if_correct_velocity = tt_lstm_config.learn.if_correct_velocity
+    # action_type = 'standard_shot'
     action_type = 'simple-pass'
     simulation_type = 'soccer_spatial_simulation'
     data_simulation_dir = '../simulated_data/'
@@ -114,9 +115,10 @@ if __name__ == '__main__':
                       model_path=saved_network_path,
                       model_nn=model_nn,
                       history_action_type=history_action_type[:data_index],
-                      action_type=action_type[:data_index],
+                      action_type=action_type,
                       sess_nn=sess_nn,
                       nn_save_image_dir=nn_image_save_dir,
-                      nn_half_save_image_dir=nn_half_image_save_dir)
+                      nn_half_save_image_dir=nn_half_image_save_dir,
+                      sport='soccer')
         image_blending(nn_image_save_dir, blend_image_save_dir, nn_half_image_save_dir, blend_half_image_save_dir,
-                       background_image_dir="../resource/soccer-field.png")
+                       background_image_dir="../resource/soccer-field.png", sport='soccer')

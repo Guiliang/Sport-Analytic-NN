@@ -8,22 +8,39 @@ from td_three_prediction_two_tower_lstm_v_correct_dir.support.data_processing_to
 from td_three_prediction_two_tower_lstm_v_correct_dir.support.data_processing_tools import get_soccer_game_data
 
 
-def image_blending(value_Img_dir, save_dir, value_Img_half_dir, half_save_dir, background_image_dir):
+def image_blending(value_Img_dir, save_dir, value_Img_half_dir, half_save_dir, background_image_dir,
+                   sport='ice-hockey'):
     value_Img = cv2.imread(
         value_Img_dir)
     value_Img_half = cv2.imread(
         value_Img_half_dir)
-    background = cv2.imread("../resource/hockey-field.png")
+    # background = cv2.imread("../resource/hockey-field.png")
     background = cv2.imread(background_image_dir)
     # v_rows, v_cols, v_channels = value_Img.shape
     # v_h_rows, v_h_cols, v_h_channels = value_Img_half.shape
-
-    focus_Img = value_Img[60:540, 188:1118]
+    print sport
+    if sport == 'soccer':
+        image_y = [66, 539]
+        image_x = [120, 750]
+        image_h_y = [134, 1079]
+        image_h_x = [190, 11356]
+        background_half = [470, 944]
+    elif sport == 'ice-hockey':
+        image_y = [60, 540]
+        image_x = [188, 1118]
+        image_h_y = [120, 1090]
+        image_h_x = [190, 1125]
+        background_half = [899, 1798]
+    else:
+        raise ValueError("unknown sport")
+    focus_Img = value_Img[image_y[0]:image_y[1], image_x[0]:image_x[1]]
+    # cv2.imshow('res', focus_Img)
+    # cv2.waitKey(0)
     f_rows, f_cols, f_channels = focus_Img.shape
     focus_background = cv2.resize(background, (f_cols, f_rows), interpolation=cv2.INTER_CUBIC)
     blend_focus = cv2.addWeighted(focus_Img, 1, focus_background, 0.5, -255 / 2)
     blend_all = value_Img
-    blend_all[60:540, 188:1118] = blend_focus
+    blend_all[image_y[0]:image_y[1], image_x[0]:image_x[1]] = blend_focus
     # final_rows = v_rows * float(b_rows) / float(f_rows)
     # final_cols = v_cols * float(b_cols) / float(f_cols)
     # blend_all_final = cv2.resize(blend_all, (int(final_cols), int(final_rows)), interpolation=cv2.INTER_CUBIC)
@@ -31,12 +48,15 @@ def image_blending(value_Img_dir, save_dir, value_Img_half_dir, half_save_dir, b
     # cv2.waitKey(0)
     cv2.imwrite(save_dir, blend_all)
 
-    focus_Img_half = value_Img_half[120:1090, 190:1125]
+    focus_Img_half = value_Img_half[image_h_y[0]:image_h_y[1], image_h_x[0]:image_h_x[1]]
+    # cv2.imshow('res', focus_Img_half)
+    # cv2.waitKey(0)
     f_h_rows, f_h_cols, f_h_channels = focus_Img_half.shape
-    focus_background_half = cv2.resize(background[:, 899:1798, :], (f_h_cols, f_h_rows), interpolation=cv2.INTER_CUBIC)
+    focus_background_half = cv2.resize(background[:, background_half[0]:background_half[1], :], (f_h_cols, f_h_rows),
+                                       interpolation=cv2.INTER_CUBIC)
     blend_half_focus = cv2.addWeighted(focus_Img_half, 1, focus_background_half, 0.5, -255 / 2)
     blend_half_all = value_Img_half
-    blend_half_all[120:1090, 190:1125] = blend_half_focus
+    blend_half_all[image_h_y[0]:image_h_y[1], image_h_x[0]:image_h_x[1]] = blend_half_focus
     cv2.imwrite(half_save_dir, blend_half_all)
 
 
@@ -81,8 +101,8 @@ def nn_simulation(simulate_data,
                   sess_nn,
                   nn_save_image_dir,
                   nn_half_save_image_dir,
-                  draw_target='Q_home'):
-
+                  draw_target='Q_home',
+                  sport='ice-hockey'):
     value_spatial_home = []
     value_spatial_away = []
     # value_spatial_home_dict_list = []
@@ -101,21 +121,15 @@ def nn_simulation(simulate_data,
                        model_nn.trace_lengths_ph: trace_length,
                        model_nn.home_away_indicator_ph: home_away_indicator})
 
-        # y_coord = -42.5 + y_count
-        # y_count += float(85) / float(simulate_data.shape[0] - 1)
-
-        # for x_coord in np.linspace(-100.0, 100.0, x_coord_states.shape[0]):
-        #     readout_x_label = 0 + float(x_coord_states.shape[0] - 1) / 200 * (x_coord + 100)
-        #     value_spatial_home_dict_list.append(
-        #         {'x_coord': x_coord, 'y_coord': y_coord, 'q_home': readout_x_coord_values[int(readout_x_label), 0]})
-        #     value_spatial_away_dict_list.append(
-        #         {'x_coord': x_coord, 'y_coord': y_coord, 'q_home': readout_x_coord_values[int(readout_x_label), 1]})
-
         value_spatial_home.append((readout_x_coord_values[:, 0]).tolist())
         value_spatial_away.append((readout_x_coord_values[:, 1]).tolist())
 
-    # value_spatial_home_df = pd.DataFrame(value_spatial_home_dict_list)
-    # value_spatial_away_df = pd.DataFrame(value_spatial_away_dict_list)
+    if sport == 'ice-hockey':
+        half_x = [200, 402]
+    elif sport == 'soccer':
+        half_x = [100, 200]
+    else:
+        raise ValueError('unknown sport')
 
     if draw_target == "Q_home":
         value_spatial = value_spatial_home
@@ -137,39 +151,38 @@ def nn_simulation(simulate_data,
         raise ValueError("wrong type of DRAW_TARGET")
 
     print "heat map"
-    plt.figure(figsize=(15, 6))
+    plt.figure(figsize=(10, 6))
     sns.set(font_scale=1.6)
     ax = sns.heatmap(value_spatial, xticklabels=False, yticklabels=False,
                      cmap="RdYlBu_r",
                      vmin=vmin_set,
                      vmax=vmax_set)
+    # plt.show()
     # plt.xlabel('XAdjcoord', fontsize=18)
     # plt.ylabel('YAdjcoord', fontsize=18)
     if len(history_action_type) != 0:
-
-        plt.title("PT-LSTM {2} for {0}\n with history:{1} on right rink"
+        plt.title("{2} for {0}\n with history:{1}"
                   .format(action_type, str(history_action_type), draw_target), fontsize=30)
     elif len(history_action_type) == 0:
-        plt.title("PT-LSTM {1} for {0} without history".format(action_type, draw_target), fontsize=20)
+        plt.title("{1} for {0}".format(action_type, draw_target), fontsize=20)
     else:
         raise ValueError("undefined HIS_ACTION_TYPE{0}:".format(history_action_type))
 
     plt.savefig(nn_save_image_dir)
 
-    value_spatial_home_half = [v[200:402] for v in value_spatial]
+    value_spatial_home_half = [v[half_x[0]:half_x[1]] for v in value_spatial]
     plt.figure(figsize=(15, 12))
-    sns.set()
+    sns.set(font_scale=2.5)
     ax = sns.heatmap(value_spatial_home_half, xticklabels=False, yticklabels=False,
                      cmap="RdYlBu_r", vmin=vmin_set,
                      vmax=vmax_set)
     # plt.xlabel('XAdjcoord', fontsize=26)
     # plt.ylabel('YAdjcoord', fontsize=26)
     if len(history_action_type) != 0:
-        plt.title("PT-LSTM {2} for {0}\n with history:{1} on right rink".format(action_type, str(history_action_type),
-                                                                                draw_target),
-                  fontsize=30)
+        plt.title("{2} for {0}\n with history:{1}".format(action_type, str(history_action_type),
+                                                                        draw_target), fontsize=30)
     elif len(history_action_type) == 0:
-        plt.title("PT-LSTM {2} for {0}\n with history:{1} on right rink".format(action_type, "[]", draw_target),
+        plt.title("{2} for {0}".format(action_type, "[]", draw_target),
                   fontsize=30)
     else:
         raise ValueError("undefined HIS_ACTION_TYPE{0}:".format(history_action_type))

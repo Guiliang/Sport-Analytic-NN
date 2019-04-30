@@ -11,8 +11,8 @@ from td_three_prediction_two_tower_lstm_v_correct_dir.nn_structure.td_tt_lstm im
 from td_three_prediction_two_tower_lstm_v_correct_dir.support.plot_tools import compute_game_values, read_plot_model
 
 if __name__ == '__main__':
-    data_path = "/cs/oschulte/soccer-data/sequences/"
-    data_store_dir = "/cs/oschulte/miyunLuo/Documents/data/"
+    data_path = "/cs/oschulte/soccer-data/sequences_append_goal/"
+    data_store_dir = "/cs/oschulte/Galen/Soccer-data/"
     # tt_lstm_config_path = '../icehockey-config.yaml'
     tt_lstm_config_path = "../soccer-config.yaml"
     home_team = 'Home'
