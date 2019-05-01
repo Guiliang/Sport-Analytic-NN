@@ -337,7 +337,7 @@ def construct_simulation_data(features_train, features_mean, features_scale,
             scale_event_outcome = float(1 - features_mean[feature]) / features_scale[feature]
             state.append(scale_event_outcome)
         elif feature == 'outcome':
-            scale_event_outcome = float(0.5 - features_mean[feature]) / features_scale[feature]
+            scale_event_outcome = float(1 - features_mean[feature]) / features_scale[feature]
             state.append(scale_event_outcome)
         # elif feature == 'angel2gate' or feature == 'angle': # TODO: temporally ignore angle
         #     xAdjCoord = set_dict.get('xAdjCoord')

@@ -16,7 +16,7 @@ def find_icehockey_target_data(directory, data_path):
         action_nex = event_nex['name'][0][0][0].encode('utf-8')
         outcome_nex = event_nex['outcome'][0][0][0].encode('utf-8')
         team_nex = event_nex['teamId'][0][0][0].encode('utf-8')
-        if action == 'shot':
+        if action == 'goal':
             print 'action:{0}, outcome:{1}, team:{2}'.format(action, outcome, team)
             print 'action_nex:{0}, outcome_nex:{1}, team:{2}\\'.format(action_nex, outcome_nex, team_nex)
     print 'ok'
@@ -24,7 +24,7 @@ def find_icehockey_target_data(directory, data_path):
 
 def find_soccer_target_data(directory, data_path):
     with open(data_path + str(directory)) as f:
-        data = json.load(f)[0]
+        data = json.load(f)
     # print "game time is:" + str(data.get('gameDate'))
     events = data.get('events')
     number = 0
@@ -34,7 +34,9 @@ def find_soccer_target_data(directory, data_path):
         y = str(event.get('y'))
         action = str(event.get('action'))
         outcome = str(event.get('outcome'))
-        if 'shot' in action:
+        h_a = str(event.get('home_away'))
+        if action == 'goal':
+            print  'team'+h_a
             print "x:{0}, y:{1}, action:{2}, reward:{3}, event_number:{4},outcome:{5}".format(x, y, action, str(reward),
                                                                                               str(number), outcome)
         number += 1
@@ -51,19 +53,33 @@ def read_training_data(data_store, dir_game):
 
 
 def check_soccer_data():
-    data_path = "/cs/oschulte/soccer-data/sequences/"
-    train_data_path = "/cs/oschulte/miyunLuo/Documents/data/"
+    data_path = "/cs/oschulte/soccer-data/sequences_append_goal/"
+    # train_data_path = "/cs/oschulte/miyunLuo/Documents/data/"
     dir_all = os.listdir(data_path)
-
     for dir in dir_all:
         # read_training_data(train_data_path, dir.split('.')[0])
         find_soccer_target_data(dir, data_path)
-        break
+        # break
+
+
+def find_events_with_idx():
+    idxs = [1787, 1788, 1789]
+    game_dir = "922070.json"
+    train_data_path = "/cs/oschulte/soccer-data/sequences_append_goal/"
+    with open(train_data_path + str(game_dir)) as f:
+        data = json.load(f)
+    events = data.get('events')
+    event_found = [events[idx] for idx in idxs]
+    for event in event_found:
+        print event
 
 
 if __name__ == '__main__':
-    data_path = "/cs/oschulte/Galen/Hockey-data-entire/Hockey-Match-All-data/"
-    dir_all = os.listdir(data_path)
-
-    for dir in dir_all:
-        find_icehockey_target_data(dir, data_path)
+    # check_soccer_data()
+    find_events_with_idx()
+    # check_soccer_data()
+    # data_path = "/cs/oschulte/Galen/Hockey-data-entire/Hockey-Match-All-data/"
+    # dir_all = os.listdir(data_path)
+    #
+    # for dir in dir_all:
+    #     find_icehockey_target_data(dir, data_path)

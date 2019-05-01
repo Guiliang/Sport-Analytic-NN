@@ -1,8 +1,10 @@
 import sys
+
 print sys.path
 sys.path.append('/Local-Scratch/PycharmProjects/Sport-Analytic-NN/')
 
 import os
+
 os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 import tensorflow as tf
 import scipy.io as sio
@@ -73,7 +75,7 @@ def train_network(sess, model, print_parameters=False):
         for dir_game in DIR_GAMES_ALL:
 
             if tt_lstm_config.learn.model_train_continue:
-	    #if checkpoint and checkpoint.model_checkpoint_path:
+                # if checkpoint and checkpoint.model_checkpoint_path:
                 if tt_lstm_config.learn.model_train_continue:  # go the check point data
                     game_starting_point += 1
                     if game_number_checkpoint + 1 > game_starting_point:
@@ -118,7 +120,7 @@ def train_network(sess, model, print_parameters=False):
                 raise Exception('state length does not equal to reward length')
 
             train_len = len(state_input)
-	    print train_len
+            print train_len
             train_number = 0
             s_t0 = state_input[train_number]
             train_number += 1
@@ -207,12 +209,12 @@ def train_network(sess, model, print_parameters=False):
                 #     print ("cost of the network is" + str(cost_out))
 
                 if terminal:
-		    print 'game{0} finishing'.format(str(game_number))
-	            if (game_number-1)%1000==0:
-                    # save progress after a game
-		        print 'saving game', game_number
-                    	saver.save(sess, SAVED_NETWORK + '/' + tt_lstm_config.learn.sport + '-game-',
-                               global_step=game_number)
+                    print 'game{0} finishing'.format(str(game_number))
+                    if (game_number - 1) % 1000 == 0:
+                        # save progress after a game
+                        print 'saving game', game_number
+                        saver.save(sess, SAVED_NETWORK + '/' + tt_lstm_config.learn.sport + '-game-',
+                                   global_step=game_number)
                     v_diff_record_average = sum(v_diff_record) / len(v_diff_record)
                     game_diff_record_dict.update({dir_game: v_diff_record_average})
                     break

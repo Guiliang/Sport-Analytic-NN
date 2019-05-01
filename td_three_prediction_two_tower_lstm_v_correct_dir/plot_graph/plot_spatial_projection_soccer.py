@@ -5,8 +5,10 @@ from td_three_prediction_two_tower_lstm_v_correct_dir.config.tt_lstm_config impo
 from td_three_prediction_two_tower_lstm_v_correct_dir.support.data_processing_tools import \
     start_lstm_generate_spatial_simulation
 from td_three_prediction_two_tower_lstm_v_correct_dir.support.plot_tools import nn_simulation, read_plot_model
+from td_three_prediction_two_tower_lstm_v_correct_dir.config.soccer_feature_setting import select_feature_setting
 
 if __name__ == '__main__':
+    features_train, features_mean_dic, features_scale_dic, actions = select_feature_setting(5)
     tt_lstm_config_path = "../soccer-config.yaml"
     tt_lstm_config = TTLSTMCongfig.load(tt_lstm_config_path)
     # history_action_type = ['reception', 'pass', 'reception']
@@ -26,8 +28,8 @@ if __name__ == '__main__':
     elif learning_rate == 1e-4:
         learning_rate_write = 4
     if_correct_velocity = tt_lstm_config.learn.if_correct_velocity
-    # action_type = 'standard_shot'
-    action_type = 'simple-pass'
+    actions = ['goal']
+    # action_type = 'simple-pass'
     simulation_type = 'soccer_spatial_simulation'
     data_simulation_dir = '../simulated_data/'
     draw_target = 'Q_home'
@@ -37,17 +39,6 @@ if __name__ == '__main__':
         diff_str = "_diff"
     else:
         diff_str = ""
-
-    simulated_data_all = start_lstm_generate_spatial_simulation(history_action_type=history_action_type,
-                                                                history_action_type_coord=history_action_type_coord,
-                                                                action_type=action_type,
-                                                                data_simulation_dir=data_simulation_dir,
-                                                                simulation_type=simulation_type,
-                                                                feature_type=feature_type,
-                                                                features_num=tt_lstm_config.learn.feature_number,
-                                                                max_trace_length=tt_lstm_config.learn.max_trace_length,
-                                                                sports='soccer'
-                                                                )
 
     sess_nn = tf.InteractiveSession()
 
@@ -87,38 +78,51 @@ if __name__ == '__main__':
 
     read_plot_model(sess_nn, saved_network_path)
 
-    for data_index in range(0, len(simulated_data_all)):
-        nn_image_save_dir = "./soccer-image/{7} {0}-{1} with Dynamic LSTM feature{2}_batch{3}_iterate{4}_lr{5}_{6}{8}{9}.png". \
-            format(
-            action_type, str(history_action_type[:data_index]), str(feature_type), str(batch_size),
-            str(iterate_num),
-            str(learning_rate),
-            str(model_type), draw_target, if_correct_velocity, diff_str)
-        nn_half_image_save_dir = "./soccer-image/right half {7} {0}-{1} with Dynamic LSTM feature{2}_batch{3}_iterate{4}_lr{5}_{6}{8}{9}.png".format(
-            action_type, str(history_action_type[:data_index]), str(feature_type), str(batch_size),
-            str(iterate_num),
-            str(learning_rate),
-            str(model_type), draw_target, if_correct_velocity, diff_str)
-        blend_image_save_dir = "./soccer-image/blend {7} {0}-{1} with Dynamic LSTM feature{2}_batch{3}_iterate{4}_lr{5}_{6}{8}{9}.png".format(
-            action_type, str(history_action_type[:data_index]), str(feature_type), str(batch_size),
-            str(iterate_num),
-            str(learning_rate),
-            str(model_type), draw_target, if_correct_velocity, diff_str)
-        blend_half_image_save_dir = "./soccer-image/blend right half {7} {0}-{1} with Dynamic LSTM feature{2}_batch{3}_iterate{4}_lr{5}_{6}{8}{9}.png".format(
-            action_type, str(history_action_type[:data_index]), str(feature_type), str(batch_size),
-            str(iterate_num),
-            str(learning_rate),
-            str(model_type), draw_target, if_correct_velocity, diff_str)
+    for action in actions:
+        action_type = action
+        simulated_data_all = start_lstm_generate_spatial_simulation(history_action_type=history_action_type,
+                                                                    history_action_type_coord=history_action_type_coord,
+                                                                    action_type=action_type,
+                                                                    data_simulation_dir=data_simulation_dir,
+                                                                    simulation_type=simulation_type,
+                                                                    feature_type=feature_type,
+                                                                    features_num=tt_lstm_config.learn.feature_number,
+                                                                    max_trace_length=tt_lstm_config.learn.max_trace_length,
+                                                                    sports='soccer'
+                                                                    )
 
-        simulate_data = simulated_data_all[data_index]
-        nn_simulation(simulate_data=simulate_data,
-                      model_path=saved_network_path,
-                      model_nn=model_nn,
-                      history_action_type=history_action_type[:data_index],
-                      action_type=action_type,
-                      sess_nn=sess_nn,
-                      nn_save_image_dir=nn_image_save_dir,
-                      nn_half_save_image_dir=nn_half_image_save_dir,
-                      sport='soccer')
-        image_blending(nn_image_save_dir, blend_image_save_dir, nn_half_image_save_dir, blend_half_image_save_dir,
-                       background_image_dir="../resource/soccer-field.png", sport='soccer')
+        for data_index in range(0, len(simulated_data_all)):
+            nn_image_save_dir = "./soccer-image/{7} {0}-{1} with Dynamic LSTM feature{2}_batch{3}_iterate{4}_lr{5}_{6}{8}{9}.png". \
+                format(
+                action_type, str(history_action_type[:data_index]), str(feature_type), str(batch_size),
+                str(iterate_num),
+                str(learning_rate),
+                str(model_type), draw_target, if_correct_velocity, diff_str)
+            nn_half_image_save_dir = "./soccer-image/right half {7} {0}-{1} with Dynamic LSTM feature{2}_batch{3}_iterate{4}_lr{5}_{6}{8}{9}.png".format(
+                action_type, str(history_action_type[:data_index]), str(feature_type), str(batch_size),
+                str(iterate_num),
+                str(learning_rate),
+                str(model_type), draw_target, if_correct_velocity, diff_str)
+            blend_image_save_dir = "./soccer-image/blend {7} {0}-{1} with Dynamic LSTM feature{2}_batch{3}_iterate{4}_lr{5}_{6}{8}{9}.png".format(
+                action_type, str(history_action_type[:data_index]), str(feature_type), str(batch_size),
+                str(iterate_num),
+                str(learning_rate),
+                str(model_type), draw_target, if_correct_velocity, diff_str)
+            blend_half_image_save_dir = "./soccer-image/blend right half {7} {0}-{1} with Dynamic LSTM feature{2}_batch{3}_iterate{4}_lr{5}_{6}{8}{9}.png".format(
+                action_type, str(history_action_type[:data_index]), str(feature_type), str(batch_size),
+                str(iterate_num),
+                str(learning_rate),
+                str(model_type), draw_target, if_correct_velocity, diff_str)
+
+            simulate_data = simulated_data_all[data_index]
+            nn_simulation(simulate_data=simulate_data,
+                          model_path=saved_network_path,
+                          model_nn=model_nn,
+                          history_action_type=history_action_type[:data_index],
+                          action_type=action_type,
+                          sess_nn=sess_nn,
+                          nn_save_image_dir=nn_image_save_dir,
+                          nn_half_save_image_dir=nn_half_image_save_dir,
+                          sport='soccer')
+            image_blending(nn_image_save_dir, blend_image_save_dir, nn_half_image_save_dir, blend_half_image_save_dir,
+                           background_image_dir="../resource/soccer-field.png", sport='soccer')

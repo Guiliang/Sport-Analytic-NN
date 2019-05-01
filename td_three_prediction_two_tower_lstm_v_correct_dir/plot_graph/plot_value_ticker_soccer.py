@@ -17,9 +17,9 @@ if __name__ == '__main__':
     tt_lstm_config_path = "../soccer-config.yaml"
     home_team = 'Home'
     away_team = 'Away'
-    target_game_id = str(922075)
     # 919164
-    dir_all = os.listdir(data_path)
+    # dir_all = os.listdir(data_path)
+    dir_all = ['922070.json']
     # find_soccer_game_dir_by_team(dir_all, data_path)
     # game_name_dir = find_game_dir(dir_all, data_path, target_game_id, sports='Soccer')
     # game_name_dir = '922075'
@@ -71,6 +71,12 @@ if __name__ == '__main__':
                                          dir_game=game_name,
                                          config=tt_lstm_config,
                                          sport='Soccer')
+        for value_index in range(0, len(game_value)):
+
+            if game_value[value_index][1] > 0.9:
+                print value_index
+
+
         # data_name = "model_three_cut_together_predict_Feature{0}_Iter{1}_lr{2}_Batch{3}_MaxLength{4}_Type{5}_v_correct_". \
         #     format(str(tt_lstm_config.learn.feature_type),
         #            str(tt_lstm_config.learn.iterate_num),
@@ -89,5 +95,5 @@ if __name__ == '__main__':
                                                                                normalize_data=normalize_data,
                                                                                home_team=home_team,
                                                                                away_team=away_team)
-        break
+        # break
         # print_mark_info(data_store_dir, game_name_dir, home_max_index, away_max_index, home_maxs, away_maxs)

@@ -21,9 +21,9 @@ def image_blending(value_Img_dir, save_dir, value_Img_half_dir, half_save_dir, b
     print sport
     if sport == 'soccer':
         image_y = [66, 539]
-        image_x = [120, 750]
+        image_x = [138, 902]
         image_h_y = [134, 1079]
-        image_h_x = [190, 11356]
+        image_h_x = [190, 1148]
         background_half = [470, 944]
     elif sport == 'ice-hockey':
         image_y = [60, 540]
@@ -151,7 +151,7 @@ def nn_simulation(simulate_data,
         raise ValueError("wrong type of DRAW_TARGET")
 
     print "heat map"
-    plt.figure(figsize=(10, 6))
+    plt.figure(figsize=(12, 6))
     sns.set(font_scale=1.6)
     ax = sns.heatmap(value_spatial, xticklabels=False, yticklabels=False,
                      cmap="RdYlBu_r",
