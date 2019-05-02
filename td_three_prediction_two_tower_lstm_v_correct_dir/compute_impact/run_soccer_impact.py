@@ -60,7 +60,7 @@ def compute_values_for_all_games(config, data_store_dir, dir_all):
 
 if __name__ == '__main__':
     data_path = "/cs/oschulte/soccer-data/sequences_append_goal/"
-    soccer_data_store_dir = "/cs/oschulte/miyunLuo/Documents/data/"
+    soccer_data_store_dir = "/cs/oschulte/Galen/Soccer-data/"
     # tt_lstm_config_path = '../icehockey-config.yaml'
     tt_lstm_config_path = "../soccer-config.yaml"
     soccer_dir_all = os.listdir(data_path)

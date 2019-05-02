@@ -210,7 +210,7 @@ def train_network(sess, model, print_parameters=False):
 
                 if terminal:
                     print 'game{0} finishing'.format(str(game_number))
-                    if (game_number - 1) % 1000 == 0:
+                    if (game_number - 1) % 5000 == 0:
                         # save progress after a game
                         print 'saving game', game_number
                         saver.save(sess, SAVED_NETWORK + '/' + tt_lstm_config.learn.sport + '-game-',
