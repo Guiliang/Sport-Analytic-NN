@@ -7,3 +7,4 @@ td_three_prediction_two_tower_lstm_v_correct_dir/plot_graph/soccer-image/
 *.mat
 td_three_prediction_two_tower_lstm_v_correct_dir/simulated_data/
 *.pyc
+*.out
