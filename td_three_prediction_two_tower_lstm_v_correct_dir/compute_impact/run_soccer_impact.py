@@ -1,5 +1,6 @@
 import scipy.io as sio
 import os
+import json
 import tensorflow as tf
 import numpy as np
 from td_three_prediction_two_tower_lstm_v_correct_dir.config.tt_lstm_config import TTLSTMCongfig
@@ -53,9 +54,17 @@ def compute_values_for_all_games(config, data_store_dir, dir_all):
                                           dir_game=game_name,
                                           config=tt_lstm_config,
                                           sport='Soccer')
+        model_value_json = {}
+        for value_index in range(0, len(model_value)):
+            model_value_json.update({value_index: {'home': model_value[value_index][0],
+                                                   'away': model_value[value_index][1],
+                                                   'end': model_value[value_index][2]}})
 
-        sio.savemat(data_store_dir + "/" + game_name_dir + "/" + data_name,
-                    {'model_value': np.asarray(model_value)})
+        with open(data_store_dir + "/" + game_name_dir + "/" + data_name, 'w') as outfile:
+            json.dump(model_value_json, outfile)
+
+        # sio.savemat(data_store_dir + "/" + game_name_dir + "/" + data_name,
+        #             {'model_value': np.asarray(model_value)})
 
 
 if __name__ == '__main__':
