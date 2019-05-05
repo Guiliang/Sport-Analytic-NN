@@ -11,6 +11,7 @@ import numpy as np
 from td_three_prediction_two_tower_lstm_v_correct_dir.config.tt_lstm_config import TTLSTMCongfig
 from td_three_prediction_two_tower_lstm_v_correct_dir.nn_structure.td_tt_lstm import td_prediction_tt_embed
 from td_three_prediction_two_tower_lstm_v_correct_dir.support.plot_tools import compute_game_values, read_plot_model
+from td_three_prediction_two_tower_lstm_v_correct_dir.compute_impact.player_impact import PlayerImpact
 
 
 def compute_values_for_all_games(config, data_store_dir, dir_all):
@@ -64,13 +65,22 @@ def compute_values_for_all_games(config, data_store_dir, dir_all):
             model_value_json.update({value_index: {'home': float(model_value[value_index][0]),
                                                    'away': float(model_value[value_index][1]),
                                                    'end': float(model_value[value_index][2])}})
-	
-	game_store_dir = game_name_dir.split('.')[0]
+
+        game_store_dir = game_name_dir.split('.')[0]
         with open(data_store_dir + "/" + game_store_dir + "/" + data_name, 'w') as outfile:
             json.dump(model_value_json, outfile)
 
-        # sio.savemat(data_store_dir + "/" + game_name_dir + "/" + data_name,
-        #             {'model_value': np.asarray(model_value)})
+            # sio.savemat(data_store_dir + "/" + game_name_dir + "/" + data_name,
+            #             {'model_value': np.asarray(model_value)})
+    return data_name
+
+
+def compute_impact(soccer_data_store_dir, data_name):
+    PI = PlayerImpact(data_name=data_name, model_data_store_dir=soccer_data_store_dir)
+    dir_all = os.listdir(soccer_data_store_dir)
+    for game_name_dir in dir_all:
+        PI.aggregate_match_diff_values(game_name_dir)
+    PI.save_player_imapct()
 
 
 if __name__ == '__main__':
@@ -87,4 +97,6 @@ if __name__ == '__main__':
     elif learning_rate == 1e-4:
         learning_rate_write = 4
 
-    compute_values_for_all_games(config=tt_lstm_config, data_store_dir=soccer_data_store_dir, dir_all=soccer_dir_all)
+    data_name = compute_values_for_all_games(config=tt_lstm_config, data_store_dir=soccer_data_store_dir,
+                                             dir_all=soccer_dir_all)
+    compute_impact(data_name=data_name, soccer_data_store_dir=soccer_data_store_dir)
