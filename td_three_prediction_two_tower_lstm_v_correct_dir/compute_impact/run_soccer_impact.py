@@ -1,3 +1,8 @@
+import sys
+
+print sys.path
+sys.path.append('/Local-Scratch/PycharmProjects/Sport-Analytic-NN/')
+
 import scipy.io as sio
 import os
 import json
@@ -56,11 +61,12 @@ def compute_values_for_all_games(config, data_store_dir, dir_all):
                                           sport='Soccer')
         model_value_json = {}
         for value_index in range(0, len(model_value)):
-            model_value_json.update({value_index: {'home': model_value[value_index][0],
-                                                   'away': model_value[value_index][1],
-                                                   'end': model_value[value_index][2]}})
-
-        with open(data_store_dir + "/" + game_name_dir + "/" + data_name, 'w') as outfile:
+            model_value_json.update({value_index: {'home': float(model_value[value_index][0]),
+                                                   'away': float(model_value[value_index][1]),
+                                                   'end': float(model_value[value_index][2])}})
+	
+	game_store_dir = game_name_dir.split('.')[0]
+        with open(data_store_dir + "/" + game_store_dir + "/" + data_name, 'w') as outfile:
             json.dump(model_value_json, outfile)
 
         # sio.savemat(data_store_dir + "/" + game_name_dir + "/" + data_name,
