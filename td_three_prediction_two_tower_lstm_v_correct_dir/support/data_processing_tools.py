@@ -76,10 +76,13 @@ def get_game_time(data_path, directory):
     time_all = 95
     game_time_all = []
     for event in events:
-        time_remain = float(event.get('gameTimeRemain'))
-        if time_all is None:
-            time_all = time_remain
-        game_time = (time_all - time_remain)
+        game_minutes = event.get('min')
+        game_seconds = event.get('sec')
+        game_time = game_minutes * 60 + game_seconds
+        # time_remain = float(event.get('gameTimeRemain'))
+        # if time_all is None:
+        #     time_all = time_remain
+        # game_time = (time_all - time_remain)
         game_time_all.append(game_time)
     game_time_all.sort(reverse=False)
     return game_time_all
@@ -189,7 +192,7 @@ def get_together_training_batch(s_t0, state_input, reward, train_number, train_l
             trace_length_index_t0 = s_length_t0 - 1
             r_t0 = np.asarray([s_reward_t0[trace_length_index_t0]])
             r_t1 = np.asarray([s_reward_t1[trace_length_index_t1]])
-	    print 'terminating'
+            print 'terminating'
             if r_t0 == [float(0)]:
                 r_t0_combine = [float(0), float(0), float(0)]
                 batch_return.append(
@@ -333,7 +336,7 @@ def construct_simulation_data(features_train, features_mean, features_scale,
         elif feature_type >= 5 and judge_feature_in_action(feature, actions):
             scale_action = float(0 - features_mean[feature]) / features_scale[feature]
             state.append(scale_action)
-        elif feature == 'event_outcome': # ignore the outcome for soccer
+        elif feature == 'event_outcome':  # ignore the outcome for soccer
             scale_event_outcome = float(1 - features_mean[feature]) / features_scale[feature]
             state.append(scale_event_outcome)
         elif feature == 'outcome':
@@ -383,7 +386,7 @@ def construct_simulation_data(features_train, features_mean, features_scale,
             distance_x = gate_x_coord - xAdjCoord
             yAdjCoord = set_dict.get('yAdjCoord')
             distance_y = abs(gate_y_coord - yAdjCoord)
-            distance_to_goal = (distance_x**2 + distance_y**2)**(1/2)
+            distance_to_goal = (distance_x ** 2 + distance_y ** 2) ** (1 / 2)
             # assert distance_y >= 0
             scale_distance_to_goal = float(distance_to_goal - features_mean[feature]) / features_scale[feature]
             state.append(scale_distance_to_goal)
@@ -505,12 +508,33 @@ def start_lstm_generate_spatial_simulation(history_action_type, history_action_t
 
 def read_feature_within_events(directory, data_path, feature_name):
     with open(data_path + str(directory)) as f:
-        data = json.load(f)[0]
+        data = json.load(f)
     events = data.get('events')
     features_all = []
     for event in events:
-        action = str(event.get(feature_name).encode('utf-8'))
-        features_all.append(action)
+        try:
+            value = str(event.get(feature_name).encode('utf-8'))
+        except:
+            value = event.get(feature_name)
+        features_all.append(value)
+
+    return features_all
+
+
+def read_features_within_events(directory, data_path, feature_name_list):
+    with open(data_path + str(directory)) as f:
+        data = json.load(f)
+    events = data.get('events')
+    features_all = []
+    for event in events:
+        feature_values = {}
+        for feature_name in feature_name_list:
+            try:
+                value = str(event.get(feature_name).encode('utf-8'))
+            except:
+                value = event.get(feature_name)
+            feature_values.update({feature_name: value})
+        features_all.append(feature_values)
 
     return features_all
 
@@ -522,7 +546,7 @@ def find_soccer_game_dir_by_team(dir_all, data_path, team="Arsenal"):
         print number
         try:
             with open(data_path + str(directory)) as f:
-                data = json.load(f)[0]
+                data = json.load(f)
         except:
             print "can't read dir {0}".format(str(directory))
             continue

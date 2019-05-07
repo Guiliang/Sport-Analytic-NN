@@ -6,19 +6,36 @@ import td_three_prediction_two_tower_lstm_v_correct_dir.support.data_processing_
 
 
 class PlayerImpact:
-    def __init__(self, data_name, model_data_store_dir, difference_type='back_difference_'):
+    def __init__(self, data_name, model_data_store_dir, game_data_dir, difference_type='back_difference_'):
         self.player_id_dict_all = {}
+        self.player_name_dict_all = {}
         # self.PLAYER_ID_DICT_ALL = {}
         self.difference_type = difference_type
         self.data_name = data_name
+        self.game_data_dir = game_data_dir
         self.model_data_store_dir = model_data_store_dir
-        pass
 
-    def save_player_imapct(self):
-        with open('./player_impact/GIM_soccer_impact.json') as f:
-            json.dump(self.player_id_dict_all, f)
+    def save_player_impact(self):
+        assert len(self.player_name_dict_all.keys()) > 0
+        with open('/Local-Scratch/PycharmProjects/Sport-Analytic-NN/'
+                  'td_three_prediction_two_tower_lstm_v_correct_dir/'
+                  'compute_impact/player_impact/soccer_player_GIM.json', 'w') as f:
+            json.dump(self.player_name_dict_all, f)
+
+    def transfer2player_name_dict(self, player_id_name_pair_dir):
+        with open(player_id_name_pair_dir, 'r') as f:
+            player_id_name_pair = json.load(f)
+
+        ids = player_id_name_pair.keys()
+        # player_name_GIM_dict = {}
+        for id in ids:
+            GIM = self.player_id_dict_all.get(id)
+            name = player_id_name_pair.get(id)
+            name_str = name.get('first_name') + ' ' + name.get('last_name')
+            self.player_name_dict_all.update({name_str: {'id': id, 'GIM': GIM}})
 
     def aggregate_match_diff_values(self, dir_game):
+        """compute impact"""
         for file_name in os.listdir(self.model_data_store_dir + "/" + dir_game):
             if file_name == self.data_name:
                 model_data_name = self.model_data_store_dir + "/" + dir_game + "/" + file_name
@@ -33,35 +50,39 @@ class PlayerImpact:
                     # teamIds = (sio.loadmat(teamIds_name))["teamId"][0]
             elif file_name.startswith("home_away"):
                 home_identifier_name = self.model_data_store_dir + "/" + dir_game + "/" + file_name
-                home_identifier = (sio.loadmat(home_identifier_name))["home_away_"][0]
+                home_identifier = (sio.loadmat(home_identifier_name))["home_away"][0]
             else:
                 continue
         # TODO: fix the names of features
-        actions = tools.read_feature_within_events(data_path=self.model_data_store_dir, directory=dir_game,
+        actions = tools.read_feature_within_events(data_path=self.game_data_dir, directory=dir_game + '.json',
                                                    feature_name='action')
-        playerIds = tools.read_feature_within_events(data_path=self.model_data_store_dir, directory=dir_game,
-                                                     feature_name='playerid')
-        teamIds = tools.read_feature_within_events(data_path=self.model_data_store_dir, directory=dir_game,
-                                                   feature_name='teamIds')
+        # print actions
+        playerIds = tools.read_feature_within_events(data_path=self.game_data_dir, directory=dir_game + '.json',
+                                                     feature_name='playerId')
+        # teamIds = tools.read_feature_within_events(data_path=self.game_data_dir, directory=dir_game+'.json',
+        #                                           feature_name='teamIds')
+        # print len(playerIds)
+        # print len(actions)
         for player_Index in range(0, len(playerIds)):
             playerId = playerIds[player_Index]
-            teamId = teamIds[player_Index]
+            # teamId = teamIds[player_Index]
             # if int(teamId_target) == int(teamId):
-            model_value = model_data[player_Index]
+            # print model_data
+            model_value = model_data[str(player_Index)]
             if player_Index - 1 >= 0:  # define model pre
                 if actions[player_Index - 1] == "goal":
-                    model_value_pre = model_data[player_Index]  # the goal cancel out here, just as we cut the game
+                    model_value_pre = model_data[str(player_Index)]  # the goal cancel out here, just as we cut the game
                 else:
-                    model_value_pre = model_data[player_Index - 1]
+                    model_value_pre = model_data[str(player_Index - 1)]
             else:
-                model_value_pre = model_data[player_Index]
-            if player_Index + 1 <= len(playerIds):  # define model next
+                model_value_pre = model_data[str(player_Index)]
+            if player_Index + 1 < len(playerIds):  # define model next
                 if actions[player_Index + 1] == "goal":
-                    model_value_nex = model_data[player_Index]
+                    model_value_nex = model_data[str(player_Index)]
                 else:
-                    model_value_nex = model_data[player_Index - 1]
+                    model_value_nex = model_data[str(player_Index + 1)]
             else:
-                model_value_nex = model_data[player_Index]
+                model_value_nex = model_data[str(player_Index)]
 
             ishome = home_identifier[player_Index]
             player_value = self.player_id_dict_all.get(playerId)

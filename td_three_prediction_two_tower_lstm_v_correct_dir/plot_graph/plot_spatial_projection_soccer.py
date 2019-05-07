@@ -28,7 +28,7 @@ if __name__ == '__main__':
     elif learning_rate == 1e-4:
         learning_rate_write = 4
     if_correct_velocity = tt_lstm_config.learn.if_correct_velocity
-    actions = ['goal']
+    # actions = ['goal']
     # action_type = 'simple-pass'
     simulation_type = 'soccer_spatial_simulation'
     data_simulation_dir = '../simulated_data/'
