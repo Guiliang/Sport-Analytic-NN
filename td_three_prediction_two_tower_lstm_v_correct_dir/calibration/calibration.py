@@ -1,27 +1,162 @@
 import os
-from td_three_prediction_two_tower_lstm_v_correct_dir.support.data_processing_tools import read_features_within_events
+from td_three_prediction_two_tower_lstm_v_correct_dir.config.tt_lstm_config import TTLSTMCongfig
+from td_three_prediction_two_tower_lstm_v_correct_dir.support.data_processing_tools import read_features_within_events, \
+    read_feature_within_events
+import json
+import math
 
 
 class Calibration:
-
-    def __init__(self, bins, data_path):
+    def __init__(self, bins, data_path, calibration_features, tt_lstm_config_path, soccer_data_store_dir):
         self.bins = bins
-        self.bins_names = bins.keys()
+        # self.bins_names = bins.keys()
         self.data_path = data_path
-        pass
+        self.calibration_features = calibration_features
+        self.calibration_values_all_dict = {}
+        self.soccer_data_store_dir = soccer_data_store_dir
+        self.tt_lstm_config = TTLSTMCongfig.load(tt_lstm_config_path)
+        # learning_rate = tt_lstm_config.learn.learning_rate
+        # pass
+
+    def recursive2construct(self, store_dict_str, depth):
+        feature_number = len(self.calibration_features)
+        if depth >= feature_number:
+            self.calibration_values_all_dict.update({store_dict_str: {'cali_sum': [0, 0, 0],
+                                                                      'model_sum': [0, 0, 0],
+                                                                      'number': 0}})
+            return
+        calibration_feature = self.calibration_features[depth]
+        feature_range = self.bins.get(calibration_feature).get('range')
+        for value in feature_range:
+            # store_dict_str = '-' + store_dict_str if len(store_dict_str) > 0 else store_dict_str
+            store_dict_str_update = store_dict_str + calibration_feature + '_' + str(value) + '-'
+            self.recursive2construct(store_dict_str_update, depth + 1)
 
     def construct_bin_dicts(self):
-        pass
+        """create calibration dict"""
+        self.recursive2construct('', 0)
+
+    def compute_calibration_values(self, actions_team_all):
+        """ground truth value for each game"""
+        pre_index = 0
+        cali_home = [0] * len(actions_team_all)
+        cali_away = [0] * len(actions_team_all)
+        cali_end = [0] * len(actions_team_all)
+        for index in range(0, len(actions_team_all)):
+            actions_team = actions_team_all[index]
+            if actions_team['action'] == 'goal':
+                if actions_team['home_away'] == 'H':
+                    cali_home[pre_index:index] = [1] * (index - pre_index)
+                elif actions_team['home_away'] == 'A':
+                    cali_away[pre_index:index] = [1] * (index - pre_index)
+                pre_index = index
+            if index == len(actions_team_all) - 1:
+                cali_end[pre_index:index] = [1] * (index - pre_index)
+        return zip(cali_home, cali_away, cali_end)
+
+    def obtain_model_prediction(self, directory):
+        """model predicted value for each game"""
+        learning_rate = self.tt_lstm_config.learn.learning_rate
+        if learning_rate == 1e-5:
+            learning_rate_write = 5
+        elif learning_rate == 1e-4:
+            learning_rate_write = 4
+        data_name = "model_three_cut_together_predict_Feature{0}_Iter{1}_lr{2}_Batch{3}_MaxLength{4}_Type{5}".format(
+            str(self.tt_lstm_config.learn.feature_type),
+            str(self.tt_lstm_config.learn.iterate_num),
+            str(learning_rate_write),
+            str(self.tt_lstm_config.learn.batch_size),
+            str(self.tt_lstm_config.learn.max_trace_length),
+            str(self.tt_lstm_config.learn.model_type))
+        with open(self.soccer_data_store_dir + "/" + directory + "/" + data_name, 'w') as outfile:
+            model_output = json.load(outfile)
+
+        return model_output
 
     def aggregate_calibration_values(self):
-
+        """update calibration dict by each game"""
         dir_all = os.listdir(self.data_path)
-        for dir in dir_all:
+        # dir_all = ['919069.json']  # TODO: test
+        # self.data_path = '/Users/liu/Desktop/'
+        for json_dir in dir_all:
             features_all = []
-            for bin_name in self.bins_names:
-                features = self.bins.get(bin_name).get('feature_name')
-                features_all.append(features)
+            for calibration_feature in self.calibration_features:
+                features = self.bins.get(calibration_feature).get('feature_name')
+                if isinstance(features, str):
+                    features_all.append(features)
+                else:
+                    for feature in features:
+                        features_all.append(feature)
 
-            features_all = read_features_within_events(feature_name_list=features_all,
-                                                       data_path=self.data_path,
-                                                       directory=dir)
+            model_values = self.obtain_model_prediction(directory=json_dir.split('.')[0])
+            # model_values = [[1, 0, 0]] * 1519  # TODO: test
+            actions_team_all = read_features_within_events(feature_name_list=['action', 'home_away'],
+                                                           data_path=self.data_path, directory=json_dir)
+            calibration_values = self.compute_calibration_values(actions_team_all)
+
+            features_values_dict_all = read_features_within_events(feature_name_list=features_all,
+                                                                   data_path=self.data_path,
+                                                                   directory=json_dir)
+            for index in range(0, len(features_values_dict_all)):
+                features_values_dict = features_values_dict_all[index]
+                cali_dict_str = ''
+                for calibration_feature in self.calibration_features:
+                    if calibration_feature == 'period':
+                        min = features_values_dict.get('min')
+                        sec = features_values_dict.get('sec')
+                        if min <= 45:
+                            value = 1
+                        else:
+                            value = 2
+                        cali_dict_str = cali_dict_str + calibration_feature + '_' + str(value) + '-'
+                    elif calibration_feature == 'score_differential':
+                        value = features_values_dict.get('scoreDiff')
+                        cali_dict_str = cali_dict_str + calibration_feature + '_' + str(value) + '-'
+                    elif calibration_feature == 'pitch':
+                        xccord = features_values_dict.get('x')
+                        if xccord <= 50:
+                            value = 'left'
+                        else:
+                            value = 'right'
+                        cali_dict_str = cali_dict_str + calibration_feature + '_' + value + '-'
+
+                    elif calibration_feature == 'manpower':
+                        value = features_values_dict.get('manPower')
+                        cali_dict_str = cali_dict_str + calibration_feature + '_' + str(value) + '-'
+                    else:
+                        raise ValueError('unknown feature' + calibration_feature)
+
+                calibration_value = calibration_values[index]
+                model_value = model_values[index]
+
+                cali_bin_info = self.calibration_values_all_dict.get(cali_dict_str)
+                assert cali_bin_info is not None
+                cali_sum = cali_bin_info.get('cali_sum')
+                model_sum = cali_bin_info.get('model_sum')
+                number = cali_bin_info.get('number')
+                number += 1
+                for i in range(3):  # [home, away,end]
+                    cali_sum[i] = cali_sum[i] + calibration_value[i]
+                    model_sum[i] = model_sum[i] + model_value[i]
+
+                self.calibration_values_all_dict.update({cali_dict_str: {'cali_sum': cali_sum,
+                                                                         'model_sum': model_sum,
+                                                                         'number': number}})
+
+    def compute_kld(self):
+        cali_dict_strs = self.calibration_values_all_dict.keys()
+        for cali_dict_str in cali_dict_strs:
+            cali_bin_info = self.calibration_values_all_dict.get(cali_dict_str)
+            kld_sum = 0
+            if cali_bin_info['number'] == 0:
+                print "number of bin {0} is 0".format(cali_dict_str)
+                continue
+            for i in range(3):  # [home, away,end]
+                cali_prob = cali_bin_info['cali_sum'][i] / cali_bin_info['number']
+                model_prob = cali_bin_info['model_sum'][i] / cali_bin_info['number']
+                model_prob = model_prob+1e-10
+                cali_prob = cali_prob+1e-10
+                kld = cali_prob * math.log(cali_prob / model_prob)
+                kld_sum += kld
+
+            print "\nkld for bin {0} is {1}\n".format(cali_dict_str, str(kld_sum))
