@@ -4,6 +4,7 @@ from td_three_prediction_two_tower_lstm_v_correct_dir.support.data_processing_to
     read_feature_within_events
 import json
 import math
+import datetime
 
 
 class Calibration:
@@ -15,8 +16,16 @@ class Calibration:
         self.calibration_values_all_dict = {}
         self.soccer_data_store_dir = soccer_data_store_dir
         self.tt_lstm_config = TTLSTMCongfig.load(tt_lstm_config_path)
+        self.save_calibration_dir = './calibration_results/calibration-' + datetime.date.today().strftime(
+            "%Y%B%d") + '.txt'
+        self.save_calibration_file = open(self.save_calibration_dir, 'w')
+        self.teams = ['home', 'away', 'end']
         # learning_rate = tt_lstm_config.learn.learning_rate
         # pass
+
+    def __del__(self):
+        print 'ending calibration'
+        print self.save_calibration_file.close()
 
     def recursive2construct(self, store_dict_str, depth):
         feature_number = len(self.calibration_features)
@@ -61,14 +70,15 @@ class Calibration:
             learning_rate_write = 5
         elif learning_rate == 1e-4:
             learning_rate_write = 4
-        data_name = "model_three_cut_together_predict_Feature{0}_Iter{1}_lr{2}_Batch{3}_MaxLength{4}_Type{5}".format(
+        data_name = "model_three_cut_together_predict_Feature{0}_Iter{1}_lr{2}_Batch{3}_MaxLength{4}_Type{5}.json".format(
             str(self.tt_lstm_config.learn.feature_type),
             str(self.tt_lstm_config.learn.iterate_num),
             str(learning_rate_write),
             str(self.tt_lstm_config.learn.batch_size),
             str(self.tt_lstm_config.learn.max_trace_length),
             str(self.tt_lstm_config.learn.model_type))
-        with open(self.soccer_data_store_dir + "/" + directory + "/" + data_name, 'w') as outfile:
+        # directory = '917811'
+        with open(self.soccer_data_store_dir + "/" + directory + "/" + data_name) as outfile:
             model_output = json.load(outfile)
 
         return model_output
@@ -127,21 +137,24 @@ class Calibration:
                         raise ValueError('unknown feature' + calibration_feature)
 
                 calibration_value = calibration_values[index]
-                model_value = model_values[index]
+                model_value = model_values[str(index)]
 
                 cali_bin_info = self.calibration_values_all_dict.get(cali_dict_str)
+                print cali_dict_str
                 assert cali_bin_info is not None
                 cali_sum = cali_bin_info.get('cali_sum')
                 model_sum = cali_bin_info.get('model_sum')
                 number = cali_bin_info.get('number')
                 number += 1
-                for i in range(3):  # [home, away,end]
+                for i in range(len(self.teams)):  # [home, away,end]
                     cali_sum[i] = cali_sum[i] + calibration_value[i]
-                    model_sum[i] = model_sum[i] + model_value[i]
+                    model_sum[i] = model_sum[i] + model_value[self.teams[i]]
 
                 self.calibration_values_all_dict.update({cali_dict_str: {'cali_sum': cali_sum,
                                                                          'model_sum': model_sum,
                                                                          'number': number}})
+
+            # break
 
     def compute_kld(self):
         cali_dict_strs = self.calibration_values_all_dict.keys()
@@ -151,12 +164,15 @@ class Calibration:
             if cali_bin_info['number'] == 0:
                 print "number of bin {0} is 0".format(cali_dict_str)
                 continue
-            for i in range(3):  # [home, away,end]
-                cali_prob = cali_bin_info['cali_sum'][i] / cali_bin_info['number']
-                model_prob = cali_bin_info['model_sum'][i] / cali_bin_info['number']
-                model_prob = model_prob+1e-10
-                cali_prob = cali_prob+1e-10
+            cali_record_dict = 'Bin:'+cali_dict_str
+            for i in range(len(self.teams)):  # [home, away,end]
+                cali_prob = float(cali_bin_info['cali_sum'][i]) / cali_bin_info['number']
+                model_prob = float(cali_bin_info['model_sum'][i]) / cali_bin_info['number']
+                cali_record_dict += '\t{0}_cali'.format(self.teams[i]) + ":" + str(cali_prob)
+                cali_record_dict += '\t{0}_model'.format(self.teams[i]) + ":" + str(model_prob)
+                model_prob = model_prob + 1e-10
+                cali_prob = cali_prob + 1e-10
                 kld = cali_prob * math.log(cali_prob / model_prob)
                 kld_sum += kld
-
-            print "\nkld for bin {0} is {1}\n".format(cali_dict_str, str(kld_sum))
+            cali_record_dict += '\tkld:' + str(kld_sum)
+            self.save_calibration_file.write(str(cali_record_dict) + '\n')
