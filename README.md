@@ -51,6 +51,12 @@ Features for bins:
     - goal differential
     - tim Shwartz's handbook?
 
+## Places To Publish
+
+- ECML journal track?
+- DAMI?
+- Big Data conference, as in `[10]  Uwe Dick and Ulf Brefeld Learning to Rate Player Positioning in Soccer. *Big data*. 2019. `
+
 
 
 
