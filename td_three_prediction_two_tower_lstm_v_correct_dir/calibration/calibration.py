@@ -168,6 +168,7 @@ class Calibration:
             for i in range(len(self.teams)):  # [home, away,end]
                 cali_prob = float(cali_bin_info['cali_sum'][i]) / cali_bin_info['number']
                 model_prob = float(cali_bin_info['model_sum'][i]) / cali_bin_info['number']
+                cali_record_dict += '\t{0}_number'.format(self.teams[i]) + ":" + str(cali_bin_info['number'])
                 cali_record_dict += '\t{0}_cali'.format(self.teams[i]) + ":" + str(cali_prob)
                 cali_record_dict += '\t{0}_model'.format(self.teams[i]) + ":" + str(model_prob)
                 model_prob = model_prob + 1e-10
