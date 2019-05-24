@@ -7,7 +7,7 @@ import math
 
 
 class Calibration:
-    def __init__(self, bins, data_path, calibration_features, tt_lstm_config_path, soccer_data_store_dir):
+    def __init__(self, bins, data_path, calibration_features, tt_lstm_config_path, soccer_data_store_dir, result_dir):
         self.bins = bins
         # self.bins_names = bins.keys()
         self.data_path = data_path
@@ -15,8 +15,12 @@ class Calibration:
         self.calibration_values_all_dict = {}
         self.soccer_data_store_dir = soccer_data_store_dir
         self.tt_lstm_config = TTLSTMCongfig.load(tt_lstm_config_path)
+        self.result_file = open(result_dir, 'w')
         # learning_rate = tt_lstm_config.learn.learning_rate
         # pass
+
+    def __del__(self):
+        self.result_file.close()
 
     def recursive2construct(self, store_dict_str, depth):
         feature_number = len(self.calibration_features)
@@ -154,9 +158,10 @@ class Calibration:
             for i in range(3):  # [home, away,end]
                 cali_prob = cali_bin_info['cali_sum'][i] / cali_bin_info['number']
                 model_prob = cali_bin_info['model_sum'][i] / cali_bin_info['number']
-                model_prob = model_prob+1e-10
-                cali_prob = cali_prob+1e-10
+                model_prob = model_prob + 1e-10
+                cali_prob = cali_prob + 1e-10
                 kld = cali_prob * math.log(cali_prob / model_prob)
                 kld_sum += kld
-
-            print "\nkld for bin {0} is {1}\n".format(cali_dict_str, str(kld_sum))
+            kld_result_str = "\nkld for bin {0} is {1}\n".format(cali_dict_str, str(kld_sum))
+            print kld_result_str
+            self.result_file.write(kld_result_str)

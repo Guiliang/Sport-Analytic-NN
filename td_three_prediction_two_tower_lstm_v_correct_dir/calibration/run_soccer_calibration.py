@@ -12,7 +12,8 @@ if __name__ == '__main__':
     tt_lstm_config_path = "../soccer-config.yaml"
     Cali = Calibration(bins=calibration_bins, data_path=data_path,
                        calibration_features=calibration_features, tt_lstm_config_path=tt_lstm_config_path,
-                       soccer_data_store_dir=soccer_data_store_dir)
+                       soccer_data_store_dir=soccer_data_store_dir,
+                       result_dir='./cali_results/calibration_result.txt')
     Cali.construct_bin_dicts()
     Cali.aggregate_calibration_values()
     Cali.compute_kld()
