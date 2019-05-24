@@ -29,8 +29,9 @@ class PlayerImpact:
         ids = player_id_name_pair.keys()
         # player_name_GIM_dict = {}
         for id in ids:
+            id = int(id)
             GIM = self.player_id_dict_all.get(id)
-            name = player_id_name_pair.get(id)
+            name = player_id_name_pair.get(str(id))
             name_str = name.get('first_name') + ' ' + name.get('last_name')
             self.player_name_dict_all.update({name_str: {'id': id, 'GIM': GIM}})
 
