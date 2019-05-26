@@ -12,10 +12,12 @@ from td_three_prediction_two_tower_lstm_v_correct_dir.config.tt_lstm_config impo
 from td_three_prediction_two_tower_lstm_v_correct_dir.nn_structure.td_tt_lstm import td_prediction_tt_embed
 from td_three_prediction_two_tower_lstm_v_correct_dir.support.plot_tools import compute_game_values, read_plot_model
 from td_three_prediction_two_tower_lstm_v_correct_dir.compute_impact.player_impact import PlayerImpact
+from td_three_prediction_lstm_v_correct_dir import td_three_prediction_lstm_v_correct_cut_together
+from td_three_prediction_two_tower_lstm_v_correct_dir.support.data_processing_tools import get_soccer_game_data_old
 
 
 def get_data_name(config):
-    data_name = "model_three_cut_together_predict_Feature{0}_Iter{1}_lr{2}_Batch{3}_MaxLength{4}_Type{5}".format(
+    data_name = "ijcai_model_three_cut_together_predict_Feature{0}_Iter{1}_lr{2}_Batch{3}_MaxLength{4}_Type{5}.json".format(
         str(tt_lstm_config.learn.feature_type),
         str(tt_lstm_config.learn.iterate_num),
         str(learning_rate_write),
@@ -26,33 +28,23 @@ def get_data_name(config):
     return data_name
 
 
-def compute_values_for_all_games(config, data_store_dir, dir_all):
+def compute_values_for_all_games(config, data_store_dir, model_data_save_dir, dir_all):
     sess_nn = tf.InteractiveSession()
-
-    model_nn = td_prediction_tt_embed(
-        feature_number=config.learn.feature_number,
-        home_h_size=config.Arch.HomeTower.home_h_size,
-        away_h_size=config.Arch.AwayTower.away_h_size,
-        max_trace_length=config.learn.max_trace_length,
-        learning_rate=config.learn.learning_rate,
-        embed_size=config.learn.embed_size,
-        output_layer_size=config.learn.output_layer_size,
-        home_lstm_layer_num=config.Arch.HomeTower.lstm_layer_num,
-        away_lstm_layer_num=config.Arch.AwayTower.lstm_layer_num,
-        dense_layer_num=config.learn.dense_layer_num,
-        apply_softmax=config.learn.apply_softmax
-    )
-    model_nn.initialize_ph()
-    model_nn.build()
-    model_nn.call()
-
-    saved_network_path = tt_lstm_config.learn.save_mother_dir + "/oschulte/Galen/soccer-models/hybrid_sl_saved_NN/Scale-tt-three-cut_together_saved_networks_feature" + str(
-        tt_lstm_config.learn.feature_type) + "_batch" + str(
-        tt_lstm_config.learn.batch_size) + "_iterate" + str(
-        tt_lstm_config.learn.iterate_num) + "_lr" + str(
-        tt_lstm_config.learn.learning_rate) + "_" + str(
-        tt_lstm_config.learn.model_type) + tt_lstm_config.learn.if_correct_velocity + "_MaxTL" + str(
-        tt_lstm_config.learn.max_trace_length)
+    td_three_prediction_lstm_v_correct_cut_together.FEATURE_NUMBER = 61
+    model_nn = td_three_prediction_lstm_v_correct_cut_together.td_prediction_lstm_V4()
+    # model_nn.initialize_ph()
+    # model_nn.build()
+    # model_nn.call()
+    # saved_network_path = tt_lstm_config.learn.save_mother_dir + "/oschulte/Galen/soccer-models/hybrid_sl_saved_NN/Scale-tt-three-cut_together_saved_networks_feature" + str(
+    #     tt_lstm_config.learn.feature_type) + "_batch" + str(
+    #     tt_lstm_config.learn.batch_size) + "_iterate" + str(
+    #     tt_lstm_config.learn.iterate_num) + "_lr" + str(
+    #     tt_lstm_config.learn.learning_rate) + "_" + str(
+    #     tt_lstm_config.learn.model_type) + tt_lstm_config.learn.if_correct_velocity + "_MaxTL" + str(
+    #     tt_lstm_config.learn.max_trace_length)
+    #
+    saved_network_path = "/cs/oschulte/Galen/miyunLuo/Code/Soccer_DRL/models/hybrid_sl_saved_NN/" \
+                         "Scale-three-cut_together_saved_networks_feature5_batch32_iterate30_lr0.0001_v4_MaxTL10"
 
     data_name = get_data_name(config)
 
@@ -60,12 +52,14 @@ def compute_values_for_all_games(config, data_store_dir, dir_all):
     for game_name_dir in dir_all:
         game_name = game_name_dir.split('.')[0]
         # game_time_all = get_game_time(data_path, game_name_dir)
-        model_value = compute_game_values(sess_nn=sess_nn,
-                                          model=model_nn,
-                                          data_store=data_store_dir,
-                                          dir_game=game_name,
-                                          config=tt_lstm_config,
-                                          sport='Soccer')
+        state_trace_length, state_input, reward = get_soccer_game_data_old(data_store=data_store_dir,
+                                                                                  dir_game=game_name,
+                                                                                  config=config, )
+
+        [model_value] = sess_nn.run([model_nn.read_out],
+                                    feed_dict={model_nn.trace_lengths: state_trace_length,
+                                               model_nn.rnn_input: state_input
+                                               })
         model_value_json = {}
         for value_index in range(0, len(model_value)):
             model_value_json.update({value_index: {'home': float(model_value[value_index][0]),
@@ -73,7 +67,7 @@ def compute_values_for_all_games(config, data_store_dir, dir_all):
                                                    'end': float(model_value[value_index][2])}})
 
         game_store_dir = game_name_dir.split('.')[0]
-        with open(data_store_dir + "/" + game_store_dir + "/" + data_name, 'w') as outfile:
+        with open(model_data_save_dir + "/" + game_store_dir + "/" + data_name, 'w') as outfile:
             json.dump(model_value_json, outfile)
 
             # sio.savemat(data_store_dir + "/" + game_name_dir + "/" + data_name,
@@ -92,8 +86,9 @@ def compute_impact(soccer_data_store_dir, game_data_dir, data_name, player_id_na
 
 if __name__ == '__main__':
     data_path = "/cs/oschulte/soccer-data/sequences_append_goal/"
-    soccer_data_store_dir = "/cs/oschulte/Galen/Soccer-data/"
-    player_id_name_pair_dir = '/Local-Scratch/PycharmProjects/Sport-Analytic-NN/td_three_prediction_two_tower_lstm_v_correct_dir/resource/soccer_id_name_pair.json'
+    soccer_data_store_dir = "/cs/oschulte/miyunLuo/Documents/Data/Soccer_for_DRL"
+    model_data_save_dir = "/cs/oschulte/Galen/Soccer-data/"
+    player_id_name_pair_dir = '/Local-Scratch/PycharmProjects/Sport-Analytic-NN/td_three_prediction_two_tower_lstm_v_correct_dir/resource/ijcai_soccer_id_name_pair.json'
 
     # tt_lstm_config_path = '../icehockey-config.yaml'
     tt_lstm_config_path = "../soccer-config.yaml"
@@ -106,8 +101,7 @@ if __name__ == '__main__':
     elif learning_rate == 1e-4:
         learning_rate_write = 4
 
-    # data_name = compute_values_for_all_games(config=tt_lstm_config, data_store_dir=soccer_data_store_dir,
-    #                                          dir_all=soccer_dir_all)
+    # compute_values_for_all_games(config=tt_lstm_config, data_store_dir=soccer_data_store_dir,
+    #                             dir_all=soccer_dir_all, model_data_save_dir=model_data_save_dir)
     data_name = get_data_name(config=tt_lstm_config)
-    compute_impact(data_name=data_name, game_data_dir=data_path, soccer_data_store_dir=soccer_data_store_dir,
-                   player_id_name_pair_dir=player_id_name_pair_dir)
+    compute_impact(data_name=data_name, game_data_dir=data_path, soccer_data_store_dir=soccer_data_store_dir,player_id_name_pair_dir=player_id_name_pair_dir)
