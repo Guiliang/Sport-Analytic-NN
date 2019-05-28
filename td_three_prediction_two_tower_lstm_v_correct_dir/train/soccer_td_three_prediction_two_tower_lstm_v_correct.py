@@ -187,7 +187,7 @@ def train_network(sess, model, print_parameters=False):
                 # perform gradient step
                 y_batch = np.asarray(y_batch)
                 [diff, read_out, cost_out, summary_train, _] = sess.run(
-                    [model.diff, model.readout, model.cost, merge, model.train_step],
+                    [model.diff, model.read_out, model.cost, merge, model.train_step],
                     feed_dict={model.y_ph: y_batch,
                                model.trace_lengths_ph: trace_t0_batch,
                                model.rnn_input_ph: s_t0_batch,
