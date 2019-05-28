@@ -8,7 +8,7 @@ from td_three_prediction_two_tower_lstm_v_correct_dir.calibration.calibration im
 def generate_cali_latex_table(result_file_dir):
     calibration_features = ['period', 'score_differential', 'pitch', 'manpower']
     calibration_bins = {'period': {'feature_name': ('sec', 'min'), 'range': (1, 2)},
-                        'score_differential': {'feature_name': ('scoreDiff'), 'range': range(0, 2)},
+                        'score_differential': {'feature_name': ('scoreDiff'), 'range': range(-1, 2)},
                         'pitch': {'feature_name': ('x'), 'range': ('left', 'right')},
                         'manpower': {'feature_name': ('manPower'), 'range': range(0, 2)}
                         }

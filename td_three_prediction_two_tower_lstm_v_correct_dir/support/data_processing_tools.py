@@ -349,7 +349,7 @@ def construct_simulation_data(features_train, features_mean, features_scale,
             state.append(scale_temp)
         elif feature_type < 5 and feature == 'event_id':
             raise ValueError("feature type<5 in inapplicable")
-        #     actions = {'block': 0,
+        # actions = {'block': 0,
         #                'carry': 1,
         #                'check': 2,
         #                'dumpin': 3,
@@ -650,3 +650,37 @@ def normalize_data(game_value_home, game_value_away, game_value_end):
         game_value_end_normalized.append(float(end_value) / (home_value + away_value + end_value))
     return np.asarray(game_value_home_normalized), np.asarray(game_value_away_normalized), np.asarray(
         game_value_end_normalized)
+
+
+def combine_player_data(player_info_csv, player_stats, player_info_stats):
+    player_id_info_dict = {}
+    with open(player_info_csv) as f:
+        data_lines = f.readlines()
+    for line in data_lines[1:]:
+        items = line.split(',')
+        playerId = items[0]
+        playerName = items[1]
+        teamId = items[2]
+        teamName = items[3]
+        value = items[4]
+        player_id_info_dict.update({playerName: [playerId, teamId, teamName]})
+
+    with open(player_stats) as f:
+        data_lines = f.readlines()
+    record_file = open(player_info_stats, 'w')
+    record_file.write('name,playerId,team,teamId,Apps,Mins,Goals,Assists,Yel,Red,SpG,PS,AeriaisWon,MotM,Rating\n')
+    for line in data_lines[1:]:
+        items = line.split(',')
+        name = items[0]
+        info = player_id_info_dict.get(name)
+        if info is None:
+            print name
+            continue
+        store_line = '{0},{1},{2},{3}'.format(items[0], str(info[0]), str(info[2]), str(info[1]))
+        for item in items[3:]:
+            store_line += ','+item
+        record_file.write(store_line)
+
+if __name__ == '__main__':
+    combine_player_data(player_info_csv='../resource/player_team_id_name_value.csv', player_stats='../resource/Soccer_summary.csv',
+                        player_info_stats='../resource/Soccer_summary_info.csv')

@@ -1,6 +1,7 @@
 import os
 import scipy.io as sio
 import json
+import operator
 import unicodedata
 import td_three_prediction_two_tower_lstm_v_correct_dir.support.data_processing_tools as tools
 
@@ -22,6 +23,34 @@ class PlayerImpact:
                   'compute_impact/player_impact/soccer_player_GIM.json', 'w') as f:
             json.dump(self.player_name_dict_all, f)
 
+    def rank_player_by_impact(self, player_summary_info_dir, rank_store_file_dir):
+        with open(player_summary_info_dir) as f:
+            lines = f.readlines()
+        player_id_info_dir = {}
+        for line in lines[1:]:
+            # name,playerId,team,teamId,Apps,Mins,Goals,Assists,Yel,Red,SpG,PS,AeriaisWon,MotM,Rating
+            items = line.split(',')
+            name = items[0]
+            playerId = items[1]
+            team = items[2]
+            Goals = items[6]
+            Assist = items[7]
+            player_id_info_dir.update({playerId: [name, team, Goals, Assist]})
+
+        rank_file = open(rank_store_file_dir, 'w')
+        sorted_id_GIM = sorted(self.player_id_dict_all.items(), key=operator.itemgetter(1), reverse=True)
+        rank_file.write('id, name, team, Goal, Assist, GIM \n')
+        print 'id & name & team & Goal & Assist & GIM \\\\'
+        for (id, GIM) in sorted_id_GIM:
+            info = player_id_info_dir.get(str(id))
+            name = info[0]
+            team = info[1]
+            goals = info[2]
+            assist = info[3]
+            rank_file.write('{0} , {1} , {2} , {3} , {4} , {5} \n'.format(str(id), name, team, goals, assist, GIM))
+            print '{0} & {1} & {2} & {3} & {4} & {5} \\\\'.format(str(id), name, team, goals, assist, GIM)
+        print '\line'
+
     def transfer2player_name_dict(self, player_id_name_pair_dir):
         with open(player_id_name_pair_dir, 'r') as f:
             player_id_name_pair = json.load(f)
@@ -33,7 +62,7 @@ class PlayerImpact:
             GIM = self.player_id_dict_all.get(id)
             name = player_id_name_pair.get(str(id))
             name_str = name.get('first_name') + ' ' + name.get('last_name')
-            self.player_name_dict_all.update({name_str: {'id': id, 'GIM': GIM}})
+            self.player_name_dict_all.update({id: {'name': name_str, 'GIM': GIM}})
 
     def aggregate_match_diff_values(self, dir_game):
         """compute impact"""

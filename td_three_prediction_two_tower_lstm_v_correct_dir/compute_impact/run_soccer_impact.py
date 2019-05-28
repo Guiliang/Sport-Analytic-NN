@@ -93,7 +93,8 @@ def compute_impact(soccer_data_store_dir, game_data_dir, data_name, player_id_na
 if __name__ == '__main__':
     data_path = "/cs/oschulte/soccer-data/sequences_append_goal/"
     soccer_data_store_dir = "/cs/oschulte/Galen/Soccer-data/"
-    player_id_name_pair_dir = '/Local-Scratch/PycharmProjects/Sport-Analytic-NN/td_three_prediction_two_tower_lstm_v_correct_dir/resource/soccer_id_name_pair.json'
+    player_id_name_pair_dir = '/Local-Scratch/PycharmProjects/Sport-Analytic-NN/' \
+                              'td_three_prediction_two_tower_lstm_v_correct_dir/resource/soccer_id_name_pair.json'
 
     # tt_lstm_config_path = '../icehockey-config.yaml'
     tt_lstm_config_path = "../soccer-config.yaml"
