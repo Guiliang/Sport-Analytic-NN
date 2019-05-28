@@ -159,7 +159,7 @@ def train_network(sess, model, print_parameters=False):
                 # readout_t1_batch = model.read_out.eval(
                 #     feed_dict={model.trace_lengths: trace_t1_batch, model.rnn_input: s_t1_batch})  # get value of s
 
-                [readout_t1_batch] = sess.run([model.readout],
+                [readout_t1_batch] = sess.run([model.read_out],
                                               feed_dict={model.trace_lengths_ph: trace_t1_batch,
                                                          model.rnn_input_ph: s_t1_batch,
                                                          model.home_away_indicator_ph: ha_id_t1_batch
