@@ -15,27 +15,34 @@ from td_three_prediction_two_tower_lstm_v_correct_dir.support.data_processing_to
     compromise_state_trace_length, \
     get_together_training_batch, write_game_average_csv
 
-tt_lstm_config_path = "../soccer-config.yaml"
+tt_lstm_config_path = "../soccer-config-v2.yaml"
 tt_lstm_config = TTLSTMCongfig.load(tt_lstm_config_path)
-
-LOG_DIR = tt_lstm_config.learn.save_mother_dir + "/oschulte/Galen/soccer-models/hybrid_sl_log_NN/Scale-tt-three-cut_together_log_train_feature" + str(
-    tt_lstm_config.learn.feature_type) + "_batch" + str(
-    tt_lstm_config.learn.batch_size) + "_iterate" + str(
-    tt_lstm_config.learn.iterate_num) + "_lr" + str(
-    tt_lstm_config.learn.learning_rate) + "_" + str(
-    tt_lstm_config.learn.model_type) + tt_lstm_config.learn.if_correct_velocity + "_MaxTL" + str(
-    tt_lstm_config.learn.max_trace_length)
-SAVED_NETWORK = tt_lstm_config.learn.save_mother_dir + "/oschulte/Galen/soccer-models/hybrid_sl_saved_NN/Scale-tt-three-cut_together_saved_networks_feature" + str(
-    tt_lstm_config.learn.feature_type) + "_batch" + str(
-    tt_lstm_config.learn.batch_size) + "_iterate" + str(
-    tt_lstm_config.learn.iterate_num) + "_lr" + str(
-    tt_lstm_config.learn.learning_rate) + "_" + str(
-    tt_lstm_config.learn.model_type) + tt_lstm_config.learn.if_correct_velocity + "_MaxTL" + str(
-    tt_lstm_config.learn.max_trace_length)
 DATA_STORE = "/cs/oschulte/Galen/Soccer-data/"
-
 DIR_GAMES_ALL = os.listdir(DATA_STORE)
 number_of_total_game = len(DIR_GAMES_ALL)
+TRAIN_FLAG = False
+if TRAIN_FLAG:
+    train_msg = 'Train_'
+    DIR_GAMES_ALL = DIR_GAMES_ALL[:2400]
+else:
+    train_msg = ''
+
+LOG_DIR = tt_lstm_config.learn.save_mother_dir + "/oschulte/Galen/soccer-models/hybrid_sl_log_NN/{0}Scale-tt-three-cut_together_log_feature".format(
+    train_msg) + str(
+    tt_lstm_config.learn.feature_type) + "_batch" + str(
+    tt_lstm_config.learn.batch_size) + "_iterate" + str(
+    tt_lstm_config.learn.iterate_num) + "_lr" + str(
+    tt_lstm_config.learn.learning_rate) + "_" + str(
+    tt_lstm_config.learn.model_type) + tt_lstm_config.learn.if_correct_velocity + "_MaxTL" + str(
+    tt_lstm_config.learn.max_trace_length)
+SAVED_NETWORK = tt_lstm_config.learn.save_mother_dir + "/oschulte/Galen/soccer-models/hybrid_sl_saved_NN/{0}Scale-tt-three-cut_together_saved_networks_feature".format(
+    train_msg) + str(
+    tt_lstm_config.learn.feature_type) + "_batch" + str(
+    tt_lstm_config.learn.batch_size) + "_iterate" + str(
+    tt_lstm_config.learn.iterate_num) + "_lr" + str(
+    tt_lstm_config.learn.learning_rate) + "_" + str(
+    tt_lstm_config.learn.model_type) + tt_lstm_config.learn.if_correct_velocity + "_MaxTL" + str(
+    tt_lstm_config.learn.max_trace_length)
 
 
 def train_network(sess, model, print_parameters=False):
@@ -170,11 +177,11 @@ def train_network(sess, model, print_parameters=False):
                         break
                     else:
                         y_home = float((r_t_batch[i])[0]) + tt_lstm_config.learn.gamma * \
-                                 ((readout_t1_batch[i]).tolist())[0]
+                                                            ((readout_t1_batch[i]).tolist())[0]
                         y_away = float((r_t_batch[i])[1]) + tt_lstm_config.learn.gamma * \
-                                 ((readout_t1_batch[i]).tolist())[1]
+                                                            ((readout_t1_batch[i]).tolist())[1]
                         y_end = float((r_t_batch[i])[2]) + tt_lstm_config.learn.gamma * \
-                                ((readout_t1_batch[i]).tolist())[2]
+                                                           ((readout_t1_batch[i]).tolist())[2]
                         y_batch.append([y_home, y_away, y_end])
 
                 # perform gradient step
