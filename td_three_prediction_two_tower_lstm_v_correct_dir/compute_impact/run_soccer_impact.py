@@ -15,7 +15,7 @@ from td_three_prediction_two_tower_lstm_v_correct_dir.compute_impact.player_impa
 
 
 def get_data_name(config):
-    data_name = "model_three_cut_together_predict_Feature{0}_Iter{1}_lr{2}_Batch{3}_MaxLength{4}_Type{5}.json".format(
+    data_name = "model_three_cut_together_predict_Feature{0}_Iter{1}_lr{2}_Batch{3}_MaxLength{4}_Type{5}".format(
         str(tt_lstm_config.learn.feature_type),
         str(tt_lstm_config.learn.iterate_num),
         str(learning_rate_write),
@@ -106,8 +106,8 @@ if __name__ == '__main__':
     elif learning_rate == 1e-4:
         learning_rate_write = 4
 
-    # compute_values_for_all_games(config=tt_lstm_config, data_store_dir=soccer_data_store_dir,
-                                 # dir_all=soccer_dir_all)
+    # data_name = compute_values_for_all_games(config=tt_lstm_config, data_store_dir=soccer_data_store_dir,
+    #                                          dir_all=soccer_dir_all)
     data_name = get_data_name(config=tt_lstm_config)
     compute_impact(data_name=data_name, game_data_dir=data_path, soccer_data_store_dir=soccer_data_store_dir,
                    player_id_name_pair_dir=player_id_name_pair_dir)

@@ -8,7 +8,7 @@ import datetime
 
 
 class Calibration:
-    def __init__(self, bins, data_path, calibration_features, tt_lstm_config_path, soccer_data_store_dir):
+    def __init__(self, bins, data_path, calibration_features, tt_lstm_config_path, soccer_data_store_dir, result_dir):
         self.bins = bins
         # self.bins_names = bins.keys()
         self.data_path = data_path
@@ -168,6 +168,7 @@ class Calibration:
             for i in range(len(self.teams)):  # [home, away,end]
                 cali_prob = float(cali_bin_info['cali_sum'][i]) / cali_bin_info['number']
                 model_prob = float(cali_bin_info['model_sum'][i]) / cali_bin_info['number']
+                cali_record_dict += '\t{0}_number'.format(self.teams[i]) + ":" + str(cali_bin_info['number'])
                 cali_record_dict += '\t{0}_cali'.format(self.teams[i]) + ":" + str(cali_prob)
                 cali_record_dict += '\t{0}_model'.format(self.teams[i]) + ":" + str(model_prob)
                 model_prob = model_prob + 1e-10

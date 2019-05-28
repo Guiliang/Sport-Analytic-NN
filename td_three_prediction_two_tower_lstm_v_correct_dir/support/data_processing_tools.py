@@ -88,6 +88,41 @@ def get_game_time(data_path, directory):
     return game_time_all
 
 
+def get_soccer_game_data_old(data_store, dir_game, config):
+    game_files = os.listdir(data_store + "/" + dir_game)
+    for filename in game_files:
+        if "reward_seq_" in filename:
+            reward_name = filename
+        elif "state_feature_seq_" in filename:
+            state_input_name = filename
+        elif "trace_drl_" in filename:
+            state_trace_length_name = filename
+
+    reward = sio.loadmat(data_store + "/" + dir_game + "/" + reward_name)
+    reward = reward['reward']
+    state_input = sio.loadmat(data_store + "/" + dir_game + "/" + state_input_name)
+    state_input = (state_input['state_feature_seq'])
+    state_trace_length = sio.loadmat(data_store + "/" + dir_game + "/" + state_trace_length_name)
+    state_trace_length = (state_trace_length['trace_length'])[0]
+    state_trace_length = handle_trace_length(state_trace_length)
+    # ha_id = sio.loadmat(data_store + "/" + dir_game + "/" + ha_id_name)["home_away"][0].astype(int)
+    # state_input = (state_input['dynamic_feature_input'])
+    # state_output = sio.loadmat(DATA_STORE + "/" + dir_game + "/" + state_output_name)
+    # state_output = state_output['hybrid_output_state']
+    # state_trace_length = sio.loadmat(
+    #     data_store + "/" + dir_game + "/" + state_trace_length_name)['trace_length'][0]
+    # state_trace_length = (state_trace_length['hybrid_trace_length'])[0]
+    # state_trace_length = handle_trace_length(state_trace_length)
+    state_trace_length, state_input, reward = compromise_state_trace_length(
+        state_trace_length=state_trace_length,
+        state_input=state_input,
+        reward=reward,
+        max_trace_length=config.learn.max_trace_length,
+        features_num=config.learn.feature_number
+    )
+    return state_trace_length, state_input, reward
+
+
 def get_soccer_game_data(data_store, dir_game, config):
     game_files = os.listdir(data_store + "/" + dir_game)
     for filename in game_files:

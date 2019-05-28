@@ -85,7 +85,7 @@ def compute_game_values(sess_nn, model, data_store, dir_game, config, sport):
     else:
         raise ValueError("unknown sport")
 
-    [readout] = sess_nn.run([model.readout],
+    [readout] = sess_nn.run([model.read_out],
                             feed_dict={model.trace_lengths_ph: state_trace_length,
                                        model.rnn_input_ph: state_input,
                                        model.home_away_indicator_ph: ha_id

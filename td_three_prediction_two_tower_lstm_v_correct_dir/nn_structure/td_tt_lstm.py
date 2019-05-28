@@ -46,7 +46,7 @@ class td_prediction_tt_embed:
         self.embed_away_w = None
         self.embed_home_w = None
         self.embed_home_b = None
-        self.readout = None
+        self.read_out = None
 
     def build(self):
         """
@@ -148,12 +148,12 @@ class td_prediction_tt_embed:
                     if i < self.dense_layer_num - 1:
                         dense_output = tf.nn.relu(dense_output, name='activation_{0}'.format(str(i)))
             if self.apply_softmax:
-                self.readout = tf.nn.softmax(dense_output)
+                self.read_out = tf.nn.softmax(dense_output)
             else:
-                self.readout = dense_output
+                self.read_out = dense_output
             with tf.name_scope("cost"):
-                self.cost = tf.reduce_mean(tf.square(self.y_ph - self.readout))
-                self.diff = tf.reduce_mean(tf.abs(self.y_ph - self.readout))
+                self.cost = tf.reduce_mean(tf.square(self.y_ph - self.read_out))
+                self.diff = tf.reduce_mean(tf.abs(self.y_ph - self.read_out))
             tf.summary.histogram('cost', self.cost)
 
             with tf.name_scope("train"):
