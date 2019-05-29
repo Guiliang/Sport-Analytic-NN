@@ -8,7 +8,7 @@ import datetime
 
 
 class Calibration:
-    def __init__(self, bins, data_path, calibration_features, tt_lstm_config_path, soccer_data_store_dir, result_dir):
+    def __init__(self, bins, data_path, calibration_features, tt_lstm_config_path, soccer_data_store_dir):
         self.bins = bins
         # self.bins_names = bins.keys()
         self.data_path = data_path
@@ -67,9 +67,11 @@ class Calibration:
         """model predicted value for each game"""
         learning_rate = self.tt_lstm_config.learn.learning_rate
         if learning_rate == 1e-5:
-            learning_rate_write = 5
+            learning_rate_write = '5'
         elif learning_rate == 1e-4:
-            learning_rate_write = 4
+            learning_rate_write = '4'
+        elif learning_rate == 0.0005:
+            learning_rate_write = '5_5'
         data_name = "model_three_cut_together_predict_Feature{0}_Iter{1}_lr{2}_Batch{3}_MaxLength{4}_Type{5}.json".format(
             str(self.tt_lstm_config.learn.feature_type),
             str(self.tt_lstm_config.learn.iterate_num),

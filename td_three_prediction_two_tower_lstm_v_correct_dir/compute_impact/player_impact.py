@@ -15,11 +15,13 @@ class PlayerImpact:
         self.game_data_dir = game_data_dir
         self.model_data_store_dir = model_data_store_dir
 
-    def save_player_impact(self):
+    def save_player_impact(self, save_name_write=None):
         assert len(self.player_name_dict_all.keys()) > 0
+        if not save_name_write:
+            save_name_write = 'soccer_player_GIM.json'
         with open('/Local-Scratch/PycharmProjects/Sport-Analytic-NN/'
                   'td_three_prediction_two_tower_lstm_v_correct_dir/'
-                  'compute_impact/player_impact/soccer_player_GIM.json', 'w') as f:
+                  'compute_impact/player_impact/' + save_name_write, 'w') as f:
             json.dump(self.player_name_dict_all, f)
 
     def transfer2player_name_dict(self, player_id_name_pair_dir):
@@ -37,7 +39,9 @@ class PlayerImpact:
 
     def aggregate_match_diff_values(self, dir_game):
         """compute impact"""
+        print self.data_name
         for file_name in os.listdir(self.model_data_store_dir + "/" + dir_game):
+            print file_name
             if file_name == self.data_name:
                 model_data_name = self.model_data_store_dir + "/" + dir_game + "/" + file_name
                 with open(model_data_name) as f:
