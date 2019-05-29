@@ -47,7 +47,6 @@ def generate_cali_latex_table(result_file_dir):
 
 
 if __name__ == '__main__':
-    # generate_cali_latex_table('./calibration_results/calibration-2019May28.txt')
     calibration_features = ['period', 'score_differential', 'pitch', 'manpower']
     calibration_bins = {'period': {'feature_name': ('sec', 'min'), 'range': (1, 2)},
                         'score_differential': {'feature_name': ('scoreDiff'), 'range': range(-8, 8)},
@@ -63,3 +62,4 @@ if __name__ == '__main__':
     Cali.construct_bin_dicts()
     Cali.aggregate_calibration_values()
     Cali.compute_distance()
+    generate_cali_latex_table(Cali.save_calibration_dir)
