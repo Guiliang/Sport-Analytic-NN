@@ -26,21 +26,25 @@ def get_data_name(config):
     return data_name
 
 
-def compute_impact(soccer_data_store_dir, game_data_dir, data_name, player_id_name_pair_dir):
+def compute_ranking(soccer_data_store_dir, game_data_dir, data_name, player_summary_info_dir, rank_store_file_dir,
+                    action_selected):
     PI = PlayerImpact(data_name=data_name, game_data_dir=game_data_dir, model_data_store_dir=soccer_data_store_dir)
     dir_all = os.listdir(soccer_data_store_dir)
     for game_name_dir in dir_all:
-        PI.aggregate_match_diff_values(game_name_dir)
-    PI.transfer2player_name_dict(player_id_name_pair_dir)
-    PI.rank_player_by_impact()
-    PI.save_player_impact()
+        PI.aggregate_match_diff_values(game_name_dir, action_selected=action_selected)
+    # PI.transfer2player_name_dict(player_id_name_pair_dir)
+    PI.rank_player_by_impact(player_summary_info_dir, rank_store_file_dir)
+    # PI.save_player_impact()
 
 
 if __name__ == '__main__':
+    action_selected = None
     data_path = "/cs/oschulte/soccer-data/sequences_append_goal/"
     soccer_data_store_dir = "/cs/oschulte/Galen/Soccer-data/"
     player_id_name_pair_dir = '/Local-Scratch/PycharmProjects/Sport-Analytic-NN/' \
                               'td_three_prediction_two_tower_lstm_v_correct_dir/resource/soccer_id_name_pair.json'
+    player_summary_info_dir = '../resource/Soccer_summary_info.csv'
+    rank_store_file_dir = './player_ranking/soccer_player_ranking'
 
     # tt_lstm_config_path = '../icehockey-config.yaml'
     tt_lstm_config_path = "../soccer-config.yaml"
@@ -56,5 +60,6 @@ if __name__ == '__main__':
     # data_name = compute_values_for_all_games(config=tt_lstm_config, data_store_dir=soccer_data_store_dir,
     #                                          dir_all=soccer_dir_all)
     data_name = get_data_name(config=tt_lstm_config)
-    compute_impact(data_name=data_name, game_data_dir=data_path, soccer_data_store_dir=soccer_data_store_dir,
-                   player_id_name_pair_dir=player_id_name_pair_dir)
+    compute_ranking(data_name=data_name, game_data_dir=data_path, soccer_data_store_dir=soccer_data_store_dir,
+                    player_summary_info_dir=player_summary_info_dir, rank_store_file_dir=rank_store_file_dir,
+                    action_selected=action_selected)

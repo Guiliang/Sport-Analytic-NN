@@ -64,7 +64,7 @@ class PlayerImpact:
             name_str = name.get('first_name') + ' ' + name.get('last_name')
             self.player_name_dict_all.update({id: {'name': name_str, 'GIM': GIM}})
 
-    def aggregate_match_diff_values(self, dir_game):
+    def aggregate_match_diff_values(self, dir_game, action_selected=None):
         """compute impact"""
         for file_name in os.listdir(self.model_data_store_dir + "/" + dir_game):
             if file_name == self.data_name:
@@ -84,6 +84,7 @@ class PlayerImpact:
             else:
                 continue
         # TODO: fix the names of features
+
         actions = tools.read_feature_within_events(data_path=self.game_data_dir, directory=dir_game + '.json',
                                                    feature_name='action')
         # print actions
@@ -94,6 +95,11 @@ class PlayerImpact:
         # print len(playerIds)
         # print len(actions)
         for player_Index in range(0, len(playerIds)):
+
+            if action_selected is not None:
+                if actions[player_Index] != action_selected:
+                    continue
+
             playerId = playerIds[player_Index]
             # teamId = teamIds[player_Index]
             # if int(teamId_target) == int(teamId):
