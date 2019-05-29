@@ -37,10 +37,11 @@ def generate_cali_latex_table(result_file_dir):
                             h_model = round(float(eles[3].split(':')[1]), 4)
                             a_model = round(float(eles[6].split(':')[1]), 4)
                             kld = round(float(eles[10].split(':')[1].replace('\n', '')), 4)
+                            mae = round(float(eles[11].split(':')[1].replace('\n', '')), 4)
 
-                            str_all += '{0} & {1} & {2} & {3} & {4} & {5} & {6} & {7} \\\\ \n'.format(
+                            str_all += '{0} & {1} & {2} & {3} & {4} & {5} & {6} & {7} & {8} \\\\ \n'.format(
                                 str(score_diff), str(manpower), str(period), str(pitch),
-                                str(number), str(h_model), str(a_model), str(kld)
+                                str(number), str(h_model), str(a_model), str(kld), str(mae)
                             )
 
     print str_all + '\hline'
