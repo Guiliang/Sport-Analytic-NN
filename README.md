@@ -28,7 +28,11 @@ Features for bins:
   - Modelling shot quality is recognized to be important. We may be able to find baseline models. For example, the caltech guys in the ghosting paper built a shot quality model.
   - We can explain how TD works: first the system learns the value of shots. Then it learns what situations lead to shots. 
   - Could calibrate against a separate shot quality model, even our own separate model perhaps.
-- If we can output action values for the game that Tarrak analyzed, he is willing to review them to see if they are plausible.
+- *Passing* is the most frequent action, another place to focus. 
+  - See [Luke's paper p.6](http://www.sloansportsconference.com/wp-content/uploads/2019/02/Decomposing-the-Immeasurable-Sport.pdf) . 
+  - Also various papers at [MLSA 2018](https://dtai.cs.kuleuven.be/events/MLSA18/schedule.php). 
+  - There's even a [pass prediction competition](https://github.com/JanVanHaaren/mlsa18-pass-prediction) .
+- If we can *output action values for the game that Tarrak analyzed*, he is willing to review them to see if they are plausible.
 - The eye test: ranges we expect:
   - free kick should be high, should increase close to goal
   - throw-ins? Tarrak gets high values
