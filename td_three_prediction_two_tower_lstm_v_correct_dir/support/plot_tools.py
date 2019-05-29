@@ -2,6 +2,8 @@ import cv2
 import numpy as np
 import tensorflow as tf
 import scipy.io as sio
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import seaborn as sns
 from td_three_prediction_two_tower_lstm_v_correct_dir.support.data_processing_tools import get_icehockey_game_data
