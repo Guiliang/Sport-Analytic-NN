@@ -14,12 +14,12 @@ if __name__ == '__main__':
     data_path = "/cs/oschulte/soccer-data/sequences_append_goal/"
     data_store_dir = "/cs/oschulte/Galen/Soccer-data/"
     # tt_lstm_config_path = '../icehockey-config.yaml'
-    tt_lstm_config_path = "../soccer-config.yaml"
-    home_team = 'Home'
-    away_team = 'Away'
+    tt_lstm_config_path = "../soccer-config-v2.yaml"
+    home_team = 'Manchester City'
+    away_team = 'Arsenal'
     # 919164
     # dir_all = os.listdir(data_path)
-    dir_all = ['922070.json']
+    dir_all = ['918996.json']
     # find_soccer_game_dir_by_team(dir_all, data_path)
     # game_name_dir = find_game_dir(dir_all, data_path, target_game_id, sports='Soccer')
     # game_name_dir = '922075'
