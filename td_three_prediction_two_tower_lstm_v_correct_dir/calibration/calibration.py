@@ -8,7 +8,7 @@ import datetime
 
 
 class Calibration:
-    def __init__(self, bins, data_path, calibration_features, tt_lstm_config_path, soccer_data_store_dir):
+    def __init__(self, bins, data_path, calibration_features, tt_lstm_config_path, soccer_data_store_dir, focus_actions_list=[]):
         self.bins = bins
         # self.bins_names = bins.keys()
         self.data_path = data_path
@@ -16,8 +16,9 @@ class Calibration:
         self.calibration_values_all_dict = {}
         self.soccer_data_store_dir = soccer_data_store_dir
         self.tt_lstm_config = TTLSTMCongfig.load(tt_lstm_config_path)
-        self.save_calibration_dir = './calibration_results/calibration-' + datetime.date.today().strftime(
-            "%Y%B%d") + '.txt'
+        self.focus_actions_list = focus_actions_list
+        self.save_calibration_dir = './calibration_results/calibration-{0}-{1}.txt'.\
+            format(str(self.focus_actions_list), datetime.date.today().strftime("%Y%B%d"))
         self.save_calibration_file = open(self.save_calibration_dir, 'w')
         self.teams = ['home', 'away', 'end']
         # learning_rate = tt_lstm_config.learn.learning_rate
@@ -110,6 +111,16 @@ class Calibration:
                                                                    data_path=self.data_path,
                                                                    directory=json_dir)
             for index in range(0, len(features_values_dict_all)):
+
+                action = actions_team_all[index]['action']  # find the action we focus
+                continue_flag = False if len(self.focus_actions_list) == 0 else True
+                for f_action in self.focus_actions_list:
+                    if f_action in action:
+                        print action
+                        continue_flag = False
+                if continue_flag:
+                    continue
+
                 features_values_dict = features_values_dict_all[index]
                 cali_dict_str = ''
                 for calibration_feature in self.calibration_features:
@@ -158,11 +169,12 @@ class Calibration:
 
             # break
 
-    def compute_kld(self):
+    def compute_distance(self):
         cali_dict_strs = self.calibration_values_all_dict.keys()
         for cali_dict_str in cali_dict_strs:
             cali_bin_info = self.calibration_values_all_dict.get(cali_dict_str)
             kld_sum = 0
+            mae_sum = 0
             if cali_bin_info['number'] == 0:
                 print "number of bin {0} is 0".format(cali_dict_str)
                 continue
@@ -177,5 +189,8 @@ class Calibration:
                 cali_prob = cali_prob + 1e-10
                 kld = cali_prob * math.log(cali_prob / model_prob)
                 kld_sum += kld
+                ae = abs(cali_prob - model_prob)
+                mae_sum = mae_sum + ae
             cali_record_dict += '\tkld:' + str(kld_sum)
+            cali_record_dict += '\tmae:' + str(float(mae_sum)/len(self.teams))
             self.save_calibration_file.write(str(cali_record_dict) + '\n')
