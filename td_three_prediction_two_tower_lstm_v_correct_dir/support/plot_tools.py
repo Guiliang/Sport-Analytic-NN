@@ -210,7 +210,7 @@ def plot_game_value(game_value, save_image_name,
     away_maxs = game_value_away[away_max_index]
 
     game_value_diff = game_value_home - game_value_away
-    game_value_rate = game_value_home / game_value_away
+    # game_value_rate = game_value_home / game_value_away
 
     event_numbers = [d for d in range(1, len(game_value_diff) + 1)]
 
