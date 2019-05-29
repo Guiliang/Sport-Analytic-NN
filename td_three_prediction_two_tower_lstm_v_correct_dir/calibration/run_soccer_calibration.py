@@ -10,16 +10,16 @@ def generate_cali_latex_table(result_file_dir):
     calibration_bins = {'period': {'feature_name': ('sec', 'min'), 'range': (1, 2)},
                         'score_differential': {'feature_name': ('scoreDiff'), 'range': range(-1, 2)},
                         'pitch': {'feature_name': ('x'), 'range': ('left', 'right')},
-                        'manpower': {'feature_name': ('manPower'), 'range': range(0, 2)}
+                        'manpower': {'feature_name': ('manPower'), 'range': range(-1, 2)}
                         }
     with open(result_file_dir) as f:
         data = f.readlines()
     str_all = ''
     ref_dict = {'score_differential': 0, 'manpower': 0, 'period': 0, 'pitch': 0}
-    for score_diff in calibration_bins['score_differential']['range']:
-        ref_dict['score_differential'] = score_diff
-        for manpower in calibration_bins['manpower']['range']:
-            ref_dict['manpower'] = manpower
+    for score_diff in calibration_bins['manpower']['range']:
+        ref_dict['manpower'] = score_diff
+        for manpower in calibration_bins['score_differential']['range']:
+            ref_dict['score_differential'] = manpower
             for period in calibration_bins['period']['range']:
                 ref_dict['period'] = period
                 for pitch in calibration_bins['pitch']['range']:
