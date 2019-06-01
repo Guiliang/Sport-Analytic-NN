@@ -14,6 +14,7 @@ class td_prediction_tt_embed:
                  away_lstm_layer_num=2,
                  dense_layer_num=2,
                  apply_softmax=False,
+                 apply_merge=False,
                  model_name="tt_lstm",
                  rnn_type="bp_last_step"):
         """
@@ -32,6 +33,7 @@ class td_prediction_tt_embed:
         self.output_layer_size = output_layer_size
         self.embed_size = embed_size
         self.apply_softmax = apply_softmax
+        self.apply_merge = apply_merge
 
         self.rnn_input_ph = None
         self.trace_lengths_ph = None
@@ -133,9 +135,12 @@ class td_prediction_tt_embed:
                 with tf.name_scope("Away_embed_layer"):
                     self.away_embed_layer = tf.matmul(rnn_last, self.embed_away_w) + self.embed_away_b
 
-            embed_layer = tf.where(condition=self.home_away_indicator_ph,
-                                   x=self.home_embed_layer,
-                                   y=self.away_embed_layer)
+            if self.apply_merge:
+                embed_layer = tf.concat([self.home_embed_layer, self.away_embed_layer], axis=1)
+            else:
+                embed_layer = tf.where(condition=self.home_away_indicator_ph,
+                                       x=self.home_embed_layer,
+                                       y=self.away_embed_layer)
             # embed_layer = tf.concat([self.home_embed_layer, self.away_embed_layer], axis=1)
             # embed_layer = self.home_embed_layer
 

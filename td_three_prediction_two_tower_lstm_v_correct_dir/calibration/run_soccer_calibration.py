@@ -34,14 +34,16 @@ def generate_cali_latex_table(result_file_dir):
 
                         if ref_str == red_str:
                             number = eles[1].split(':')[1]
+                            h_cali = round(float(eles[2].split(':')[1]), 4)
                             h_model = round(float(eles[3].split(':')[1]), 4)
+                            a_cali = round(float(eles[5].split(':')[1]), 4)
                             a_model = round(float(eles[6].split(':')[1]), 4)
                             kld = round(float(eles[10].split(':')[1].replace('\n', '')), 4)
                             mae = round(float(eles[11].split(':')[1].replace('\n', '')), 4)
 
-                            str_all += '{0} & {1} & {2} & {3} & {4} & {5} & {6} & {7} & {8} \\\\ \n'.format(
+                            str_all += '{0} & {1} & {2} & {3} & {4} & {5} & {6} & {7} & {8} & {10} \\\\ \n'.format(
                                 str(score_diff), str(manpower), str(period), str(pitch),
-                                str(number), str(h_model), str(a_model), str(kld), str(mae)
+                                str(number), str(h_model), str(a_model), str(h_cali), str(a_cali), str(kld), str(mae)
                             )
 
     print str_all + '\hline'
@@ -56,11 +58,17 @@ if __name__ == '__main__':
                         }
     data_path = "/cs/oschulte/soccer-data/sequences_append_goal/"
     soccer_data_store_dir = "/cs/oschulte/Galen/Soccer-data"
-    tt_lstm_config_path = "../soccer-config-v2.yaml"
+    tt_lstm_config_path = "../soccer-config.yaml"
+    apply_old = True
+    apply_difference = False
     Cali = Calibration(bins=calibration_bins, data_path=data_path,
                        calibration_features=calibration_features, tt_lstm_config_path=tt_lstm_config_path,
-                       soccer_data_store_dir=soccer_data_store_dir, focus_actions_list=['shot', 'pass'])
+                       soccer_data_store_dir=soccer_data_store_dir, apply_old=apply_old,
+                       apply_difference=apply_difference,
+                       focus_actions_list=['shot', 'pass'])
     Cali.construct_bin_dicts()
     Cali.aggregate_calibration_values()
     Cali.compute_distance()
+    # save_calibration_dir = "/Local-Scratch/PycharmProjects/Sport-Analytic-NN/td_three_prediction_two_tower_lstm_v_correct_dir/calibration/calibration_results/calibration-['shot', 'pass']-2019May29.txt"
     generate_cali_latex_table(Cali.save_calibration_dir)
+    # generate_cali_latex_table(save_calibration_dir)

@@ -30,6 +30,7 @@ class TTLSTMCongfig(object):
         save_mother_dir = None
         if_correct_velocity = None
         apply_softmax = None
+        merge_tower = None
 
     class Arch(InitWithDict):
 

@@ -21,6 +21,7 @@ Learn:
   save_mother_dir : "/cs"
   if_correct_velocity : "_v_correct_"
   apply_softmax: 1
+  merge_tower: False
 
 Arch:
   HomeTower:

@@ -8,19 +8,30 @@ import datetime
 
 
 class Calibration:
-    def __init__(self, bins, data_path, calibration_features, tt_lstm_config_path, soccer_data_store_dir, focus_actions_list=[]):
+    def __init__(self, bins, data_path, calibration_features,
+                 tt_lstm_config_path, soccer_data_store_dir,
+                 apply_old, apply_difference, focus_actions_list=[]):
         self.bins = bins
         # self.bins_names = bins.keys()
+        self.apply_old = apply_old
+        self.apply_difference = apply_difference
         self.data_path = data_path
         self.calibration_features = calibration_features
         self.calibration_values_all_dict = {}
         self.soccer_data_store_dir = soccer_data_store_dir
         self.tt_lstm_config = TTLSTMCongfig.load(tt_lstm_config_path)
         self.focus_actions_list = focus_actions_list
-        self.save_calibration_dir = './calibration_results/calibration-{0}-{1}.txt'.\
+        if self.apply_difference:
+            self.save_calibration_dir = './calibration_results/difference-calibration-{0}-{1}.txt'. \
+            format(str(self.focus_actions_list), datetime.date.today().strftime("%Y%B%d"))
+        else:
+            self.save_calibration_dir = './calibration_results/calibration-{0}-{1}.txt'. \
             format(str(self.focus_actions_list), datetime.date.today().strftime("%Y%B%d"))
         self.save_calibration_file = open(self.save_calibration_dir, 'w')
-        self.teams = ['home', 'away', 'end']
+        if apply_difference:
+            self.teams = ['home-away']
+        else:
+            self.teams = ['home', 'away', 'end']
         # learning_rate = tt_lstm_config.learn.learning_rate
         # pass
 
@@ -31,9 +42,14 @@ class Calibration:
     def recursive2construct(self, store_dict_str, depth):
         feature_number = len(self.calibration_features)
         if depth >= feature_number:
-            self.calibration_values_all_dict.update({store_dict_str: {'cali_sum': [0, 0, 0],
-                                                                      'model_sum': [0, 0, 0],
-                                                                      'number': 0}})
+            if self.apply_difference:
+                self.calibration_values_all_dict.update({store_dict_str: {'cali_sum': [0],
+                                                                          'model_sum': [0],
+                                                                          'number': 0}})
+            else:
+                self.calibration_values_all_dict.update({store_dict_str: {'cali_sum': [0, 0, 0],
+                                                                          'model_sum': [0, 0, 0],
+                                                                          'number': 0}})
             return
         calibration_feature = self.calibration_features[depth]
         feature_range = self.bins.get(calibration_feature).get('range')
@@ -66,6 +82,12 @@ class Calibration:
 
     def obtain_model_prediction(self, directory):
         """model predicted value for each game"""
+
+        if self.apply_old:
+            old_string = 'ijcai_'
+        else:
+            old_string = ''
+
         learning_rate = self.tt_lstm_config.learn.learning_rate
         if learning_rate == 1e-5:
             learning_rate_write = '5'
@@ -73,13 +95,15 @@ class Calibration:
             learning_rate_write = '4'
         elif learning_rate == 0.0005:
             learning_rate_write = '5_5'
-        data_name = "model_three_cut_together_predict_Feature{0}_Iter{1}_lr{2}_Batch{3}_MaxLength{4}_Type{5}.json".format(
+        data_name = "{6}model_three_cut_together_predict_Feature{0}_Iter{1}_lr{2}_Batch{3}_MaxLength{4}_Type{5}.json".format(
             str(self.tt_lstm_config.learn.feature_type),
             str(self.tt_lstm_config.learn.iterate_num),
             str(learning_rate_write),
             str(self.tt_lstm_config.learn.batch_size),
             str(self.tt_lstm_config.learn.max_trace_length),
-            str(self.tt_lstm_config.learn.model_type))
+            str(self.tt_lstm_config.learn.model_type),
+            str(old_string)
+        )
         # directory = '917811'
         with open(self.soccer_data_store_dir + "/" + directory + "/" + data_name) as outfile:
             model_output = json.load(outfile)
@@ -159,9 +183,13 @@ class Calibration:
                 model_sum = cali_bin_info.get('model_sum')
                 number = cali_bin_info.get('number')
                 number += 1
-                for i in range(len(self.teams)):  # [home, away,end]
-                    cali_sum[i] = cali_sum[i] + calibration_value[i]
-                    model_sum[i] = model_sum[i] + model_value[self.teams[i]]
+                if self.apply_difference:
+                    cali_sum[0] = cali_sum[0] + (calibration_value[0]-calibration_value[1])
+                    model_sum[0] = model_sum[0] + (model_value['home']-model_value['away'])
+                else:
+                    for i in range(len(self.teams)):  # [home, away,end]
+                        cali_sum[i] = cali_sum[i] + calibration_value[i]
+                        model_sum[i] = model_sum[i] + model_value[self.teams[i]]
 
                 self.calibration_values_all_dict.update({cali_dict_str: {'cali_sum': cali_sum,
                                                                          'model_sum': model_sum,
@@ -178,7 +206,7 @@ class Calibration:
             if cali_bin_info['number'] == 0:
                 print "number of bin {0} is 0".format(cali_dict_str)
                 continue
-            cali_record_dict = 'Bin:'+cali_dict_str
+            cali_record_dict = 'Bin:' + cali_dict_str
             for i in range(len(self.teams)):  # [home, away,end]
                 cali_prob = float(cali_bin_info['cali_sum'][i]) / cali_bin_info['number']
                 model_prob = float(cali_bin_info['model_sum'][i]) / cali_bin_info['number']
@@ -187,10 +215,14 @@ class Calibration:
                 cali_record_dict += '\t{0}_model'.format(self.teams[i]) + ":" + str(model_prob)
                 model_prob = model_prob + 1e-10
                 cali_prob = cali_prob + 1e-10
-                kld = cali_prob * math.log(cali_prob / model_prob)
+                try:
+                    kld = cali_prob * math.log(cali_prob / model_prob)
+                except:
+                    print 'kld is ' + str(cali_prob / model_prob)
+                    kld = 0
                 kld_sum += kld
                 ae = abs(cali_prob - model_prob)
                 mae_sum = mae_sum + ae
             cali_record_dict += '\tkld:' + str(kld_sum)
-            cali_record_dict += '\tmae:' + str(float(mae_sum)/len(self.teams))
+            cali_record_dict += '\tmae:' + str(float(mae_sum) / len(self.teams))
             self.save_calibration_file.write(str(cali_record_dict) + '\n')

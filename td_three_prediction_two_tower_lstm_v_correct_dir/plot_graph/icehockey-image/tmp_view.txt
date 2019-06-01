@@ -1,0 +1,35 @@
+total 7812
+-rw-rw-r-- 1 gla68 gla68 355857 Mar 25 15:52 blend Q_home shot-['reception', 'pass', 'reception'] with Dynamic LSTM feature5_batch32_iterate30_lr0.0001_v4_v_correct__diff.png
+-rw-rw-r-- 1 gla68 gla68 303948 Mar 26 11:56 blend Q_home shot-['reception', 'pass', 'reception'] with Dynamic LSTM feature5_batch64_iterate30_lr0.0001_v4_v_correct__diff.png
+-rw-rw-r-- 1 gla68 gla68 349258 Mar 25 15:52 blend Q_home shot-['reception', 'pass'] with Dynamic LSTM feature5_batch32_iterate30_lr0.0001_v4_v_correct__diff.png
+-rw-rw-r-- 1 gla68 gla68 303199 Mar 26 11:56 blend Q_home shot-['reception', 'pass'] with Dynamic LSTM feature5_batch64_iterate30_lr0.0001_v4_v_correct__diff.png
+-rw-rw-r-- 1 gla68 gla68 315597 Mar 25 15:52 blend Q_home shot-['reception'] with Dynamic LSTM feature5_batch32_iterate30_lr0.0001_v4_v_correct__diff.png
+-rw-rw-r-- 1 gla68 gla68 327263 Mar 26 11:56 blend Q_home shot-['reception'] with Dynamic LSTM feature5_batch64_iterate30_lr0.0001_v4_v_correct__diff.png
+-rw-rw-r-- 1 gla68 gla68 306628 Mar 25 15:52 blend Q_home shot-[] with Dynamic LSTM feature5_batch32_iterate30_lr0.0001_v4_v_correct__diff.png
+-rw-rw-r-- 1 gla68 gla68 250091 Mar 26 12:55 blend Q_home shot-[] with Dynamic LSTM feature5_batch64_iterate30_lr0.0001_v4_v_correct__diff.png
+-rw-rw-r-- 1 gla68 gla68 554603 Mar 25 15:52 blend right half Q_home shot-['reception', 'pass', 'reception'] with Dynamic LSTM feature5_batch32_iterate30_lr0.0001_v4_v_correct__diff.png
+-rw-rw-r-- 1 gla68 gla68 468321 Mar 26 11:56 blend right half Q_home shot-['reception', 'pass', 'reception'] with Dynamic LSTM feature5_batch64_iterate30_lr0.0001_v4_v_correct__diff.png
+-rw-rw-r-- 1 gla68 gla68 550172 Mar 25 15:52 blend right half Q_home shot-['reception', 'pass'] with Dynamic LSTM feature5_batch32_iterate30_lr0.0001_v4_v_correct__diff.png
+-rw-rw-r-- 1 gla68 gla68 459273 Mar 26 11:56 blend right half Q_home shot-['reception', 'pass'] with Dynamic LSTM feature5_batch64_iterate30_lr0.0001_v4_v_correct__diff.png
+-rw-rw-r-- 1 gla68 gla68 493448 Mar 25 15:52 blend right half Q_home shot-['reception'] with Dynamic LSTM feature5_batch32_iterate30_lr0.0001_v4_v_correct__diff.png
+-rw-rw-r-- 1 gla68 gla68 498757 Mar 26 11:56 blend right half Q_home shot-['reception'] with Dynamic LSTM feature5_batch64_iterate30_lr0.0001_v4_v_correct__diff.png
+-rw-rw-r-- 1 gla68 gla68 527941 Mar 25 15:52 blend right half Q_home shot-[] with Dynamic LSTM feature5_batch32_iterate30_lr0.0001_v4_v_correct__diff.png
+-rw-rw-r-- 1 gla68 gla68 401926 Mar 26 12:55 blend right half Q_home shot-[] with Dynamic LSTM feature5_batch64_iterate30_lr0.0001_v4_v_correct__diff.png
+-rw-rw-r-- 1 gla68 gla68 127796 Mar 27 12:10 Penguins v.s. Canadiens value_ticker.png
+-rw-rw-r-- 1 gla68 gla68  89361 Mar 25 15:52 Q_home shot-['reception', 'pass', 'reception'] with Dynamic LSTM feature5_batch32_iterate30_lr0.0001_v4_v_correct__diff.png
+-rw-rw-r-- 1 gla68 gla68  83392 Mar 26 11:56 Q_home shot-['reception', 'pass', 'reception'] with Dynamic LSTM feature5_batch64_iterate30_lr0.0001_v4_v_correct__diff.png
+-rw-rw-r-- 1 gla68 gla68  79937 Mar 25 15:52 Q_home shot-['reception', 'pass'] with Dynamic LSTM feature5_batch32_iterate30_lr0.0001_v4_v_correct__diff.png
+-rw-rw-r-- 1 gla68 gla68  80671 Mar 26 11:56 Q_home shot-['reception', 'pass'] with Dynamic LSTM feature5_batch64_iterate30_lr0.0001_v4_v_correct__diff.png
+-rw-rw-r-- 1 gla68 gla68  82000 Mar 25 15:52 Q_home shot-['reception'] with Dynamic LSTM feature5_batch32_iterate30_lr0.0001_v4_v_correct__diff.png
+-rw-rw-r-- 1 gla68 gla68  86820 Mar 26 11:56 Q_home shot-['reception'] with Dynamic LSTM feature5_batch64_iterate30_lr0.0001_v4_v_correct__diff.png
+-rw-rw-r-- 1 gla68 gla68  75538 Mar 25 15:52 Q_home shot-[] with Dynamic LSTM feature5_batch32_iterate30_lr0.0001_v4_v_correct__diff.png
+-rw-rw-r-- 1 gla68 gla68  66098 Mar 26 12:55 Q_home shot-[] with Dynamic LSTM feature5_batch64_iterate30_lr0.0001_v4_v_correct__diff.png
+-rw-rw-r-- 1 gla68 gla68  93868 Mar 25 15:52 right half Q_home shot-['reception', 'pass', 'reception'] with Dynamic LSTM feature5_batch32_iterate30_lr0.0001_v4_v_correct__diff.png
+-rw-rw-r-- 1 gla68 gla68  85540 Mar 26 11:56 right half Q_home shot-['reception', 'pass', 'reception'] with Dynamic LSTM feature5_batch64_iterate30_lr0.0001_v4_v_correct__diff.png
+-rw-rw-r-- 1 gla68 gla68  82305 Mar 25 15:52 right half Q_home shot-['reception', 'pass'] with Dynamic LSTM feature5_batch32_iterate30_lr0.0001_v4_v_correct__diff.png
+-rw-rw-r-- 1 gla68 gla68  83515 Mar 26 11:56 right half Q_home shot-['reception', 'pass'] with Dynamic LSTM feature5_batch64_iterate30_lr0.0001_v4_v_correct__diff.png
+-rw-rw-r-- 1 gla68 gla68  83638 Mar 25 15:52 right half Q_home shot-['reception'] with Dynamic LSTM feature5_batch32_iterate30_lr0.0001_v4_v_correct__diff.png
+-rw-rw-r-- 1 gla68 gla68  87647 Mar 26 11:56 right half Q_home shot-['reception'] with Dynamic LSTM feature5_batch64_iterate30_lr0.0001_v4_v_correct__diff.png
+-rw-rw-r-- 1 gla68 gla68  85306 Mar 25 15:52 right half Q_home shot-[] with Dynamic LSTM feature5_batch32_iterate30_lr0.0001_v4_v_correct__diff.png
+-rw-rw-r-- 1 gla68 gla68  69943 Mar 26 12:55 right half Q_home shot-[] with Dynamic LSTM feature5_batch64_iterate30_lr0.0001_v4_v_correct__diff.png
+-rw-rw-r-- 1 gla68 gla68      0 May 29 15:57 tmp_view.txt
