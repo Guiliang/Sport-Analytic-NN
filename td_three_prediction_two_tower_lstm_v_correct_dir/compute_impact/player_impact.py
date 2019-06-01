@@ -1,4 +1,6 @@
 import os
+
+import datetime
 import scipy.io as sio
 import json
 import operator
@@ -19,7 +21,7 @@ class PlayerImpact:
     def save_player_impact(self, save_name_write=None):
         assert len(self.player_name_dict_all.keys()) > 0
         if not save_name_write:
-            save_name_write = 'soccer_player_GIM.json'
+            save_name_write = 'soccer_player_GIM_{0}.json'.format(datetime.date.today().strftime("%Y%B%d"))
         with open('/Local-Scratch/PycharmProjects/Sport-Analytic-NN/'
                   'td_three_prediction_two_tower_lstm_v_correct_dir/'
                   'compute_impact/player_impact/' + save_name_write, 'w') as f:

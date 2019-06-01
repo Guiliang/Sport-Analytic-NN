@@ -10,7 +10,7 @@ class Correlation:
                                       'offensive': online_info_path_list[2]}
         self.game_info_path = game_info_path
         self.ranking_dir_dict = {'GIM': ['GIM', '../compute_impact/player_impact/ijcai_soccer_player_GIM.json'],
-                                 # 'markov': '',
+                                 'SI': ['', '../resource/soccer_player_markov_impact-2019May31.json'],
                                  # 'GIM2t': '',
                                  # 'ALG': ''
                                  }
@@ -43,7 +43,13 @@ class Correlation:
                 return True, info[2]
         return False, ' '
 
-    def get_rank_value(self, metric_name):
+    def get_markov_rank_value(self, metric_name):
+        metric_info = self.ranking_dir_dict.get(metric_name)
+        with open(metric_info[1]) as f:
+            d = json.load(f)
+        return d
+
+    def get_GIM_rank_value(self, metric_name):
         metric_info = self.ranking_dir_dict.get(metric_name)
         rank_value_dict = {}
         with open(metric_info[1]) as f:
@@ -98,12 +104,15 @@ class Correlation:
         for category in ['summary', 'defensive', 'offensive']:
             correlation_record_rank_dict = correlation_record_all_dict.get(category)
             for rank_value_name in self.ranking_dir_dict.keys():
-                rank_value_dict = self.get_rank_value(rank_value_name)
+                if rank_value_name == 'GIM':
+                    rank_value_dict = self.get_GIM_rank_value(rank_value_name)
+                else:
+                    rank_value_dict = self.get_markov_rank_value(rank_value_name)
                 correlation_rank_list = []
                 for interest_metric in self.interested_standard_metric.get(category):
                     correlation = self.compute_correlation(rank_value_dict, interest_metric, category)
                     correlation_rank_list.append(correlation)
-                str_line = rank_value_name+' '
+                str_line = rank_value_name + ' '
                 for index in range(0, len(correlation_rank_list)):
                     str_line = str_line + ' & ' + str(round(correlation_rank_list[index][0][1], 3))
                 str_line += '\\\\'

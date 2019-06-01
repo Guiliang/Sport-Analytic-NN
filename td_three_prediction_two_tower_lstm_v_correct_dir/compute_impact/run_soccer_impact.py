@@ -15,13 +15,20 @@ from td_three_prediction_two_tower_lstm_v_correct_dir.compute_impact.player_impa
 
 
 def get_data_name(config):
-    data_name = "model_three_cut_together_predict_Feature{0}_Iter{1}_lr{2}_Batch{3}_MaxLength{4}_Type{5}.json".format(
-        str(tt_lstm_config.learn.feature_type),
-        str(tt_lstm_config.learn.iterate_num),
+    if config.learn.merge_tower:
+        merge_model_msg = '_merge'
+    else:
+        merge_model_msg = ''
+
+    data_name = "model{6}_three_cut_together_predict_Feature{0}_Iter{1}_lr{2}_Batch{3}_MaxLength{4}_Type{5}.json".format(
+        str(config.learn.feature_type),
+        str(config.learn.iterate_num),
         str(learning_rate_write),
-        str(tt_lstm_config.learn.batch_size),
-        str(tt_lstm_config.learn.max_trace_length),
-        str(tt_lstm_config.learn.model_type))
+        str(config.learn.batch_size),
+        str(config.learn.max_trace_length),
+        str(config.learn.model_type),
+        merge_model_msg
+    )
 
     return data_name
 
@@ -46,13 +53,23 @@ def compute_values_for_all_games(config, data_store_dir, dir_all):
     model_nn.build()
     model_nn.call()
 
-    saved_network_path = tt_lstm_config.learn.save_mother_dir + "/oschulte/Galen/soccer-models/hybrid_sl_saved_NN/Scale-tt-three-cut_together_saved_networks_feature" + str(
-        tt_lstm_config.learn.feature_type) + "_batch" + str(
-        tt_lstm_config.learn.batch_size) + "_iterate" + str(
-        tt_lstm_config.learn.iterate_num) + "_lr" + str(
-        tt_lstm_config.learn.learning_rate) + "_" + str(
-        tt_lstm_config.learn.model_type) + tt_lstm_config.learn.if_correct_velocity + "_MaxTL" + str(
-        tt_lstm_config.learn.max_trace_length)
+    if tt_lstm_config.learn.merge_tower:
+        merge_msg = 'm'
+    else:
+        merge_msg = 's'
+
+    saved_network_path = "{0}/oschulte/Galen/soccer-models/hybrid_sl_saved_NN/" \
+                    "{1}Scale-tt{9}-three-cut_together_saved_networks_feature{2}" \
+                    "_batch{3}_iterate{4}_lr{5}_{6}{7}_MaxTL{8}".format(tt_lstm_config.learn.save_mother_dir,
+                                                                        '',
+                                                                        str(tt_lstm_config.learn.feature_type),
+                                                                        str(tt_lstm_config.learn.batch_size),
+                                                                        str(tt_lstm_config.learn.iterate_num),
+                                                                        str(tt_lstm_config.learn.learning_rate),
+                                                                        str(tt_lstm_config.learn.model_type),
+                                                                        str(tt_lstm_config.learn.if_correct_velocity),
+                                                                        str(tt_lstm_config.learn.max_trace_length),
+                                                                        merge_msg)
 
     data_name = get_data_name(config)
 
@@ -97,7 +114,7 @@ if __name__ == '__main__':
                               'td_three_prediction_two_tower_lstm_v_correct_dir/resource/soccer_id_name_pair.json'
 
     # tt_lstm_config_path = '../icehockey-config.yaml'
-    tt_lstm_config_path = "../soccer-config-v2.yaml"
+    tt_lstm_config_path = "../soccer-config-v3.yaml"
     soccer_dir_all = os.listdir(data_path)
 
     tt_lstm_config = TTLSTMCongfig.load(tt_lstm_config_path)
@@ -109,8 +126,8 @@ if __name__ == '__main__':
     elif learning_rate == 0.0005:
         learning_rate_write = '5_5'
 
-    # data_name = compute_values_for_all_games(config=tt_lstm_config, data_store_dir=soccer_data_store_dir,
-    #                                          dir_all=soccer_dir_all)
+    data_name = compute_values_for_all_games(config=tt_lstm_config, data_store_dir=soccer_data_store_dir,
+                                             dir_all=soccer_dir_all)
     data_name = get_data_name(config=tt_lstm_config)
     compute_impact(data_name=data_name, game_data_dir=data_path, soccer_data_store_dir=soccer_data_store_dir,
                    player_id_name_pair_dir=player_id_name_pair_dir)

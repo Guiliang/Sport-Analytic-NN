@@ -1,5 +1,7 @@
 import sys
 
+import datetime
+
 print sys.path
 sys.path.append('/Local-Scratch/PycharmProjects/Sport-Analytic-NN/')
 
@@ -81,7 +83,7 @@ def compute_impact(soccer_data_store_dir, game_data_dir, data_name, player_id_na
     for game_name_dir in dir_all:
         PI.aggregate_match_diff_values(game_name_dir)
     PI.transfer2player_name_dict(player_id_name_pair_dir)
-    PI.save_player_impact('ijcai_soccer_player_GIM.json')
+    PI.save_player_impact('ijcai_soccer_player_GIM_{0}.json'.format(datetime.date.today().strftime("%Y%B%d")))
 
 
 if __name__ == '__main__':
