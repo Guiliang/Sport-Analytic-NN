@@ -33,13 +33,18 @@ def generate_cali_latex_table(result_file_dir):
                         red_str = eles[0].split(':')[1]
 
                         if ref_str == red_str:
-                            number = eles[1].split(':')[1]
-                            h_cali = round(float(eles[2].split(':')[1]), 4)
-                            h_model = round(float(eles[3].split(':')[1]), 4)
-                            a_cali = round(float(eles[5].split(':')[1]), 4)
-                            a_model = round(float(eles[6].split(':')[1]), 4)
-                            kld = round(float(eles[10].split(':')[1].replace('\n', '')), 4)
-                            mae = round(float(eles[11].split(':')[1].replace('\n', '')), 4)
+                            try:
+                                number = eles[1].split(':')[1]
+                                h_cali = round(float(eles[2].split(':')[1]), 4)
+                                h_model = round(float(eles[3].split(':')[1]), 4)
+                                a_cali = round(float(eles[5].split(':')[1]), 4)
+                                a_model = round(float(eles[6].split(':')[1]), 4)
+                                kld = round(float(eles[10].split(':')[1].replace('\n', '')), 4)
+                                mae = round(float(eles[11].split(':')[1].replace('\n', '')), 4)
+                            except:
+                                # raise ValueError('something wrong')
+                                print eles
+                                raise ValueError('something wrong')
 
                             str_all += '{0} & {1} & {2} & {3} & {4} & {5} & {6} & {7} & {8} & {10} \\\\ \n'.format(
                                 str(score_diff), str(manpower), str(period), str(pitch),
@@ -66,9 +71,9 @@ if __name__ == '__main__':
                        soccer_data_store_dir=soccer_data_store_dir, apply_old=apply_old,
                        apply_difference=apply_difference,
                        focus_actions_list=['shot', 'pass'])
-    Cali.construct_bin_dicts()
-    Cali.aggregate_calibration_values()
-    Cali.compute_distance()
+    # Cali.construct_bin_dicts()
+    # Cali.aggregate_calibration_values()
+    # Cali.compute_distance()
     # save_calibration_dir = "/Local-Scratch/PycharmProjects/Sport-Analytic-NN/td_three_prediction_two_tower_lstm_v_correct_dir/calibration/calibration_results/calibration-['shot', 'pass']-2019May29.txt"
     generate_cali_latex_table(Cali.save_calibration_dir)
     # generate_cali_latex_table(save_calibration_dir)
