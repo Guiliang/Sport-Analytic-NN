@@ -74,7 +74,7 @@ def compute_games_values_for_different_model(config, data_store_dir, game_name_d
 
     # data_name = get_data_name(config)
     saver = tf.train.Saver()
-    for i in range(0, 300):
+    for i in range(1, 301):
         store_game_number = i*300+1
         model_path = saved_network_path + '/Soccer-game--{0}'.format(store_game_number)
         saver.restore(sess_nn, model_path)
@@ -89,7 +89,7 @@ def compute_games_values_for_different_model(config, data_store_dir, game_name_d
                                           config=tt_lstm_config,
                                           sport='Soccer')
         model_value_json = {}
-        for value_index in range(0, 10):
+        for value_index in range(0, 5):
             model_value_json.update({value_index: {'home': float(model_value[value_index][0]),
                                                    'away': float(model_value[value_index][1]),
                                                    'end': float(model_value[value_index][2])}})
