@@ -58,7 +58,7 @@ if __name__ == '__main__':
                         }
     data_path = "/cs/oschulte/soccer-data/sequences_append_goal/"
     soccer_data_store_dir = "/cs/oschulte/Galen/Soccer-data"
-    tt_lstm_config_path = "../soccer-config-v3.yaml"
+    tt_lstm_config_path = "../soccer-config-v4.yaml"
     apply_old = False
     apply_difference = False
     Cali = Calibration(bins=calibration_bins, data_path=data_path,
