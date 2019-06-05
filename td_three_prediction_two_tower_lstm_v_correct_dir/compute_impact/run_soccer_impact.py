@@ -132,7 +132,7 @@ if __name__ == '__main__':
     elif learning_rate == 0.0005:
         learning_rate_write = '5_5'
 
-    model_number = 15301  # 2101, 7201, 7801 ,10501 ,13501 ,15301 ,18301*, 20701*
+    model_number = 2101  # 2101, 7201, 7801 ,10501 ,13501 ,15301 ,18301*, 20701*
     data_name = compute_values_for_all_games(config=tt_lstm_config, data_store_dir=soccer_data_store_dir,
                                              dir_all=soccer_dir_all, model_number=model_number)
     # data_name = get_data_name(config=tt_lstm_config)
