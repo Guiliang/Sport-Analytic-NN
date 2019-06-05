@@ -1,11 +1,15 @@
 import csv
 import json
 import os
+import pickle
+
 import numpy as np
 import operator
 from scipy.stats import pearsonr
 import scipy.io as sio
 import td_three_prediction_two_tower_lstm_v_correct_dir.support.data_processing_tools as tools
+from td_three_prediction_two_tower_lstm_v_correct_dir.config.tt_lstm_config import TTLSTMCongfig
+from td_three_prediction_two_tower_lstm_v_correct_dir.support.data_processing_tools import get_data_name
 
 
 class RoundByRoundCorrelation:
@@ -17,13 +21,15 @@ class RoundByRoundCorrelation:
         self.model_data_store_dir = model_data_store_dir
         self.difference_type = difference_type
         self.data_name = data_name
-        self.ROUND_NUMBER = 60
+        self.round_number = 50
 
     def read_team_by_date(self):
         dir_all = os.listdir(self.raw_data_path)
         team_game_dict = {}
         for directory in dir_all:
+            print('processing date data {0}'.format(directory))
             with open(self.raw_data_path + str(directory)) as f:
+
                 data = json.load(f)
                 game_date = int(data.get('gameDate').split(' ')[0].replace('-', ''))
                 home_teamId = data.get('homeTeamId')
@@ -45,6 +51,8 @@ class RoundByRoundCorrelation:
         return team_game_dict
 
     def aggregate_partial_impact_values(self, dir_game, ha_id, partial_player_value_dict, action_selected=None):
+        print('processing game {0}'.format(dir_game))
+        ha_id = 1 if ha_id == 'home' else 0
         """compute impact"""
         for file_name in os.listdir(self.model_data_store_dir + "/" + dir_game):
             if file_name == self.data_name:
@@ -113,63 +121,68 @@ class RoundByRoundCorrelation:
 
             if ishome:
                 if self.difference_type == "back_difference_":
-                    q_value = (home_model_value - home_model_value_pre)
+                    impact_value = (home_model_value - home_model_value_pre)
                     # - (away_model_value - away_model_value_pre)
                 elif self.difference_type == "front_difference_":
-                    q_value = (home_model_value_nex - home_model_value)
+                    impact_value = (home_model_value_nex - home_model_value)
                     # - (away_model_value_nex - away_model_value)
                 elif self.difference_type == "skip_difference_":
-                    q_value = (home_model_value_nex - home_model_value_pre)
+                    impact_value = (home_model_value_nex - home_model_value_pre)
                     # - (away_model_value_nex - away_model_value_pre)
                 else:
                     raise ValueError('unknown difference type')
                 if player_value is None:
-                    partial_player_value_dict.update({playerId: {"value": q_value}})
+                    partial_player_value_dict.update({playerId: {"value": impact_value}})
                 else:
-                    player_value_number = player_value.get("value") + q_value
+                    player_value_number = player_value.get("value") + impact_value
                     partial_player_value_dict.update(
                         {playerId: {"value": player_value_number}})
                     # "state value": model_state_value[0] - model_state_value[1]}})
             else:
 
                 if self.difference_type == "back_difference_":
-                    q_value = (away_model_value - away_model_value_pre)
+                    impact_value = (away_model_value - away_model_value_pre)
                     # - (home_model_value - home_model_value_pre)
                 elif self.difference_type == "front_difference_":
-                    q_value = (away_model_value_nex - away_model_value)
+                    impact_value = (away_model_value_nex - away_model_value)
                     # - (home_model_value_nex - home_model_value)
                 elif self.difference_type == "skip_difference_":
-                    q_value = (away_model_value_nex - away_model_value_pre)
+                    impact_value = (away_model_value_nex - away_model_value_pre)
                     # - (home_model_value_nex - home_model_value_pre)
                 else:
                     raise ValueError('unknown difference type')
 
                 if player_value is None:
-                    partial_player_value_dict.update({playerId: {"value": q_value}})
+                    partial_player_value_dict.update({playerId: {"value": impact_value}})
                 else:
-                    player_value_number = player_value.get("value") + q_value
+                    player_value_number = player_value.get("value") + impact_value
                     partial_player_value_dict.update(
                         {playerId: {"value": player_value_number}})
+        return partial_player_value_dict
 
     def compute_game_by_round(self, team_game_dict):
         teams = team_game_dict.keys()
         game_by_round_dict = {}
-        for round_num in range(0, self.ROUND_NUMBER):
+        for round_num in range(0, self.round_number):
             game_by_round_dict.update({round_num + 1: []})
 
         for teamId in teams:
             date_dict = team_game_dict.get(teamId)
 
-            if len(date_dict) < self.ROUND_NUMBER:
-                raise Exception("ROUND_NUMBER is too large")
+            if len(date_dict) < self.round_number:
+                print("team round is {0},round_number ({1}) is too large".format(str(len(date_dict)),
+                                                                                 str(self.round_number)))
 
             sorted_date_dict = sorted(date_dict.items(), key=operator.itemgetter(0))
 
-            for round_num in range(1, self.ROUND_NUMBER + 1):
+            for round_num in range(1, self.round_number + 1):
                 games_list = game_by_round_dict.get(round_num)
 
-                for date in sorted_date_dict[:round_num]:
-                    games_list.append(date[0] + '$' + date[1])
+                if len(sorted_date_dict) < round_num:
+                    continue
+
+                date = sorted_date_dict[round_num-1]
+                games_list.append(str(date[0]) + '$' + date[1])
                 game_by_round_dict.update({round_num: games_list})
 
         return game_by_round_dict
@@ -184,8 +197,8 @@ class RoundByRoundCorrelation:
             name = items[0]
             playerId = items[1]
             team = items[2]
-            Goals = items[6]
-            Assist = items[7]
+            Goals = items[6] if items[6] != '-' else 0
+            Assist = items[7] if items[7] != '-' else 0
             player_id_info_dict.update({playerId: [name, team, Goals, Assist]})
         return player_id_info_dict
 
@@ -194,9 +207,9 @@ class RoundByRoundCorrelation:
         correlated_coefficient_round_by_round = {}
 
         playerIds = player_id_info_dict.keys()
-
-        for round_num in range(1, self.ROUND_NUMBER + 1):
-            partial_player_value_dict = {}
+        partial_player_value_dict = {}
+        for round_num in range(1, self.round_number + 1):  # TODO: too slow, fix it
+            # partial_player_value_dict = {}
             game_info_lists = game_by_round_dict.get(round_num)
             game_dir_all = []
             game_ha_id_all = []
@@ -204,9 +217,10 @@ class RoundByRoundCorrelation:
                 game_info_items = game_info.split('$')
                 h_a_id = game_info_items[1]
                 game_ha_id_all.append(h_a_id)
-                game_dir = game_info[2]
+                game_dir = game_info_items[2]
                 game_dir_all.append(game_dir)
-                partial_player_value_dict = self.aggregate_partial_impact_values(dir_game=game_dir, ha_id=h_a_id,
+                partial_player_value_dict = self.aggregate_partial_impact_values(dir_game=game_dir.split('.')[0],
+                                                                                 ha_id=h_a_id,
                                                                                  partial_player_value_dict=partial_player_value_dict)
 
             player_assist_list = []
@@ -215,7 +229,9 @@ class RoundByRoundCorrelation:
             for playerId in playerIds:
                 player_assist_list.append(int(player_id_info_dict.get(playerId)[3]))
                 player_goal_list.append(int(player_id_info_dict.get(playerId)[2]))
-                partial_player_GIM_list.append(partial_player_value_dict.get(playerId))
+                player_gim = partial_player_value_dict.get(int(playerId))
+                player_gim_value = player_gim['value'] if player_gim is not None else 0
+                partial_player_GIM_list.append(player_gim_value)  # TODO: we might want to fix it
 
             goal_correlation = self.compute_correlated_coefficient(partial_player_GIM_list,
                                                                    player_goal_list)
@@ -252,7 +268,7 @@ class RoundByRoundCorrelation:
             fieldnames = standard_statistic_fields
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
             writer.writeheader()
-            for round_number in range(1, self.ROUND_NUMBER + 1):
+            for round_number in range(1, self.round_number + 1):
                 round_correlated_coefficients = correlated_coefficient_round_by_round.get(round_number)
                 round_correlated_coefficients_record = {}
                 for standard_statistic in standard_statistic_fields:
@@ -262,7 +278,24 @@ class RoundByRoundCorrelation:
 
 
 if __name__ == "__main__":
-    raw_data_path = "/cs/oschulte/soccer-data/sequences_append_goal/"
-    interested_metric = ['Goals', 'Assists', 'Auto']
+    tt_lstm_config_path = "../soccer-config-v3.yaml"
 
-    # print 'still working'
+    tt_lstm_config = TTLSTMCongfig.load(tt_lstm_config_path)
+    raw_data_path = "/cs/oschulte/soccer-data/sequences_append_goal/"
+    model_data_store_dir = "/cs/oschulte/Galen/Soccer-data"
+    interested_metric = ['Goals', 'Assists', 'Auto']
+    player_summary_info_dir = '../resource/Soccer_summary_info.csv'
+    data_name = get_data_name(config=tt_lstm_config)
+    rbr_correlation = RoundByRoundCorrelation(raw_data_path, interested_metric, player_summary_info_dir,
+                                              model_data_store_dir, data_name)
+    # team_game_dict = rbr_correlation.read_team_by_date()
+    # pickle.dump(team_game_dict, open('./tmp_stores/team_game_dict.pkl', 'w'))
+    team_game_dict = pickle.load(open('./tmp_stores/team_game_dict.pkl', 'r'))
+    game_by_round_dict = rbr_correlation.compute_game_by_round(team_game_dict=team_game_dict)
+    player_id_info_dict = rbr_correlation.compute_player_season_totals()
+    correlated_coefficient_round_by_round = rbr_correlation.compute_correlations_by_round(
+        player_id_info_dict=player_id_info_dict, game_by_round_dict=game_by_round_dict)
+    with open('round_by_round_correlation.json', 'w') as outfile:
+        json.dumps(correlated_coefficient_round_by_round)
+
+    print 'still working'

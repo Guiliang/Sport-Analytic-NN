@@ -15,7 +15,7 @@ from td_three_prediction_two_tower_lstm_v_correct_dir.support.data_processing_to
     compromise_state_trace_length, \
     get_together_training_batch, write_game_average_csv
 
-tt_lstm_config_path = "../soccer-config-v3.yaml"
+tt_lstm_config_path = "../soccer-config-v4.yaml"
 tt_lstm_config = TTLSTMCongfig.load(tt_lstm_config_path)
 DATA_STORE = "/cs/oschulte/Galen/Soccer-data/"
 DIR_GAMES_ALL = os.listdir(DATA_STORE)

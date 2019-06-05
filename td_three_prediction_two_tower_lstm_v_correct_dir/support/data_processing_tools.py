@@ -330,6 +330,32 @@ def judge_feature_in_action(feature_input, actions):
     return False
 
 
+def get_data_name(config):
+    learning_rate = config.learn.learning_rate
+    if learning_rate == 1e-5:
+        learning_rate_write = '5'
+    elif learning_rate == 1e-4:
+        learning_rate_write = '4'
+    elif learning_rate == 0.0005:
+        learning_rate_write = '5_5'
+    if config.learn.merge_tower:
+        merge_model_msg = '_merge'
+    else:
+        merge_model_msg = ''
+
+    data_name = "model{6}_three_cut_together_predict_Feature{0}_Iter{1}_lr{2}_Batch{3}_MaxLength{4}_Type{5}.json".format(
+        str(config.learn.feature_type),
+        str(config.learn.iterate_num),
+        str(learning_rate_write),
+        str(config.learn.batch_size),
+        str(config.learn.max_trace_length),
+        str(config.learn.model_type),
+        merge_model_msg
+    )
+
+    return data_name
+
+
 def construct_simulation_data(features_train, features_mean, features_scale,
                               feature_type, is_home, action_type, actions, set_dict={}, gate_x_coord=None,
                               gate_y_coord=None):
@@ -678,9 +704,11 @@ def combine_player_data(player_info_csv, player_stats, player_info_stats):
             continue
         store_line = '{0},{1},{2},{3}'.format(items[0], str(info[0]), str(info[2]), str(info[1]))
         for item in items[3:]:
-            store_line += ','+item
+            store_line += ',' + item
         record_file.write(store_line)
 
+
 if __name__ == '__main__':
-    combine_player_data(player_info_csv='../resource/player_team_id_name_value.csv', player_stats='../resource/Soccer_summary.csv',
+    combine_player_data(player_info_csv='../resource/player_team_id_name_value.csv',
+                        player_stats='../resource/Soccer_summary.csv',
                         player_info_stats='../resource/Soccer_summary_info.csv')

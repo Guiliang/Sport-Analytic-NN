@@ -9,11 +9,12 @@ class Correlation:
                                       'defensive': online_info_path_list[1],
                                       'offensive': online_info_path_list[2]}
         self.game_info_path = game_info_path
-        self.ranking_dir_dict = {'GIM': ['GIM', '../compute_impact/player_impact/ijcai_soccer_player_GIM.json'],
-                                 'SI': ['', '../resource/soccer_player_markov_impact-2019May31.json'],
-                                 # 'GIM2t': '',
-                                 # 'ALG': ''
-                                 }
+        self.ranking_dir_dict = {
+            'GIM': ['GIM', '../compute_impact/player_impact/ijcai_soccer_player_GIM_2019June01.json'],
+            'SI': ['', '../resource/soccer_player_markov_impact-2019June04.json'],
+            'GIM2t': ['GIM', '../compute_impact/player_impact/soccer_player_GIM_2019June01.json'],
+            # 'ALG': ''
+            }
         self.interested_standard_metric = {'summary': ['Mins', 'Goals', 'Assists', 'Yel', 'Red',
                                                        'SpG', 'PS', 'AeriaisWon', 'MotM'],
                                            'defensive': ['Mins', 'Tackles', 'Inter', 'Fouls', 'Offsides',
@@ -57,7 +58,7 @@ class Correlation:
             for k in d.keys():
                 dic = d[k]
                 gim = dic[metric_info[0]]
-                id = dic['id']
+                id = k
                 if gim is None:
                     continue
                 value = gim['value']
@@ -88,6 +89,7 @@ class Correlation:
                     continue
                 # print(value)
                 mins_online_list.append(float(standard_value))
+                # print(value)
                 mins_game_list.append(float(value))
                 i += 1
 
@@ -104,7 +106,7 @@ class Correlation:
         for category in ['summary', 'defensive', 'offensive']:
             correlation_record_rank_dict = correlation_record_all_dict.get(category)
             for rank_value_name in self.ranking_dir_dict.keys():
-                if rank_value_name == 'GIM':
+                if rank_value_name == 'GIM' or rank_value_name == 'GIM2t':
                     rank_value_dict = self.get_GIM_rank_value(rank_value_name)
                 else:
                     rank_value_dict = self.get_markov_rank_value(rank_value_name)

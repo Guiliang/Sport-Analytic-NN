@@ -114,7 +114,7 @@ if __name__ == '__main__':
                               'td_three_prediction_two_tower_lstm_v_correct_dir/resource/soccer_id_name_pair.json'
 
     # tt_lstm_config_path = '../icehockey-config.yaml'
-    tt_lstm_config_path = "../soccer-config-v3.yaml"
+    tt_lstm_config_path = "../soccer-config-v4.yaml"
     soccer_dir_all = os.listdir(data_path)
 
     tt_lstm_config = TTLSTMCongfig.load(tt_lstm_config_path)
@@ -126,8 +126,8 @@ if __name__ == '__main__':
     elif learning_rate == 0.0005:
         learning_rate_write = '5_5'
 
-    # data_name = compute_values_for_all_games(config=tt_lstm_config, data_store_dir=soccer_data_store_dir,
-    #                                          dir_all=soccer_dir_all)
-    data_name = get_data_name(config=tt_lstm_config)
-    compute_impact(data_name=data_name, game_data_dir=data_path, soccer_data_store_dir=soccer_data_store_dir,
-                   player_id_name_pair_dir=player_id_name_pair_dir)
+    data_name = compute_values_for_all_games(config=tt_lstm_config, data_store_dir=soccer_data_store_dir,
+                                             dir_all=soccer_dir_all)
+    # data_name = get_data_name(config=tt_lstm_config)
+    # compute_impact(data_name=data_name, game_data_dir=data_path, soccer_data_store_dir=soccer_data_store_dir,
+    #                player_id_name_pair_dir=player_id_name_pair_dir)

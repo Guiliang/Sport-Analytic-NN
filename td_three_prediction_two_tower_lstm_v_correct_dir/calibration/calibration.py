@@ -88,6 +88,11 @@ class Calibration:
         else:
             old_string = ''
 
+        if self.tt_lstm_config.learn.merge_tower:
+            merge_model_msg = '_merge'
+        else:
+            merge_model_msg = ''
+
         learning_rate = self.tt_lstm_config.learn.learning_rate
         if learning_rate == 1e-5:
             learning_rate_write = '5'
@@ -95,16 +100,18 @@ class Calibration:
             learning_rate_write = '4'
         elif learning_rate == 0.0005:
             learning_rate_write = '5_5'
-        data_name = "{6}model_three_cut_together_predict_Feature{0}_Iter{1}_lr{2}_Batch{3}_MaxLength{4}_Type{5}.json".format(
+        data_name = "{6}model{7}_three_cut_together_predict_Feature{0}_Iter{1}_lr{2}_Batch{3}_MaxLength{4}_Type{5}.json".format(
             str(self.tt_lstm_config.learn.feature_type),
             str(self.tt_lstm_config.learn.iterate_num),
             str(learning_rate_write),
             str(self.tt_lstm_config.learn.batch_size),
             str(self.tt_lstm_config.learn.max_trace_length),
             str(self.tt_lstm_config.learn.model_type),
-            str(old_string)
+            str(old_string),
+            merge_model_msg
         )
         # directory = '917811'
+        print('model name is {0}'.format(data_name))
         with open(self.soccer_data_store_dir + "/" + directory + "/" + data_name) as outfile:
             model_output = json.load(outfile)
 
@@ -177,7 +184,7 @@ class Calibration:
                 model_value = model_values[str(index)]
 
                 cali_bin_info = self.calibration_values_all_dict.get(cali_dict_str)
-                print cali_dict_str
+                # print cali_dict_str
                 assert cali_bin_info is not None
                 cali_sum = cali_bin_info.get('cali_sum')
                 model_sum = cali_bin_info.get('model_sum')
