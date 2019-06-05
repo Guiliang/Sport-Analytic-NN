@@ -118,7 +118,7 @@ if __name__ == '__main__':
                               'td_three_prediction_two_tower_lstm_v_correct_dir/resource/soccer_id_name_pair.json'
 
     # tt_lstm_config_path = '../icehockey-config.yaml'
-    tt_lstm_config_path = "../soccer-config-v4.yaml"
+    tt_lstm_config_path = "../soccer-config-v5.yaml"
     soccer_dir_all = os.listdir(data_path)
 
     tt_lstm_config = TTLSTMCongfig.load(tt_lstm_config_path)
