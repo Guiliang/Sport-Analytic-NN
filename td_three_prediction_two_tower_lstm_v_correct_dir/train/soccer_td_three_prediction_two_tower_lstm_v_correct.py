@@ -15,7 +15,7 @@ from td_three_prediction_two_tower_lstm_v_correct_dir.support.data_processing_to
     compromise_state_trace_length, \
     get_together_training_batch, write_game_average_csv
 
-tt_lstm_config_path = "../soccer-config-v4.yaml"
+tt_lstm_config_path = "../soccer-config-v5.yaml"
 tt_lstm_config = TTLSTMCongfig.load(tt_lstm_config_path)
 DATA_STORE = "/cs/oschulte/Galen/Soccer-data/"
 DIR_GAMES_ALL = os.listdir(DATA_STORE)
@@ -66,7 +66,7 @@ def train_network(sess, model, print_parameters=False):
     converge_flag = False
 
     # loading network
-    saver = tf.train.Saver()
+    saver = tf.train.Saver(max_to_keep=300)
     merge = tf.summary.merge_all()
     train_writer = tf.summary.FileWriter(LOG_DIR, sess.graph)
     sess.run(tf.global_variables_initializer())
@@ -232,7 +232,7 @@ def train_network(sess, model, print_parameters=False):
 
                 if terminal:
                     print 'game{0} finishing'.format(str(game_number))
-                    if (game_number - 1) % 5000 == 0:
+                    if (game_number - 1) % 300 == 0:
                         # save progress after a game
                         print 'saving game', game_number
                         saver.save(sess, SAVED_NETWORK + '/' + tt_lstm_config.learn.sport + '-game-',

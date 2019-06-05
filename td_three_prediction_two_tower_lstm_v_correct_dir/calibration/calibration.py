@@ -17,23 +17,26 @@ class Calibration:
         self.apply_difference = apply_difference
         self.data_path = data_path
         self.calibration_features = calibration_features
-        self.calibration_values_all_dict = {}
+        if self.apply_difference:
+            self.calibration_values_all_dict = {'all': {'cali_sum': [0], 'model_sum': [0], 'number': 0}}
+        else:
+            self.calibration_values_all_dict = {'all': {'cali_sum': [0, 0, 0], 'model_sum': [0, 0, 0], 'number': 0}}
         self.soccer_data_store_dir = soccer_data_store_dir
         self.tt_lstm_config = TTLSTMCongfig.load(tt_lstm_config_path)
         self.focus_actions_list = focus_actions_list
         if self.apply_difference:
             self.save_calibration_dir = './calibration_results/difference-calibration-{0}-{1}.txt'. \
-            format(str(self.focus_actions_list), datetime.date.today().strftime("%Y%B%d"))
+                format(str(self.focus_actions_list), datetime.date.today().strftime("%Y%B%d"))
         else:
             self.save_calibration_dir = './calibration_results/calibration-{0}-{1}.txt'. \
-            format(str(self.focus_actions_list), datetime.date.today().strftime("%Y%B%d"))
+                format(str(self.focus_actions_list), datetime.date.today().strftime("%Y%B%d"))
         self.save_calibration_file = open(self.save_calibration_dir, 'w')
         if apply_difference:
             self.teams = ['home-away']
         else:
             self.teams = ['home', 'away', 'end']
-        # learning_rate = tt_lstm_config.learn.learning_rate
-        # pass
+            # learning_rate = tt_lstm_config.learn.learning_rate
+            # pass
 
     def __del__(self):
         print 'ending calibration'
@@ -191,8 +194,8 @@ class Calibration:
                 number = cali_bin_info.get('number')
                 number += 1
                 if self.apply_difference:
-                    cali_sum[0] = cali_sum[0] + (calibration_value[0]-calibration_value[1])
-                    model_sum[0] = model_sum[0] + (model_value['home']-model_value['away'])
+                    cali_sum[0] = cali_sum[0] + (calibration_value[0] - calibration_value[1])
+                    model_sum[0] = model_sum[0] + (model_value['home'] - model_value['away'])
                 else:
                     for i in range(len(self.teams)):  # [home, away,end]
                         cali_sum[i] = cali_sum[i] + calibration_value[i]
@@ -202,7 +205,24 @@ class Calibration:
                                                                          'model_sum': model_sum,
                                                                          'number': number}})
 
-            # break
+                cali_bin_info = self.calibration_values_all_dict.get('all')
+                cali_sum = cali_bin_info.get('cali_sum')
+                model_sum = cali_bin_info.get('model_sum')
+                number = cali_bin_info.get('number')
+                number += 1
+                if self.apply_difference:
+                    cali_sum[0] = cali_sum[0] + (calibration_value[0] - calibration_value[1])
+                    model_sum[0] = model_sum[0] + (model_value['home'] - model_value['away'])
+                else:
+                    for i in range(len(self.teams)):  # [home, away,end]
+                        cali_sum[i] = cali_sum[i] + calibration_value[i]
+                        model_sum[i] = model_sum[i] + model_value[self.teams[i]]
+
+                self.calibration_values_all_dict.update({'all': {'cali_sum': cali_sum,
+                                                                 'model_sum': model_sum,
+                                                                 'number': number}})
+
+                # break
 
     def compute_distance(self):
         cali_dict_strs = self.calibration_values_all_dict.keys()
