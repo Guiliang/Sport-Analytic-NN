@@ -147,7 +147,7 @@ class Calibration:
                 continue_flag = False if len(self.focus_actions_list) == 0 else True
                 for f_action in self.focus_actions_list:
                     if f_action in action:
-                        print action
+                        # print action
                         continue_flag = False
                 if continue_flag:
                     continue
