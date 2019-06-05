@@ -79,7 +79,7 @@ def compute_games_values_for_different_model(config, data_store_dir, game_name_d
         model_path = saved_network_path + '/Soccer-game--{0}'.format(store_game_number)
         saver.restore(sess_nn, model_path)
         print 'successfully load data from' + model_path
-        read_plot_model(model_path=saved_network_path, sess_nn=sess_nn)
+        # read_plot_model(model_path=saved_network_path, sess_nn=sess_nn)
         game_name = game_name_dir.split('.')[0]
         # game_time_all = get_game_time(data_path, game_name_dir)
         model_value = compute_game_values(sess_nn=sess_nn,
