@@ -33,7 +33,7 @@ def get_data_name(config):
     return data_name
 
 
-def compute_values_for_all_games(config, data_store_dir, dir_all):
+def compute_values_for_all_games(config, data_store_dir, dir_all, model_number=None):
     sess_nn = tf.InteractiveSession()
 
     model_nn = td_prediction_tt_embed(
@@ -59,21 +59,27 @@ def compute_values_for_all_games(config, data_store_dir, dir_all):
         merge_msg = 's'
 
     saved_network_path = "{0}/oschulte/Galen/soccer-models/hybrid_sl_saved_NN/" \
-                    "{1}Scale-tt{9}-three-cut_together_saved_networks_feature{2}" \
-                    "_batch{3}_iterate{4}_lr{5}_{6}{7}_MaxTL{8}".format(tt_lstm_config.learn.save_mother_dir,
-                                                                        '',
-                                                                        str(tt_lstm_config.learn.feature_type),
-                                                                        str(tt_lstm_config.learn.batch_size),
-                                                                        str(tt_lstm_config.learn.iterate_num),
-                                                                        str(tt_lstm_config.learn.learning_rate),
-                                                                        str(tt_lstm_config.learn.model_type),
-                                                                        str(tt_lstm_config.learn.if_correct_velocity),
-                                                                        str(tt_lstm_config.learn.max_trace_length),
-                                                                        merge_msg)
+                         "{1}Scale-tt{9}-three-cut_together_saved_networks_feature{2}" \
+                         "_batch{3}_iterate{4}_lr{5}_{6}{7}_MaxTL{8}".format(tt_lstm_config.learn.save_mother_dir,
+                                                                             '',
+                                                                             str(tt_lstm_config.learn.feature_type),
+                                                                             str(tt_lstm_config.learn.batch_size),
+                                                                             str(tt_lstm_config.learn.iterate_num),
+                                                                             str(tt_lstm_config.learn.learning_rate),
+                                                                             str(tt_lstm_config.learn.model_type),
+                                                                             str(
+                                                                                 tt_lstm_config.learn.if_correct_velocity),
+                                                                             str(tt_lstm_config.learn.max_trace_length),
+                                                                             merge_msg)
 
     data_name = get_data_name(config)
-
-    read_plot_model(model_path=saved_network_path, sess_nn=sess_nn)
+    if model_number is not None:
+        saver = tf.train.Saver()
+        model_path = saved_network_path + '/Soccer-game--{0}'.format(model_number)
+        saver.restore(sess_nn, model_path)
+        print 'successfully load data from' + model_path
+    else:
+        read_plot_model(model_path=saved_network_path, sess_nn=sess_nn)
     for game_name_dir in dir_all:
         game_name = game_name_dir.split('.')[0]
         # game_time_all = get_game_time(data_path, game_name_dir)
@@ -114,7 +120,7 @@ if __name__ == '__main__':
                               'td_three_prediction_two_tower_lstm_v_correct_dir/resource/soccer_id_name_pair.json'
 
     # tt_lstm_config_path = '../icehockey-config.yaml'
-    tt_lstm_config_path = "../soccer-config-v4.yaml"
+    tt_lstm_config_path = "../soccer-config-v5.yaml"
     soccer_dir_all = os.listdir(data_path)
 
     tt_lstm_config = TTLSTMCongfig.load(tt_lstm_config_path)
@@ -126,8 +132,9 @@ if __name__ == '__main__':
     elif learning_rate == 0.0005:
         learning_rate_write = '5_5'
 
+    model_number = 15301  # 2101, 7201, 7801 ,10501 ,13501 ,15301 ,18301*, 20701*
     data_name = compute_values_for_all_games(config=tt_lstm_config, data_store_dir=soccer_data_store_dir,
-                                             dir_all=soccer_dir_all)
+                                             dir_all=soccer_dir_all, model_number=model_number)
     # data_name = get_data_name(config=tt_lstm_config)
     # compute_impact(data_name=data_name, game_data_dir=data_path, soccer_data_store_dir=soccer_data_store_dir,
     #                player_id_name_pair_dir=player_id_name_pair_dir)
