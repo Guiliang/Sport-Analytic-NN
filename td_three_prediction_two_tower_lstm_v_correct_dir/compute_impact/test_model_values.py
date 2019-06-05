@@ -75,8 +75,8 @@ def compute_games_values_for_different_model(config, data_store_dir, game_name_d
     # data_name = get_data_name(config)
     saver = tf.train.Saver()
     for i in range(0, 300):
-        store_game_number = i+1
-        model_path = saved_network_path + 'Soccer-game--{0}'.format(store_game_number)
+        store_game_number = i*300+1
+        model_path = saved_network_path + '/Soccer-game--{0}'.format(store_game_number)
         saver.restore(sess_nn, model_path)
         print 'successfully load data from' + model_path
         read_plot_model(model_path=saved_network_path, sess_nn=sess_nn)
