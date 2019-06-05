@@ -75,5 +75,6 @@ if __name__ == '__main__':
     # Cali.aggregate_calibration_values()
     # Cali.compute_distance()
     # save_calibration_dir = "/Local-Scratch/PycharmProjects/Sport-Analytic-NN/td_three_prediction_two_tower_lstm_v_correct_dir/calibration/calibration_results/calibration-['shot', 'pass']-2019May29.txt"
+    print Cali.save_calibration_dir
     generate_cali_latex_table(Cali.save_calibration_dir)
     # generate_cali_latex_table(save_calibration_dir)
