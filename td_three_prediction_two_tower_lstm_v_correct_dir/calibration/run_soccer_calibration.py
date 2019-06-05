@@ -71,9 +71,9 @@ if __name__ == '__main__':
                        soccer_data_store_dir=soccer_data_store_dir, apply_old=apply_old,
                        apply_difference=apply_difference,
                        focus_actions_list=['shot', 'pass'])
-    # Cali.construct_bin_dicts()
-    # Cali.aggregate_calibration_values()
-    # Cali.compute_distance()
+    Cali.construct_bin_dicts()
+    Cali.aggregate_calibration_values()
+    Cali.compute_distance()
     # save_calibration_dir = "/Local-Scratch/PycharmProjects/Sport-Analytic-NN/td_three_prediction_two_tower_lstm_v_correct_dir/calibration/calibration_results/calibration-['shot', 'pass']-2019May29.txt"
     print Cali.save_calibration_dir
     generate_cali_latex_table(Cali.save_calibration_dir)
