@@ -313,10 +313,10 @@ class RoundByRoundCorrelation:
                 game_value_list.append(float(value))
                 i += 1
 
-        print(len(online_value_list))
-        print(len(game_value_list))
+        # print(len(online_value_list))
+        # print(len(game_value_list))
         # print('matched number is ' + str(i))
-        return np.corrcoef(online_value_list, game_value_list)
+        return np.corrcoef(online_value_list, game_value_list)[0][1]
 
     def normalization(self, player_impacts):
         impact_all = []
