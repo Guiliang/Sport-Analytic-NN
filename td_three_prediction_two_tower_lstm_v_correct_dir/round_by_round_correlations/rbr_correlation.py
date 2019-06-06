@@ -186,7 +186,7 @@ class RoundByRoundCorrelation:
                 if len(sorted_date_dict) < round_num:
                     continue
 
-                date = sorted_date_dict[round_num-1]
+                date = sorted_date_dict[round_num - 1]
                 games_list.append(str(date[0]) + '$' + date[1])
                 game_by_round_dict.update({round_num: games_list})
 
@@ -304,6 +304,6 @@ if __name__ == "__main__":
     correlated_coefficient_round_by_round = rbr_correlation.compute_correlations_by_round(
         player_id_info_dict=player_id_info_dict, game_by_round_dict=game_by_round_dict)
     with open('round_by_round_correlation.json', 'w') as outfile:
-        json.dumps(correlated_coefficient_round_by_round)
+        json.dump(obj=correlated_coefficient_round_by_round, fp=outfile)
 
     print 'still working'
