@@ -236,7 +236,11 @@ class RoundByRoundCorrelation:
                 player_assist_list.append(int(player_id_info_dict.get(playerId)[3]))
                 player_goal_list.append(int(player_id_info_dict.get(playerId)[2]))
                 player_gim = partial_player_value_dict.get(int(playerId))
-                player_gim_value = player_gim['value'] if player_gim is not None else 0
+                if player_gim is not None:
+                    player_gim_value = player_gim['value']
+                else:
+                    print 'continue'
+                    continue
                 partial_player_GIM_list.append(player_gim_value)  # TODO: we might want to fix it
 
             goal_correlation = self.compute_correlated_coefficient(partial_player_GIM_list,
