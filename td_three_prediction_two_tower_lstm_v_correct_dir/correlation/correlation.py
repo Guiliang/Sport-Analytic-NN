@@ -11,8 +11,8 @@ class Correlation:
         self.game_info_path = game_info_path
         self.ranking_dir_dict = {
             'GIM': ['GIM', '../compute_impact/player_impact/ijcai_soccer_player_GIM_2019June01.json'],
-            'SI': ['', '../resource/soccer_player_markov_impact-2019June04.json'],
-            'GIM2t': ['GIM', '../compute_impact/player_impact/soccer_player_GIM_2019June01.json'],
+            'SI': ['', '../resource/soccer_player_markov_impact-2019June01.json'],
+            'GIM2t': ['GIM', '../compute_impact/player_impact/soccer_player_GIM_2019June05.json'],
             # 'ALG': ''
             }
         self.interested_standard_metric = {'summary': ['Mins', 'Goals', 'Assists', 'Yel', 'Red',

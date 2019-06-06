@@ -21,7 +21,8 @@ class PlayerImpact:
     def save_player_impact(self, save_name_write=None):
         assert len(self.player_name_dict_all.keys()) > 0
         if not save_name_write:
-            save_name_write = 'soccer_player_GIM_{0}.json'.format(datetime.date.today().strftime("%Y%B%d"))
+            save_name_write = 'soccer_player_GIM_{0}_{1}.json'.\
+                format(datetime.date.today().strftime("%Y%B%d"), self.difference_type)
         with open('/Local-Scratch/PycharmProjects/Sport-Analytic-NN/'
                   'td_three_prediction_two_tower_lstm_v_correct_dir/'
                   'compute_impact/player_impact/' + save_name_write, 'w') as f:
@@ -141,40 +142,44 @@ class PlayerImpact:
 
             if ishome:
                 if self.difference_type == "back_difference_":
-                    q_value = (home_model_value - home_model_value_pre)
+                    value = (home_model_value - home_model_value_pre)
                     # - (away_model_value - away_model_value_pre)
                 elif self.difference_type == "front_difference_":
-                    q_value = (home_model_value_nex - home_model_value)
+                    value = (home_model_value_nex - home_model_value)
                     # - (away_model_value_nex - away_model_value)
                 elif self.difference_type == "skip_difference_":
-                    q_value = (home_model_value_nex - home_model_value_pre)
+                    value = (home_model_value_nex - home_model_value_pre)
                     # - (away_model_value_nex - away_model_value_pre)
+                elif self.difference_type == "expected_goal":
+                    value = home_model_value
                 else:
                     raise ValueError('unknown difference type')
                 if player_value is None:
-                    self.player_id_dict_all.update({playerId: {"value": q_value}})
+                    self.player_id_dict_all.update({playerId: {"value": value}})
                 else:
-                    player_value_number = player_value.get("value") + q_value
+                    player_value_number = player_value.get("value") + value
                     self.player_id_dict_all.update(
                         {playerId: {"value": player_value_number}})
                     # "state value": model_state_value[0] - model_state_value[1]}})
             else:
 
                 if self.difference_type == "back_difference_":
-                    q_value = (away_model_value - away_model_value_pre)
+                    value = (away_model_value - away_model_value_pre)
                     # - (home_model_value - home_model_value_pre)
                 elif self.difference_type == "front_difference_":
-                    q_value = (away_model_value_nex - away_model_value)
+                    value = (away_model_value_nex - away_model_value)
                     # - (home_model_value_nex - home_model_value)
                 elif self.difference_type == "skip_difference_":
-                    q_value = (away_model_value_nex - away_model_value_pre)
+                    value = (away_model_value_nex - away_model_value_pre)
                     # - (home_model_value_nex - home_model_value_pre)
+                elif self.difference_type == "expected_goal":
+                    value = away_model_value
                 else:
                     raise ValueError('unknown difference type')
 
                 if player_value is None:
-                    self.player_id_dict_all.update({playerId: {"value": q_value}})
+                    self.player_id_dict_all.update({playerId: {"value": value}})
                 else:
-                    player_value_number = player_value.get("value") + q_value
+                    player_value_number = player_value.get("value") + value
                     self.player_id_dict_all.update(
                         {playerId: {"value": player_value_number}})
