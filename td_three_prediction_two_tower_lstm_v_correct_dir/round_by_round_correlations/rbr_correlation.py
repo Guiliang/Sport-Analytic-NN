@@ -301,9 +301,8 @@ class RoundByRoundCorrelation:
                 Flag, id = self.get_id(playername, teamname)
                 if not Flag:
                     continue
-                print Flag
-                print id
-                print rank_value_dict
+                print type(id)
+                # print rank_value_dict
                 if id not in rank_value_dict:
                     continue
                 value = rank_value_dict[id]
