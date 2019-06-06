@@ -258,7 +258,8 @@ class RoundByRoundCorrelation:
         return correlated_coefficient_round_by_round
 
     def compute_correlated_coefficient(self, listA, listB):
-        return pearsonr(listA, listB)[0]
+        return np.corrcoef(listA, listB)[0][1]
+        # return pearsonr(listA, listB)[0]
 
     def normalization(self, player_impacts):
         impact_all = []
