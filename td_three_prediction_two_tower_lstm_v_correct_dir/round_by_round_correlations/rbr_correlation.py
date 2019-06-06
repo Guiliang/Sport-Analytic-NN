@@ -89,6 +89,7 @@ class RoundByRoundCorrelation:
                     continue
 
             if home_identifier[event_Index] != ha_id:
+                print 'skip event {0} as id is {1}'.format(str(event_Index), str(home_identifier[event_Index]))
                 continue
 
             playerId = playerIds[event_Index]
