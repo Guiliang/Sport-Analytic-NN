@@ -89,7 +89,7 @@ class RoundByRoundCorrelation:
                     continue
 
             if home_identifier[event_Index] != ha_id:
-                print 'skip event {0} as id is {1}'.format(str(event_Index), str(home_identifier[event_Index]))
+                # print 'skip event {0} as id is {1}'.format(str(event_Index), str(home_identifier[event_Index]))
                 continue
 
             playerId = playerIds[event_Index]
@@ -233,15 +233,17 @@ class RoundByRoundCorrelation:
             player_goal_list = []
             partial_player_GIM_list = []
             for playerId in playerIds:
-                player_assist_list.append(int(player_id_info_dict.get(playerId)[3]))
-                player_goal_list.append(int(player_id_info_dict.get(playerId)[2]))
                 player_gim = partial_player_value_dict.get(int(playerId))
                 if player_gim is not None:
                     player_gim_value = player_gim['value']
                 else:
-                    print 'continue'
+                    # print 'continue'
                     continue
+                player_assist_list.append(int(player_id_info_dict.get(playerId)[3]))
+                player_goal_list.append(int(player_id_info_dict.get(playerId)[2]))
                 partial_player_GIM_list.append(player_gim_value)  # TODO: we might want to fix it
+
+            print ('matched player number is {0}'.format(len(partial_player_GIM_list)))
 
             goal_correlation = self.compute_correlated_coefficient(partial_player_GIM_list,
                                                                    player_goal_list)
