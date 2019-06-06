@@ -283,8 +283,8 @@ class RoundByRoundCorrelation:
         return False, ''
 
     def compute_correlation(self, rank_value_dict, interest_metric):
-        mins_online_list = []
-        mins_game_list = []
+        online_value_list = []
+        game_value_list = []
         with open(self.player_summary_dir) as online_info_file:
             online_reader = csv.DictReader(online_info_file)
             i = 0
@@ -305,15 +305,15 @@ class RoundByRoundCorrelation:
                 if not Flag:
                     continue
                 # print(value)
-                mins_online_list.append(float(standard_value))
+                online_value_list.append(float(standard_value))
                 # print(value)
-                mins_game_list.append(float(value))
+                game_value_list.append(float(value))
                 i += 1
 
-        # print(len(mins_online_list))
-        # print(len(mins_game_list))
+        print(len(online_value_list))
+        print(len(game_value_list))
         # print('matched number is ' + str(i))
-        return np.corrcoef(mins_online_list, mins_game_list)
+        return np.corrcoef(online_value_list, game_value_list)
 
     def normalization(self, player_impacts):
         impact_all = []
