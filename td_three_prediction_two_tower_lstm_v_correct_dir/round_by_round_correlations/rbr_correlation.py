@@ -299,11 +299,14 @@ class RoundByRoundCorrelation:
                     continue
                 # print(playername, ' ', teamname)
                 Flag, id = self.get_id(playername, teamname)
+                if not Flag:
+                    continue
+                print Flag
+                print id
+                print rank_value_dict
                 if id not in rank_value_dict:
                     continue
                 value = rank_value_dict[id]
-                if not Flag:
-                    continue
                 # print(value)
                 online_value_list.append(float(standard_value))
                 # print(value)
