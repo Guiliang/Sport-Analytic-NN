@@ -245,6 +245,9 @@ class RoundByRoundCorrelation:
 
             correlated_coefficient_round_by_round.update({round_num: {'assistant': assistant_correlation,
                                                                       'goal': goal_correlation}})
+            print 'correlation for round {0} is assist:{1} and goal:{2}'.format(str(round_num),
+                                                                                str(assistant_correlation),
+                                                                                str(goal_correlation))
         return correlated_coefficient_round_by_round
 
     def compute_correlated_coefficient(self, listA, listB):
