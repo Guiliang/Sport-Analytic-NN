@@ -56,8 +56,8 @@ class RoundByRoundCorrelation:
         return team_game_dict
 
     def aggregate_partial_impact_values(self, dir_game, ha_id, partial_player_value_dict, action_selected=None):
-        print('processing game {0}'.format(dir_game))
         ha_id = 1 if ha_id == 'home' else 0
+        print('processing game {0} with ha_id {1}'.format(dir_game, str(ha_id)))
         """compute impact"""
         for file_name in os.listdir(self.model_data_store_dir + "/" + dir_game):
             if file_name == self.data_name:
@@ -300,6 +300,17 @@ if __name__ == "__main__":
     # pickle.dump(team_game_dict, open('./tmp_stores/team_game_dict.pkl', 'w'))
     team_game_dict = pickle.load(open('./tmp_stores/team_game_dict.pkl', 'r'))
     game_by_round_dict = rbr_correlation.compute_game_by_round(team_game_dict=team_game_dict)
+    total_game = 0
+    game_ste = {}
+    for values in game_by_round_dict.values():
+        total_game += len(values)
+        for value in values:
+            if game_ste.get(value.split('$')[-1]) is not None:
+                number = game_ste.get(value.split('$')[-1]) + 1
+            else:
+                number = 1
+            game_ste.update({value.split('$')[-1]: number})
+    print total_game / 2
     player_id_info_dict = rbr_correlation.compute_player_season_totals()
     correlated_coefficient_round_by_round = rbr_correlation.compute_correlations_by_round(
         player_id_info_dict=player_id_info_dict, game_by_round_dict=game_by_round_dict)
