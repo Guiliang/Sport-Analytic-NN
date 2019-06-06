@@ -66,15 +66,15 @@ if __name__ == '__main__':
     tt_lstm_config_path = "../soccer-config-v5.yaml"
     apply_old = False
     apply_difference = False
-    Cali = Calibration(bins=calibration_bins, data_path=data_path,
-                       calibration_features=calibration_features, tt_lstm_config_path=tt_lstm_config_path,
-                       soccer_data_store_dir=soccer_data_store_dir, apply_old=apply_old,
-                       apply_difference=apply_difference,
-                       focus_actions_list=['shot', 'pass'])
-    Cali.construct_bin_dicts()
-    Cali.aggregate_calibration_values()
-    Cali.compute_distance()
-    # save_calibration_dir = "/Users/liu/PycharmProjects/sport-analytic-NN/td_three_prediction_two_tower_lstm_v_correct_dir/calibration/calibration_results/calibration-['shot', 'pass']-2019June05.txt"
-    print Cali.save_calibration_dir
-    generate_cali_latex_table(Cali.save_calibration_dir)
+    # Cali = Calibration(bins=calibration_bins, data_path=data_path,
+    #                    calibration_features=calibration_features, tt_lstm_config_path=tt_lstm_config_path,
+    #                    soccer_data_store_dir=soccer_data_store_dir, apply_old=apply_old,
+    #                    apply_difference=apply_difference,
+    #                    focus_actions_list=['shot', 'pass'])
+    # Cali.construct_bin_dicts()
+    # Cali.aggregate_calibration_values()
+    # Cali.compute_distance()
+    save_calibration_dir = "/Users/liu/PycharmProjects/sport-analytic-NN/td_three_prediction_two_tower_lstm_v_correct_dir/calibration/calibration_results/calibration-['shot', 'pass']-2019June05.txt"
+    # print Cali.save_calibration_dir
+    generate_cali_latex_table(save_calibration_dir)
     # generate_cali_latex_table(save_calibration_dir)
