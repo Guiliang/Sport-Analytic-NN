@@ -19,12 +19,12 @@ from td_three_prediction_two_tower_lstm_v_correct_dir.support.data_processing_to
 
 class RoundByRoundCorrelation:
     def __init__(self, raw_data_path, interested_metric, player_summary_dir,
-                 model_data_store_dir, data_name, game_info_path, difference_type='back_difference_'):
+                 model_data_store_dir, data_name, game_info_path):
         self.player_summary_dir = player_summary_dir
         self.raw_data_path = raw_data_path
         self.interested_metric = interested_metric
         self.model_data_store_dir = model_data_store_dir
-        self.difference_type = difference_type
+        self.difference_type = None
         self.data_name = data_name
         self.round_number = 50
         self.game_info_path = game_info_path
@@ -136,41 +136,45 @@ class RoundByRoundCorrelation:
 
             if ishome:
                 if self.difference_type == "back_difference_":
-                    impact_value = (home_model_value - home_model_value_pre)
+                    value = (home_model_value - home_model_value_pre)
                     # - (away_model_value - away_model_value_pre)
                 elif self.difference_type == "front_difference_":
-                    impact_value = (home_model_value_nex - home_model_value)
+                    value = (home_model_value_nex - home_model_value)
                     # - (away_model_value_nex - away_model_value)
                 elif self.difference_type == "skip_difference_":
-                    impact_value = (home_model_value_nex - home_model_value_pre)
+                    value = (home_model_value_nex - home_model_value_pre)
                     # - (away_model_value_nex - away_model_value_pre)
+                elif self.difference_type == "expected_goal":
+                    value = home_model_value
                 else:
                     raise ValueError('unknown difference type')
                 if player_value is None:
-                    partial_player_value_dict.update({playerId: {"value": impact_value}})
+                    partial_player_value_dict.update({playerId: {"value": value}})
                 else:
-                    player_value_number = player_value.get("value") + impact_value
+                    player_value_number = player_value.get("value") + value
                     partial_player_value_dict.update(
                         {playerId: {"value": player_value_number}})
                     # "state value": model_state_value[0] - model_state_value[1]}})
             else:
 
                 if self.difference_type == "back_difference_":
-                    impact_value = (away_model_value - away_model_value_pre)
+                    value = (away_model_value - away_model_value_pre)
                     # - (home_model_value - home_model_value_pre)
                 elif self.difference_type == "front_difference_":
-                    impact_value = (away_model_value_nex - away_model_value)
+                    value = (away_model_value_nex - away_model_value)
                     # - (home_model_value_nex - home_model_value)
                 elif self.difference_type == "skip_difference_":
-                    impact_value = (away_model_value_nex - away_model_value_pre)
+                    value = (away_model_value_nex - away_model_value_pre)
                     # - (home_model_value_nex - home_model_value_pre)
+                elif self.difference_type == "expected_goal":
+                    value = away_model_value
                 else:
                     raise ValueError('unknown difference type')
 
                 if player_value is None:
-                    partial_player_value_dict.update({playerId: {"value": impact_value}})
+                    partial_player_value_dict.update({playerId: {"value": value}})
                 else:
-                    player_value_number = player_value.get("value") + impact_value
+                    player_value_number = player_value.get("value") + value
                     partial_player_value_dict.update(
                         {playerId: {"value": player_value_number}})
         return partial_player_value_dict
@@ -218,7 +222,7 @@ class RoundByRoundCorrelation:
         return player_id_info_dict
 
     def compute_correlations_by_round(self, game_by_round_dict,
-                                      player_id_info_dict):
+                                      player_id_info_dict, metric_name):
         correlated_coefficient_round_by_round = {}
 
         playerIds = player_id_info_dict.keys()
