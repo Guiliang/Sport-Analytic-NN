@@ -330,7 +330,7 @@ def judge_feature_in_action(feature_input, actions):
     return False
 
 
-def get_data_name(config):
+def get_data_name(config, if_old=False):
     learning_rate = config.learn.learning_rate
     if learning_rate == 1e-5:
         learning_rate_write = '5'
@@ -343,14 +343,20 @@ def get_data_name(config):
     else:
         merge_model_msg = ''
 
-    data_name = "model{6}_three_cut_together_predict_Feature{0}_Iter{1}_lr{2}_Batch{3}_MaxLength{4}_Type{5}.json".format(
+    if if_old:
+        extra_model_msg = 'ijcai_'
+    else:
+        extra_model_msg = ''
+
+    data_name = "{7}model{6}_three_cut_together_predict_Feature{0}_Iter{1}_lr{2}_Batch{3}_MaxLength{4}_Type{5}.json".format(
         str(config.learn.feature_type),
         str(config.learn.iterate_num),
         str(learning_rate_write),
         str(config.learn.batch_size),
         str(config.learn.max_trace_length),
         str(config.learn.model_type),
-        merge_model_msg
+        merge_model_msg,
+        extra_model_msg,
     )
 
     return data_name

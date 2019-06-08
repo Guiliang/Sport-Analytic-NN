@@ -10,17 +10,13 @@ from td_three_prediction_two_tower_lstm_v_correct_dir.round_by_round_correlation
     RoundByRoundCorrelation
 
 if __name__ == "__main__":
-    tt_lstm_config_path = "../soccer-config-v3.yaml"
-
-    tt_lstm_config = TTLSTMCongfig.load(tt_lstm_config_path)
     raw_data_path = "/cs/oschulte/soccer-data/sequences_append_goal/"
     model_data_store_dir = "/cs/oschulte/Galen/Soccer-data"
-    interested_metric = ['GIM2t', 'EG']  # ['GIM', 'SI']
+    interested_metric = ['GIM2t', 'GIM', 'EG', 'SI']  # ['GIM', 'SI']
     player_summary_dir = '../resource/Soccer_summary.csv'
     game_info_path = '../resource/player_team_id_name_value.csv'
-    data_name = get_data_name(config=tt_lstm_config)
     rbr_correlation = RoundByRoundCorrelation(raw_data_path, interested_metric, player_summary_dir,
-                                              model_data_store_dir, data_name, game_info_path)
+                                              model_data_store_dir, game_info_path)
     # team_game_dict = rbr_correlation.read_team_by_date()
     # pickle.dump(team_game_dict, open('./tmp_stores/team_game_dict.pkl', 'w'))
     team_game_dict = pickle.load(open('./tmp_stores/team_game_dict.pkl', 'r'))
@@ -41,8 +37,26 @@ if __name__ == "__main__":
     for metric in interested_metric:
         if metric == 'GIM2t':
             rbr_correlation.difference_type = 'back_difference_'
+            tt_lstm_config_path = "../soccer-config-v3.yaml"
+            tt_lstm_config = TTLSTMCongfig.load(tt_lstm_config_path)
+            data_name = get_data_name(config=tt_lstm_config)
+            rbr_correlation.data_name = data_name
         elif metric == 'EG':
             rbr_correlation.difference_type = 'expected_goal'
+            tt_lstm_config_path = "../soccer-config-v3.yaml"
+            tt_lstm_config = TTLSTMCongfig.load(tt_lstm_config_path)
+            data_name = get_data_name(config=tt_lstm_config)
+            rbr_correlation.data_name = data_name
+        elif metric == 'GIM':
+            rbr_correlation.difference_type = 'back_difference_'
+            tt_lstm_config_path = "../soccer-config.yaml"
+            tt_lstm_config = TTLSTMCongfig.load(tt_lstm_config_path)
+            data_name = get_data_name(config=tt_lstm_config, if_old=True)
+            rbr_correlation.data_name = data_name
+        elif metric == 'SI':
+            rbr_correlation.difference_type = 'expected_goal'
+            data_name = 'markov_impact_values.json'
+            rbr_correlation.data_name = data_name
         correlated_coefficient_round_by_round = rbr_correlation.compute_correlations_by_round(
             player_id_info_dict=player_id_info_dict, game_by_round_dict=game_by_round_dict,
             metric_name=metric)

@@ -19,13 +19,13 @@ from td_three_prediction_two_tower_lstm_v_correct_dir.support.data_processing_to
 
 class RoundByRoundCorrelation:
     def __init__(self, raw_data_path, interested_metric, player_summary_dir,
-                 model_data_store_dir, data_name, game_info_path):
+                 model_data_store_dir, game_info_path):
         self.player_summary_dir = player_summary_dir
         self.raw_data_path = raw_data_path
         self.interested_metric = interested_metric
         self.model_data_store_dir = model_data_store_dir
         self.difference_type = None
-        self.data_name = data_name
+        self.data_name = None
         self.round_number = 50
         self.game_info_path = game_info_path
         self.game_info_file = open(self.game_info_path)

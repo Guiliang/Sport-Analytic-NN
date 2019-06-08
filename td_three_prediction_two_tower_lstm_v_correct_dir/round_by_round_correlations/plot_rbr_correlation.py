@@ -23,15 +23,15 @@ class DrawRoundCorrelation:
             for method in self.metric_names_all:
                 field_dict.update({method: []})
             self.field_dict.update({field_name: field_dict})
-        self.ROUND_NUMBER = 60
+        self.ROUND_NUMBER = 50
 
     def read_round_by_round_correlation(self):
-        methods_record_all = {}
+        # methods_record_all = {}
         with open(self.rbr_results_dir) as fp:
             record_rbr_dict = json.load(fp)
         for metric_name in record_rbr_dict.keys():
             metric_values = record_rbr_dict.get(metric_name)
-            round_number_all = sorted(metric_values.keys(), reverse=True)
+            round_number_all = map(str, sorted(map(int, metric_values.keys()), reverse=False))
             for round_number in round_number_all:
                 values = metric_values.get(round_number)
                 for field_name in values.keys():
@@ -41,7 +41,7 @@ class DrawRoundCorrelation:
                     inner_list.append(correl_value)
                     metric_dict.update({metric_name: inner_list})
                     self.field_dict.update({field_name: metric_dict})
-        return methods_record_all
+        return self.field_dict
 
     # def read_append_round_by_round_correlation(self, methods_record_all):
     #     record_all_dict = self.read_csv(self.append_round_by_round_dir, 'sta_auto')
@@ -67,7 +67,7 @@ class DrawRoundCorrelation:
                 correlations = methods_record_all.get(field_name).get(method)
 
                 for pop_number in range(0, self.ROUND_NUMBER / scale):
-                    correlations.pop(pop_number + 1)
+                    correlations.pop(pop_number)
 
                 # plt.plot(x_list, correlations, label=method)
                 plt.plot(x_list, correlations,
@@ -93,7 +93,8 @@ class DrawRoundCorrelation:
 
 
 if __name__ == "__main__":
-    DRC = DrawRoundCorrelation()
+    rbr_results_dir = './round_by_round_correlation.json'
+    DRC = DrawRoundCorrelation(rbr_results_dir=rbr_results_dir)
     record_all_dict = DRC.read_round_by_round_correlation()
     # DRC.read_append_round_by_round_correlation(record_all_dict)
     DRC.draw_round_by_round_correlation(record_all_dict)
