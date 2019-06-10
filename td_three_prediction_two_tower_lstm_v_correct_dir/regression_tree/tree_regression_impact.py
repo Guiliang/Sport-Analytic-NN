@@ -33,7 +33,7 @@ class TreeRegression:
         self.features_train_all = []
         self.trace_length = trace_length
         for j in range(0, self.trace_length):
-            for feature in features_train:
+            for feature in features_train[0:16]:  # ignore the actions
                 self.features_train_all.append(feature + '${0}'.format(str(j)))
 
     def cart_validation_model(self, data_train, target_train, data_test, target_test, read_model=True, test_flag=False):
@@ -181,9 +181,9 @@ class TreeRegression:
     def gather_game_training_data(self, dir_game):
         game_impact_list = []
         game_input_list = []
-        print self.data_name
+        # print self.data_name
         for file_name in os.listdir(self.model_data_store_dir + "/" + dir_game):
-            print file_name
+            # print file_name
             if file_name.startswith('.'):
                 continue
             if file_name == self.data_name:
@@ -221,6 +221,7 @@ class TreeRegression:
             # print model_data
             model_value = model_data[str(event_Index)]
             state_input_value = state_input[event_Index]
+            state_input_value = state_input_value[:, 0:16]
             state_input_value_flat = tools.flat_state_input(state_input=state_input_value)
             game_input_list.append(state_input_value_flat)
             if event_Index - 1 >= 0:  # define model pre

@@ -1,0 +1,6 @@
+The binary tree structure has 5 nodes and has the following tree structure:
+node=0 test node: go to node 1 if distance_to_goal$0 <= 16.703088209117134 else to node 2.
+	node=1 leaf node.
+	node=2 test node: go to node 3 if distance_to_goal$1 <= 30.564412412967638 else to node 4.
+		node=3 leaf node.
+		node=4 leaf node.

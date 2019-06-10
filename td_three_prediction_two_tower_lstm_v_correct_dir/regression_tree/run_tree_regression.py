@@ -14,7 +14,7 @@ if __name__ == '__main__':
     if test_flag:
         data_path = '/Users/liu/Desktop/soccer-data-sample/sequences_append_goal/'
         soccer_data_store_dir = "/Users/liu/Desktop/soccer-data-sample/Soccer-data/"
-        min_sample_leaf = 1
+        min_sample_leaf = 20
     else:
         data_path = "/cs/oschulte/soccer-data/sequences_append_goal/"
         soccer_data_store_dir = "/cs/oschulte/Galen/Soccer-data/"
