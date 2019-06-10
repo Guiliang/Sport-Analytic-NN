@@ -21,7 +21,7 @@ class PlayerImpact:
     def save_player_impact(self, save_name_write=None):
         assert len(self.player_name_dict_all.keys()) > 0
         if not save_name_write:
-            save_name_write = 'soccer_player_GIM_{0}_{1}.json'.\
+            save_name_write = 'soccer_player_GIM_{0}_{1}.json'. \
                 format(datetime.date.today().strftime("%Y%B%d"), self.difference_type)
         with open('/Local-Scratch/PycharmProjects/Sport-Analytic-NN/'
                   'td_three_prediction_two_tower_lstm_v_correct_dir/'
@@ -104,7 +104,7 @@ class PlayerImpact:
         for player_Index in range(0, len(playerIds)):
 
             if action_selected is not None:
-                if actions[player_Index] != action_selected:
+                if action_selected not in actions[player_Index]:
                     continue
 
             playerId = playerIds[player_Index]

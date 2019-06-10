@@ -12,25 +12,7 @@ from td_three_prediction_two_tower_lstm_v_correct_dir.config.tt_lstm_config impo
 from td_three_prediction_two_tower_lstm_v_correct_dir.nn_structure.td_tt_lstm import td_prediction_tt_embed
 from td_three_prediction_two_tower_lstm_v_correct_dir.support.plot_tools import compute_game_values, read_plot_model
 from td_three_prediction_two_tower_lstm_v_correct_dir.compute_impact.player_impact import PlayerImpact
-
-
-def get_data_name(config):
-    if config.learn.merge_tower:
-        merge_model_msg = '_merge'
-    else:
-        merge_model_msg = ''
-
-    data_name = "model{6}_three_cut_together_predict_Feature{0}_Iter{1}_lr{2}_Batch{3}_MaxLength{4}_Type{5}.json".format(
-        str(config.learn.feature_type),
-        str(config.learn.iterate_num),
-        str(learning_rate_write),
-        str(config.learn.batch_size),
-        str(config.learn.max_trace_length),
-        str(config.learn.model_type),
-        merge_model_msg
-    )
-
-    return data_name
+from td_three_prediction_two_tower_lstm_v_correct_dir.support.data_processing_tools import get_data_name
 
 
 def compute_values_for_all_games(config, data_store_dir, dir_all, model_number=None):

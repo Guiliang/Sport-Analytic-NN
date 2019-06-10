@@ -8,7 +8,6 @@ import unicodedata
 import td_three_prediction_two_tower_lstm_v_correct_dir.config.icehockey_feature_setting as icehockey_feature_setting
 import td_three_prediction_two_tower_lstm_v_correct_dir.config.soccer_feature_setting as soccer_feature_setting
 
-
 def handle_trace_length(state_trace_length):
     """
     transform format of trace length
@@ -712,6 +711,22 @@ def combine_player_data(player_info_csv, player_stats, player_info_stats):
         for item in items[3:]:
             store_line += ',' + item
         record_file.write(store_line)
+
+
+def flat_state_input(state_input):
+    flat_input = []
+    for state in state_input:
+        zero_flag = True
+        for value in state:
+            if value != 0:
+                zero_flag = False
+                break
+        if zero_flag:
+            flat_input = flat_input + len(state) * [0]
+        else:
+            flat_input = state.tolist() + flat_input
+    return flat_input
+
 
 
 if __name__ == '__main__':
