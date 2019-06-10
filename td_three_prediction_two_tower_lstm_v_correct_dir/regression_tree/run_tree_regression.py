@@ -5,7 +5,7 @@ from td_three_prediction_two_tower_lstm_v_correct_dir.support.data_processing_to
 from tree_regression_impact import TreeRegression
 
 if __name__ == '__main__':
-    test_flag = True
+    test_flag = False
     if test_flag:
         data_path = '/Users/liu/Desktop/soccer-data-sample/sequences_append_goal/'
         soccer_data_store_dir = "/Users/liu/Desktop/soccer-data-sample/Soccer-data/"
