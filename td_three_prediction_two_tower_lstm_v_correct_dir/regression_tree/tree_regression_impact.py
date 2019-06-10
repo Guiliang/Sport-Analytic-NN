@@ -25,8 +25,8 @@ class TreeRegression:
         self.min_sample_leaf = min_sample_leaf
         self.model_store_mother_dir = '/cs/oschulte/Galen/soccer-models/dt_models/'
         self.data_name = data_name
-        self.write_feature_importance_dir = './dt_record/feature_importance.txt'
-        self.write_print_tree_dir = './dt_record/print_tree.txt'
+        self.write_feature_importance_dir = './dt_record/feature_importance_{0}_tree.txt'.format(action_selected)
+        self.write_print_tree_dir = './dt_record/print_{0}_tree.txt'.format(action_selected)
         self.action_selected = action_selected
         self.regressor = None
         features_train, self.features_mean_dic, self.features_scale_dic, _ = select_feature_setting(5)
