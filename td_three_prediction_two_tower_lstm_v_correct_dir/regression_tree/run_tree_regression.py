@@ -11,7 +11,7 @@ from tree_regression_impact import TreeRegression
 
 if __name__ == '__main__':
     test_flag = False
-    read_model = True
+    read_model = False
     if test_flag:
         data_path = '/Users/liu/Desktop/soccer-data-sample/sequences_append_goal/'
         soccer_data_store_dir = "/Users/liu/Desktop/soccer-data-sample/Soccer-data/"
@@ -22,9 +22,9 @@ if __name__ == '__main__':
         min_sample_leaf = 20
     tt_lstm_config_path = '../soccer-config-v5.yaml'
     difference_type = 'back_difference_'
-    action_selected = 'shot'
+    action_selected = 'pass'
     cart_model_name = 'CART_soccer_impact_{0}_{1}.json'. \
-        format(datetime.date.today().strftime("%Y%B%d"), difference_type)
+        format(action_selected, difference_type)
 
     tt_lstm_config = TTLSTMCongfig.load(tt_lstm_config_path)
     learning_rate = tt_lstm_config.learn.learning_rate
