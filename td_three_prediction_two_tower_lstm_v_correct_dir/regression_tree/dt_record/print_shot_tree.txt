@@ -1,6 +1,21 @@
-The binary tree structure has 5 nodes and has the following tree structure:
-node=0 test node: go to node 1 if distance_to_goal$0 <= 16.703088209117134 else to node 2.
-	node=1 leaf node.
-	node=2 test node: go to node 3 if distance_to_goal$1 <= 30.564412412967638 else to node 4.
-		node=3 leaf node.
-		node=4 leaf node.
+The binary tree structure has 20 nodes and has the following tree structure:
+node=0 test node: go to node 1 if outcome$0 <= 0.49999999727380784 else to node 5246.
+	node=1 test node: go to node 2 if x$1 <= 79.1499991996615 else to node 2821.
+		node=2 test node: go to node 3 if velocity_x$0 <= 252.64713562386615 else to node 2174.
+			node=3 test node: go to node 4 if gameTimeRemain$1 <= 45.60480589396911 else to node 487.
+				node=4 test node: go to node 5 if distance_to_goal$0 <= 17.82343989841271 else to node 24.
+					node=5 test node: go to node 6 if y$0 <= 39.60000026843031 else to node 7.
+						node=6 leaf node.
+						node=7 test node: go to node 8 if velocity_y$6 <= -222.78706655459123 else to node 9.
+							node=8 leaf node.
+							node=9 test node: go to node 10 if velocity_x$2 <= 421.45097732658917 else to node 23.
+								node=10 test node: go to node 11 if distance_to_goal$0 <= 13.894953605267531 else to node 14.
+									node=11 test node: go to node 12 if distance_y$0 <= 3.950000976326276 else to node 13.
+										node=12 leaf node.
+										node=13 leaf node.
+									node=14 test node: go to node 15 if scoreDiff$4 <= 0.06488620082869072 else to node 18.
+										node=15 test node: go to node 16 if distance_y$1 <= 30.199999887911233 else to node 17.
+											node=16 leaf node.
+											node=17 leaf node.
+										node=18 test node: go to node 19 if velocity_y$0 <= 242.21724741030795 else to node 22.
+											node=19 test node: go to node 20 if interrupted$1 <= 0.49999999045247445 else to node 21.
