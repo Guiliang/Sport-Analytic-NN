@@ -38,6 +38,18 @@ class TreeRegression:
 
     def read_cart_model(self):
         self.regressor = pickle.load(open(self.model_store_mother_dir + self.cart_model_name, 'rb'))
+        feature_importances_dict = {}
+        feature_importances = self.regressor.feature_importances_
+        for index in range(0, len(feature_importances)):
+            feature_importance = feature_importances[index]
+            feature_importances_dict.update({self.features_train_all[index]: feature_importance})
+        feature_importances_sorted = sorted(feature_importances_dict.items(), key=operator.itemgetter(1), reverse=True)
+        print '\nfeature importance:'
+        print feature_importances_sorted[:20]
+        print '\n'
+        with open(self.write_feature_importance_dir, 'w') as f:
+            for feature_importance in feature_importances_sorted:
+                f.write(str(feature_importance[0]) + '&' + str(feature_importance[1]) + '\\\\ \n')
 
     def train_cart_validation_model(self, data_train, target_train, data_test, target_test, read_model=True,
                                     test_flag=False):
@@ -158,7 +170,7 @@ class TreeRegression:
                         node_depth[i] * "\t", i, sum(node_values[i]) / len(node_values[i])))
                 else:
                     print("%snode=%s test node value%s: go to node %s if %s <= %s else to "
-                          "node %s."
+                          "node %s.\n"
                           % (node_depth[i] * "\t",
                              i,
                              sum(node_values[i]) / len(node_values[i]),
