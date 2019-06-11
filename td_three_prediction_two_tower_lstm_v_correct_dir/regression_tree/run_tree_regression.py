@@ -11,6 +11,7 @@ from tree_regression_impact import TreeRegression
 
 if __name__ == '__main__':
     test_flag = False
+    read_model = True
     if test_flag:
         data_path = '/Users/liu/Desktop/soccer-data-sample/sequences_append_goal/'
         soccer_data_store_dir = "/Users/liu/Desktop/soccer-data-sample/Soccer-data/"
@@ -43,8 +44,11 @@ if __name__ == '__main__':
                         model_data_store_dir=soccer_data_store_dir, game_data_dir=data_path,
                         difference_type=difference_type, action_selected=action_selected,
                         min_sample_leaf=min_sample_leaf)
-    all_input_list, all_impact_list = TR.gather_all_training_data()
-    TR.cart_validation_model(np.asarray(all_input_list), np.asarray(all_impact_list),
-                             np.asarray(all_input_list), np.asarray(all_impact_list),
-                             read_model=False, test_flag=test_flag)
+    if not read_model:
+        all_input_list, all_impact_list = TR.gather_all_training_data()
+        TR.train_cart_validation_model(np.asarray(all_input_list), np.asarray(all_impact_list),
+                                       np.asarray(all_input_list), np.asarray(all_impact_list),
+                                       read_model=False, test_flag=test_flag)
+    else:
+        TR.read_cart_model()
     TR.print_decision_path()

@@ -36,21 +36,19 @@ class TreeRegression:
             for feature in features_train[0:16]:  # ignore the actions
                 self.features_train_all.append(feature + '${0}'.format(str(j)))
 
-    def cart_validation_model(self, data_train, target_train, data_test, target_test, read_model=True, test_flag=False):
+    def read_cart_model(self):
+        self.regressor = pickle.load(open(self.cart_model_name, 'rb'))
 
-        # for train_input_feature in data_train:
-        #     self.return_unscaled_input_feature(train_input_feature)
+    def train_cart_validation_model(self, data_train, target_train, data_test, target_test, read_model=True,
+                                    test_flag=False):
 
-        if read_model:
-            self.regressor = pickle.load(open(self.cart_model_name, 'rb'))
-        else:
-            self.regressor = DecisionTreeRegressor(random_state=0, max_depth=self.max_depth,
-                                                   max_leaf_nodes=self.max_leaf_node,
-                                                   min_samples_leaf=self.min_sample_leaf)
-            self.regressor.fit(data_train, target_train)
-            if not test_flag:
-                with open(self.model_store_mother_dir + self.cart_model_name, 'wb') as f:
-                    pickle.dump(self.regressor, f)
+        self.regressor = DecisionTreeRegressor(random_state=0, max_depth=self.max_depth,
+                                               max_leaf_nodes=self.max_leaf_node,
+                                               min_samples_leaf=self.min_sample_leaf)
+        self.regressor.fit(data_train, target_train)
+        if not test_flag:
+            with open(self.model_store_mother_dir + self.cart_model_name, 'wb') as f:
+                pickle.dump(self.regressor, f)
         feature_importances_dict = {}
         feature_importances = self.regressor.feature_importances_
         for index in range(0, len(feature_importances)):
@@ -154,21 +152,12 @@ class TreeRegression:
                     % n_nodes)
             for i in range(n_nodes):
                 if is_leaves[i]:
-                    print("%snode=%s leaf node value%s." % (node_depth[i] * "\t", i, sum(node_values[i])/len(node_values[i])))
-                    f.write("%snode=%s leaf node value%s.\n" % (node_depth[i] * "\t", i, sum(node_values[i])/len(node_values[i])))
+                    print("%snode=%s leaf node value%s." % (
+                    node_depth[i] * "\t", i, sum(node_values[i]) / len(node_values[i])))
+                    f.write("%snode=%s leaf node value%s.\n" % (
+                    node_depth[i] * "\t", i, sum(node_values[i]) / len(node_values[i])))
                 else:
                     print("%snode=%s test node value%s: go to node %s if %s <= %s else to "
-                          "node %s."
-                          % (node_depth[i] * "\t",
-                             i,
-                             sum(node_values[i])/len(node_values[i]),
-                             children_left[i],
-                             # feature[i],
-                             self.features_train_all[feature[i]],
-                             threshold[i],
-                             children_right[i],
-                             ))
-                    f.write("%snode=%s test node value%s: go to node %s if %s <= %s else to "
                           "node %s."
                           % (node_depth[i] * "\t",
                              i,
@@ -179,6 +168,17 @@ class TreeRegression:
                              threshold[i],
                              children_right[i],
                              ))
+                    f.write("%snode=%s test node value%s: go to node %s if %s <= %s else to "
+                            "node %s."
+                            % (node_depth[i] * "\t",
+                               i,
+                               sum(node_values[i]) / len(node_values[i]),
+                               children_left[i],
+                               # feature[i],
+                               self.features_train_all[feature[i]],
+                               threshold[i],
+                               children_right[i],
+                               ))
             print()
 
     def gather_game_training_data(self, dir_game):
