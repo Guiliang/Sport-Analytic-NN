@@ -119,6 +119,7 @@ class TreeRegression:
         n_nodes = estimator.tree_.node_count
         children_left = estimator.tree_.children_left
         children_right = estimator.tree_.children_right
+        node_values = estimator.tree_.value
         feature = estimator.tree_.feature
         threshold = estimator.tree_.threshold
         feature_node_name_all = []
@@ -153,29 +154,31 @@ class TreeRegression:
                     % n_nodes)
             for i in range(n_nodes):
                 if is_leaves[i]:
-                    print("%snode=%s leaf node." % (node_depth[i] * "\t", i))
-                    f.write("%snode=%s leaf node.\n" % (node_depth[i] * "\t", i))
+                    print("%snode=%s leaf node value%s." % (node_depth[i] * "\t", i, sum(node_values[i])/len(node_values[i])))
+                    f.write("%snode=%s leaf node value%s.\n" % (node_depth[i] * "\t", i, sum(node_values[i])/len(node_values[i])))
                 else:
-                    print("%snode=%s test node: go to node %s if %s <= %s else to "
+                    print("%snode=%s test node value%s: go to node %s if %s <= %s else to "
                           "node %s."
                           % (node_depth[i] * "\t",
                              i,
+                             sum(node_values[i])/len(node_values[i]),
                              children_left[i],
                              # feature[i],
                              self.features_train_all[feature[i]],
                              threshold[i],
                              children_right[i],
                              ))
-                    f.write("%snode=%s test node: go to node %s if %s <= %s else to "
-                            "node %s.\n"
-                            % (node_depth[i] * "\t",
-                               i,
-                               children_left[i],
-                               # feature[i],
-                               self.features_train_all[feature[i]],
-                               threshold[i],
-                               children_right[i],
-                               ))
+                    f.write("%snode=%s test node value%s: go to node %s if %s <= %s else to "
+                          "node %s."
+                          % (node_depth[i] * "\t",
+                             i,
+                             sum(node_values[i]) / len(node_values[i]),
+                             children_left[i],
+                             # feature[i],
+                             self.features_train_all[feature[i]],
+                             threshold[i],
+                             children_right[i],
+                             ))
             print()
 
     def gather_game_training_data(self, dir_game):
