@@ -62,7 +62,7 @@ class TreeRegression:
         print '\n'
         with open(self.write_feature_importance_dir, 'w') as f:
             for feature_importance in feature_importances_sorted:
-                f.write(str(feature_importance) + '\n')
+                f.write(str(feature_importance[0]) + '&' + str(feature_importance[1]) + '\\\\ \n')
 
         target_output = self.regressor.predict(data_test)
         mae = sum(abs(target_output - target_test)) / target_test.size
@@ -143,7 +143,7 @@ class TreeRegression:
                 stack.append((children_right[node_id], parent_depth + 1))
             else:
                 is_leaves[node_id] = True
-        n_nodes = n_nodes if n_nodes < max_print_node else max_print_node
+        # n_nodes = n_nodes if n_nodes < max_print_node else max_print_node
         with open(self.write_print_tree_dir, 'w') as f:
             print("The binary tree structure has %s nodes and has "
                   "the following tree structure:"
