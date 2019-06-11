@@ -170,7 +170,7 @@ class TreeRegression:
                         node_depth[i] * "\t", i, sum(node_values[i]) / len(node_values[i])))
                 else:
                     print("%snode=%s test node value%s: go to node %s if %s <= %s else to "
-                          "node %s.\n"
+                          "node %s."
                           % (node_depth[i] * "\t",
                              i,
                              sum(node_values[i]) / len(node_values[i]),
@@ -181,7 +181,7 @@ class TreeRegression:
                              children_right[i],
                              ))
                     f.write("%snode=%s test node value%s: go to node %s if %s <= %s else to "
-                            "node %s."
+                            "node %s.\n"
                             % (node_depth[i] * "\t",
                                i,
                                sum(node_values[i]) / len(node_values[i]),
