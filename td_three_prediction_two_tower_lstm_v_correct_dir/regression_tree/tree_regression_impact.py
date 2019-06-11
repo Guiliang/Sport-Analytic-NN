@@ -37,7 +37,7 @@ class TreeRegression:
                 self.features_train_all.append(feature + '${0}'.format(str(j)))
 
     def read_cart_model(self):
-        self.regressor = pickle.load(open(self.cart_model_name, 'rb'))
+        self.regressor = pickle.load(open(self.model_store_mother_dir + self.cart_model_name, 'rb'))
 
     def train_cart_validation_model(self, data_train, target_train, data_test, target_test, read_model=True,
                                     test_flag=False):
@@ -153,9 +153,9 @@ class TreeRegression:
             for i in range(n_nodes):
                 if is_leaves[i]:
                     print("%snode=%s leaf node value%s." % (
-                    node_depth[i] * "\t", i, sum(node_values[i]) / len(node_values[i])))
+                        node_depth[i] * "\t", i, sum(node_values[i]) / len(node_values[i])))
                     f.write("%snode=%s leaf node value%s.\n" % (
-                    node_depth[i] * "\t", i, sum(node_values[i]) / len(node_values[i])))
+                        node_depth[i] * "\t", i, sum(node_values[i]) / len(node_values[i])))
                 else:
                     print("%snode=%s test node value%s: go to node %s if %s <= %s else to "
                           "node %s."
