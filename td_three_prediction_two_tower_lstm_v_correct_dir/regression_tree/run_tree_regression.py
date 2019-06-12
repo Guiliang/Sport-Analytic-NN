@@ -55,5 +55,5 @@ if __name__ == '__main__':
     else:
         TR.read_cart_model()
     TR.print_decision_path()
-    with open('cs/oschulte/Galen/soccer-models/dt_datas/dt_data_{0}.pkl'.format(action_selected)) as f:
+    with open('/cs/oschulte/Galen/soccer-models/dt_datas/dt_data_{0}.pkl'.format(action_selected)) as f:
         pickle.dump([all_input_list, all_impact_list], f)
