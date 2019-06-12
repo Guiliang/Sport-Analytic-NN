@@ -1,3 +1,4 @@
+import pickle
 import sys
 
 print sys.path
@@ -23,6 +24,7 @@ if __name__ == '__main__':
     tt_lstm_config_path = '../soccer-config-v5.yaml'
     difference_type = 'back_difference_'
     action_selected = 'pass'
+    print 'selected action is {0}'.format(action_selected)
     cart_model_name = 'CART_soccer_impact_{0}_{1}.json'. \
         format(action_selected, difference_type)
 
@@ -46,9 +48,12 @@ if __name__ == '__main__':
                         min_sample_leaf=min_sample_leaf)
     if not read_model:
         all_input_list, all_impact_list = TR.gather_all_training_data()
+        print 'total data collected length is {0}'.format(len(all_input_list))
         TR.train_cart_validation_model(np.asarray(all_input_list), np.asarray(all_impact_list),
                                        np.asarray(all_input_list), np.asarray(all_impact_list),
                                        read_model=False, test_flag=test_flag)
     else:
         TR.read_cart_model()
     TR.print_decision_path()
+    with open('cs/oschulte/Galen/soccer-models/dt_datas/dt_data_{0}.pkl'.format(action_selected)) as f:
+        pickle.dump([all_input_list, all_impact_list], f)

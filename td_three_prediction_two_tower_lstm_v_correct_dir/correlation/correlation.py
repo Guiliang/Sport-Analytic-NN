@@ -13,7 +13,7 @@ class Correlation:
             'GIM': ['GIM', '../compute_impact/player_impact/ijcai_soccer_player_GIM_2019June01.json'],
             'SI': ['', '../resource/bak_soccer_player_markov_impact-2019June04.json'],
             'GIM2t': ['GIM', '../compute_impact/player_impact/soccer_player_GIM_2019June05.json'],
-            'EG': ['GIM', '../compute_impact/player_impact/soccer_player_GIM_2019June05_expected_goal.json']
+            'EG': ['GIM', '../compute_impact/player_impact/bak-soccer_player_GIM_2019June05_expected_goal.json']
             # 'ALG': ''
         }
         self.interested_standard_metric = {'summary': ['Mins', 'Goals', 'Assists', 'Yel', 'Red',

@@ -71,9 +71,9 @@ class PlayerImpact:
 
     def aggregate_match_diff_values(self, dir_game, action_selected=None):
         """compute impact"""
-        print self.data_name
+        print dir_game
         for file_name in os.listdir(self.model_data_store_dir + "/" + dir_game):
-            print file_name
+            # print file_name
             if file_name == self.data_name:
                 model_data_name = self.model_data_store_dir + "/" + dir_game + "/" + file_name
                 with open(model_data_name) as f:

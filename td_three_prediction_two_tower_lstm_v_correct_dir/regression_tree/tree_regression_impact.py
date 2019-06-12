@@ -156,30 +156,30 @@ class TreeRegression:
                 is_leaves[node_id] = True
         # n_nodes = n_nodes if n_nodes < max_print_node else max_print_node
         with open(self.write_print_tree_dir, 'w') as f:
-            print("The binary tree structure has %s nodes and has "
-                  "the following tree structure:"
-                  % n_nodes)
+            # print("The binary tree structure has %s nodes and has "
+            #       "the following tree structure:"
+            #       % n_nodes)
             f.write("The binary tree structure has %s nodes and has "
                     "the following tree structure:\n"
                     % n_nodes)
             for i in range(n_nodes):
                 if is_leaves[i]:
-                    print("%snode=%s leaf node value%s." % (
-                        node_depth[i] * "\t", i, sum(node_values[i]) / len(node_values[i])))
+                    # print("%snode=%s leaf node value%s." % (
+                    #     node_depth[i] * "\t", i, sum(node_values[i]) / len(node_values[i])))
                     f.write("%snode=%s leaf node value%s.\n" % (
                         node_depth[i] * "\t", i, sum(node_values[i]) / len(node_values[i])))
                 else:
-                    print("%snode=%s test node value%s: go to node %s if %s <= %s else to "
-                          "node %s."
-                          % (node_depth[i] * "\t",
-                             i,
-                             sum(node_values[i]) / len(node_values[i]),
-                             children_left[i],
-                             # feature[i],
-                             self.features_train_all[feature[i]],
-                             threshold[i],
-                             children_right[i],
-                             ))
+                    # print("%snode=%s test node value%s: go to node %s if %s <= %s else to "
+                    #       "node %s."
+                    #       % (node_depth[i] * "\t",
+                    #          i,
+                    #          sum(node_values[i]) / len(node_values[i]),
+                    #          children_left[i],
+                    #          # feature[i],
+                    #          self.features_train_all[feature[i]],
+                    #          threshold[i],
+                    #          children_right[i],
+                    #          ))
                     f.write("%snode=%s test node value%s: go to node %s if %s <= %s else to "
                             "node %s.\n"
                             % (node_depth[i] * "\t",
@@ -194,6 +194,7 @@ class TreeRegression:
             print()
 
     def gather_game_training_data(self, dir_game):
+        # print('gathering data for game {0}'.format(dir_game))
         game_impact_list = []
         game_input_list = []
         # print self.data_name
@@ -296,4 +297,5 @@ class TreeRegression:
                 else:
                     raise ValueError('unknown difference type')
             game_impact_list.append(value)
+        print('gathering data for game {0} with data length {1}'.format(dir_game, str(len(game_impact_list))))
         return game_input_list, game_impact_list

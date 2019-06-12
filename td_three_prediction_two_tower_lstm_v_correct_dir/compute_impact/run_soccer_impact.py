@@ -91,7 +91,10 @@ def compute_impact(soccer_data_store_dir, game_data_dir, data_name, player_id_na
                       model_data_store_dir=soccer_data_store_dir, difference_type=difference_type)
     dir_all = os.listdir(soccer_data_store_dir)
     for game_name_dir in dir_all:
-        PI.aggregate_match_diff_values(game_name_dir)
+        if difference_type == 'expected_goal':
+            PI.aggregate_match_diff_values(game_name_dir, action_selected='shot')
+        else:
+            PI.aggregate_match_diff_values(game_name_dir, action_selected=None)
     PI.transfer2player_name_dict(player_id_name_pair_dir)
     PI.save_player_impact()
 
@@ -119,6 +122,9 @@ if __name__ == '__main__':
     model_number = 2101  # 2101, 7201, 7801 ,10501 ,13501 ,15301 ,18301*, 20701*
     # data_name = compute_values_for_all_games(config=tt_lstm_config, data_store_dir=soccer_data_store_dir,
     #                                          dir_all=soccer_dir_all, model_number=model_number)
-    data_name = get_data_name(config=tt_lstm_config)
+    if difference_type == 'expected_goal':
+        data_name = 'markov_values_iter100'
+    else:
+        data_name = get_data_name(config=tt_lstm_config)
     compute_impact(data_name=data_name, game_data_dir=data_path, soccer_data_store_dir=soccer_data_store_dir,
                    player_id_name_pair_dir=player_id_name_pair_dir, difference_type=difference_type)
