@@ -123,7 +123,7 @@ if __name__ == '__main__':
     # data_name = compute_values_for_all_games(config=tt_lstm_config, data_store_dir=soccer_data_store_dir,
     #                                          dir_all=soccer_dir_all, model_number=model_number)
     if difference_type == 'expected_goal':
-        data_name = 'markov_values_iter100'
+        data_name = get_data_name(config=tt_lstm_config)
     else:
         data_name = get_data_name(config=tt_lstm_config)
     compute_impact(data_name=data_name, game_data_dir=data_path, soccer_data_store_dir=soccer_data_store_dir,
