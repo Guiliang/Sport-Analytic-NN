@@ -21,6 +21,7 @@ class RoundByRoundCorrelation:
     def __init__(self, raw_data_path, interested_metric, player_summary_dir,
                  model_data_store_dir, game_info_path):
         self.player_summary_dir = player_summary_dir
+        self.action_selected_list = None
         self.raw_data_path = raw_data_path
         self.interested_metric = interested_metric
         self.model_data_store_dir = model_data_store_dir
@@ -226,7 +227,8 @@ class RoundByRoundCorrelation:
         correlated_coefficient_round_by_round = {}
 
         playerIds = player_id_info_dict.keys()
-        partial_player_value_dict = {}
+        partial_player_value_dict_goal = {}
+        partial_player_value_dict_assist = {}
         for round_num in range(1, self.round_number + 1):  # TODO: too slow, fix it
             # partial_player_value_dict = {}
             game_info_lists = game_by_round_dict.get(round_num)
@@ -238,9 +240,18 @@ class RoundByRoundCorrelation:
                 game_ha_id_all.append(h_a_id)
                 game_dir = game_info_items[2]
                 game_dir_all.append(game_dir)
-                partial_player_value_dict = self.aggregate_partial_impact_values(dir_game=game_dir.split('.')[0],
-                                                                                 ha_id=h_a_id,
-                                                                                 partial_player_value_dict=partial_player_value_dict)
+                action_selected = None if self.action_selected_list is None else self.action_selected_list[0]
+                partial_player_value_dict_goal = \
+                    self.aggregate_partial_impact_values(dir_game=game_dir.split('.')[0],
+                                                         ha_id=h_a_id,
+                                                         partial_player_value_dict=partial_player_value_dict_goal,
+                                                         action_selected=action_selected)
+                action_selected = None if self.action_selected_list is None else self.action_selected_list[1]
+                partial_player_value_dict_assist = \
+                    self.aggregate_partial_impact_values(dir_game=game_dir.split('.')[0],
+                                                         ha_id=h_a_id,
+                                                         partial_player_value_dict=partial_player_value_dict_goal,
+                                                         action_selected=action_selected)
 
             # player_assist_list = []
             # player_goal_list = []
@@ -261,12 +272,13 @@ class RoundByRoundCorrelation:
             #                                                             player_assist_list)
             # print ('matched player number is {0}'.format(len(partial_player_GIM_list)))
 
-            goal_correlation = self.compute_correlation(rank_value_dict=partial_player_value_dict,
+            goal_correlation = self.compute_correlation(rank_value_dict=partial_player_value_dict_goal,
                                                         interest_metric='Goals')
-            assistant_correlation = self.compute_correlation(rank_value_dict=partial_player_value_dict,
+            assistant_correlation = self.compute_correlation(rank_value_dict=partial_player_value_dict_assist,
                                                              interest_metric='Assists')
-            correlated_coefficient_round_by_round.update({round_num: {'assistant': assistant_correlation,
-                                                                      'goal': goal_correlation}})
+            rate = -1 if metric_name == 'SI' else 1
+            correlated_coefficient_round_by_round.update({round_num: {'assistant': rate*assistant_correlation,
+                                                                      'goal': rate*goal_correlation}})
             print 'correlation for round {0} is assist:{1} and goal:{2}'.format(str(round_num),
                                                                                 str(assistant_correlation),
                                                                                 str(goal_correlation))

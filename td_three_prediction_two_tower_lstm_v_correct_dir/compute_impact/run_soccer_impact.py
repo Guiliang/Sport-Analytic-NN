@@ -128,3 +128,5 @@ if __name__ == '__main__':
         data_name = get_data_name(config=tt_lstm_config)
     compute_impact(data_name=data_name, game_data_dir=data_path, soccer_data_store_dir=soccer_data_store_dir,
                    player_id_name_pair_dir=player_id_name_pair_dir, difference_type=difference_type)
+
+
