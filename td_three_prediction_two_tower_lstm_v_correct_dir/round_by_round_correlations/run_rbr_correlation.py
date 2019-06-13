@@ -12,7 +12,7 @@ from td_three_prediction_two_tower_lstm_v_correct_dir.round_by_round_correlation
 if __name__ == "__main__":
     raw_data_path = "/cs/oschulte/soccer-data/sequences_append_goal/"
     model_data_store_dir = "/cs/oschulte/Galen/Soccer-data"
-    interested_metric = ['GIM2t', 'EG', 'GIM', 'SI']  # ['GIM', 'SI']
+    interested_metric = ['GIM2t', 'SI']  # ['GIM', 'SI']
     # interested_metric = ['GIM', 'SI', 'GIM2t', 'EG']
     player_summary_dir = '../resource/Soccer_summary.csv'
     game_info_path = '../resource/player_team_id_name_value.csv'

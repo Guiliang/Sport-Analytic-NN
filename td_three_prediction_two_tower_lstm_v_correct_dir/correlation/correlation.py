@@ -1,6 +1,7 @@
 import csv
 import json
 import numpy as np
+import td_three_prediction_two_tower_lstm_v_correct_dir.resource.plus_minus_1718 as plus_minus
 
 
 class Correlation:
@@ -10,10 +11,12 @@ class Correlation:
                                       'offensive': online_info_path_list[2]}
         self.game_info_path = game_info_path
         self.ranking_dir_dict = {
+            'PM': ['', ''],
             'GIM': ['GIM', '../compute_impact/player_impact/ijcai_soccer_player_GIM_2019June01.json'],
             'SI': ['', '../resource/bak_soccer_player_markov_impact-2019June04.json'],
             'GIM2t': ['GIM', '../compute_impact/player_impact/soccer_player_GIM_2019June01.json'],
-            'EG': ['GIM', '../compute_impact/player_impact/bak-soccer_player_GIM_2019June05_expected_goal.json']
+            'EG': ['GIM', '../compute_impact/player_impact/bak-soccer_player_GIM_2019June05_expected_goal.json'],
+            # 'PM': ['', ''],
             # 'ALG': ''
         }
         self.interested_standard_metric = {'summary': ['Mins', 'Goals', 'Assists', 'Yel', 'Red',
@@ -114,8 +117,13 @@ class Correlation:
             for rank_value_name in self.ranking_dir_dict.keys():
                 if rank_value_name == 'GIM' or rank_value_name == 'GIM2t' or rank_value_name == 'EG':
                     rank_value_dict = self.get_GIM_rank_value(rank_value_name)
-                else:
+                elif rank_value_name == 'SI':
                     rank_value_dict = self.get_markov_rank_value(rank_value_name)
+                elif rank_value_name == 'PM':
+                    plus_minus_dict = plus_minus.pm
+                    rank_value_dict = {}
+                    for player_id in plus_minus_dict:
+                        rank_value_dict.update({str(player_id):plus_minus_dict.get(player_id)})
                 correlation_rank_list = []
                 for interest_metric in interest_metric_all:
                     correlation = self.compute_correlation(rank_value_dict, interest_metric, category)

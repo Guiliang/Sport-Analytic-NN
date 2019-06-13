@@ -8,6 +8,7 @@ import unicodedata
 import td_three_prediction_two_tower_lstm_v_correct_dir.config.icehockey_feature_setting as icehockey_feature_setting
 import td_three_prediction_two_tower_lstm_v_correct_dir.config.soccer_feature_setting as soccer_feature_setting
 
+
 def handle_trace_length(state_trace_length):
     """
     transform format of trace length
@@ -727,6 +728,28 @@ def flat_state_input(state_input):
             flat_input = state.tolist() + flat_input
     return flat_input
 
+
+def get_markov_rank_value(metric_name, ranking_dir_dict):
+    metric_info = ranking_dir_dict.get(metric_name)
+    with open(metric_info[1]) as f:
+        d = json.load(f)
+    return d
+
+
+def get_GIM_rank_value(metric_name, ranking_dir_dict):
+    metric_info = ranking_dir_dict.get(metric_name)
+    rank_value_dict = {}
+    with open(metric_info[1]) as f:
+        d = json.load(f)
+        for k in d.keys():
+            dic = d[k]
+            gim = dic[metric_info[0]]
+            id = k
+            if gim is None:
+                continue
+            value = gim['value']
+            rank_value_dict[str(id)] = value
+    return rank_value_dict
 
 
 if __name__ == '__main__':
