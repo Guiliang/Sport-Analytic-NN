@@ -62,7 +62,7 @@ if __name__ == "__main__":
             player_id_info_dict=player_id_info_dict, game_by_round_dict=game_by_round_dict,
             metric_name=metric)
         correlated_coefficient_round_by_round_all.update({metric: correlated_coefficient_round_by_round})
-    with open('round_by_round_correlation.json', 'w') as outfile:
-        json.dump(obj=correlated_coefficient_round_by_round_all, fp=outfile)
+        with open('round_by_round_correlation_{0}.json'.format(metric), 'w') as outfile:
+            json.dump(obj=correlated_coefficient_round_by_round, fp=outfile)
 
     print 'still working'
