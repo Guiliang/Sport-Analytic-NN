@@ -31,7 +31,7 @@ def compute_ranking(soccer_data_store_dir, game_data_dir, data_name, player_summ
     PI = PlayerImpact(data_name=data_name, game_data_dir=game_data_dir, model_data_store_dir=soccer_data_store_dir)
     dir_all = os.listdir(soccer_data_store_dir)
     for game_name_dir in dir_all:
-        PI.aggregate_match_diff_values(game_name_dir, action_selected=action_selected)
+        PI.aggregate_match_diff_values(game_name_dir, action_selected_list=action_selected)
     # PI.transfer2player_name_dict(player_id_name_pair_dir)
     PI.rank_player_by_impact(player_summary_info_dir, rank_store_file_dir)
     # PI.save_player_impact()

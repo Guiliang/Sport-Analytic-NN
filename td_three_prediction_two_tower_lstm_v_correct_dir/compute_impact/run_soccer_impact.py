@@ -92,9 +92,9 @@ def compute_impact(soccer_data_store_dir, game_data_dir, data_name, player_id_na
     dir_all = os.listdir(soccer_data_store_dir)
     for game_name_dir in dir_all:
         if difference_type == 'expected_goal':
-            PI.aggregate_match_diff_values(game_name_dir, action_selected='shot')
+            PI.aggregate_match_diff_values(game_name_dir, action_selected_list=['shot'])
         else:
-            PI.aggregate_match_diff_values(game_name_dir, action_selected='shot')
+            PI.aggregate_match_diff_values(game_name_dir, action_selected_list=['shot', 'pass'])
     PI.transfer2player_name_dict(player_id_name_pair_dir)
     PI.save_player_impact()
 

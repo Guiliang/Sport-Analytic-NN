@@ -69,7 +69,7 @@ class PlayerImpact:
             name_str = name.get('first_name') + ' ' + name.get('last_name')
             self.player_name_dict_all.update({id: {'name': name_str, 'GIM': GIM}})
 
-    def aggregate_match_diff_values(self, dir_game, action_selected=None):
+    def aggregate_match_diff_values(self, dir_game, action_selected_list=None):
         """compute impact"""
         print dir_game
         for file_name in os.listdir(self.model_data_store_dir + "/" + dir_game):
@@ -103,9 +103,13 @@ class PlayerImpact:
         # print len(actions)
         for player_Index in range(0, len(playerIds)):
 
-            if action_selected is not None:
-                if action_selected not in actions[player_Index]:
-                    continue
+            continue_flag = False if len(action_selected_list) == 0 else True
+            for f_action in action_selected_list:
+                if f_action in actions[player_Index]:
+                    # print action
+                    continue_flag = False
+            if continue_flag:
+                continue
 
             playerId = playerIds[player_Index]
             # teamId = teamIds[player_Index]
