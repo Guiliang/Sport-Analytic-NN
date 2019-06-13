@@ -53,8 +53,8 @@ class DrawRoundCorrelation:
         field_names = {'assistant': 'Assists', 'goal': 'Goals', 'point': 'Points', 'auto': 'Auto'}
         # methods_marker_all = {'plusminus': '^', 'EG': '*', 'SI': 'x', 'GIM': 'P'}
         # methods_color_all = {'plusminus': 'b', 'EG': 'y', 'SI': 'g', 'GIM': 'r'}
-        methods_marker_all = {'GIM-T1': '^', 'EG': '*', 'SI': 'x', 'GIM': 'P'}
-        methods_color_all = {'GIM-T1': 'b', 'EG': 'y', 'SI': 'g', 'GIM': 'r'}
+        methods_marker_all = {'GIM-T1': '^', 'EG': '*', 'SI': 'x', 'GIM2t': 'P'}
+        methods_color_all = {'GIM-T1': 'b', 'EG': 'y', 'SI': 'g', 'GIM2t': 'r'}
 
         x_list = range(1, self.ROUND_NUMBER + 1, scale)
 

@@ -12,7 +12,8 @@ from td_three_prediction_two_tower_lstm_v_correct_dir.round_by_round_correlation
 if __name__ == "__main__":
     raw_data_path = "/cs/oschulte/soccer-data/sequences_append_goal/"
     model_data_store_dir = "/cs/oschulte/Galen/Soccer-data"
-    interested_metric = ['GIM2t', 'GIM', 'EG', 'SI']  # ['GIM', 'SI']
+    # interested_metric = ['GIM2t', 'GIM', 'EG', 'SI']  # ['GIM', 'SI']
+    interested_metric = ['GIM', 'SI', 'GIM2t', 'EG']
     player_summary_dir = '../resource/Soccer_summary.csv'
     game_info_path = '../resource/player_team_id_name_value.csv'
     rbr_correlation = RoundByRoundCorrelation(raw_data_path, interested_metric, player_summary_dir,
@@ -41,7 +42,7 @@ if __name__ == "__main__":
             tt_lstm_config = TTLSTMCongfig.load(tt_lstm_config_path)
             data_name = get_data_name(config=tt_lstm_config)
             rbr_correlation.data_name = data_name
-        elif metric == 'EG':
+        elif metric == 'EG':  # we might want to recompute EG
             rbr_correlation.difference_type = 'expected_goal'
             tt_lstm_config_path = "../soccer-config-v3.yaml"
             tt_lstm_config = TTLSTMCongfig.load(tt_lstm_config_path)
@@ -54,7 +55,7 @@ if __name__ == "__main__":
             data_name = get_data_name(config=tt_lstm_config, if_old=True)
             rbr_correlation.data_name = data_name
         elif metric == 'SI':
-            rbr_correlation.difference_type = 'expected_goal'
+            rbr_correlation.difference_type = 'back_difference_'
             data_name = 'markov_impact_values.json'
             rbr_correlation.data_name = data_name
         correlated_coefficient_round_by_round = rbr_correlation.compute_correlations_by_round(

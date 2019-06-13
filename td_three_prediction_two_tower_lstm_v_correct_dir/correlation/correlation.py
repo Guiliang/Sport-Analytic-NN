@@ -12,8 +12,8 @@ class Correlation:
         self.ranking_dir_dict = {
             'GIM': ['GIM', '../compute_impact/player_impact/ijcai_soccer_player_GIM_2019June01.json'],
             'SI': ['', '../resource/bak_soccer_player_markov_impact-2019June04.json'],
-            'GIM2t': ['GIM', '../compute_impact/player_impact/soccer_player_GIM_2019June01.json'],
-            'EG': ['GIM', '../compute_impact/player_impact/soccer_player_GIM_2019June11_expected_goal.json']
+            'GIM2t': ['GIM', '../compute_impact/player_impact/soccer_player_GIM_2019June12.json'],
+            'EG': ['GIM', '../compute_impact/player_impact/bak-soccer_player_GIM_2019June05_expected_goal.json']
             # 'ALG': ''
         }
         self.interested_standard_metric = {'summary': ['Mins', 'Goals', 'Assists', 'Yel', 'Red',
@@ -105,14 +105,19 @@ class Correlation:
                                        'offensive': {}}
 
         for category in ['summary', 'defensive', 'offensive']:
+            interest_metric_all = self.interested_standard_metric.get(category)
+            metric_string = 'model'
+            for interest_metric in interest_metric_all:
+                metric_string += ' & ' + interest_metric
+            print metric_string
             correlation_record_rank_dict = correlation_record_all_dict.get(category)
             for rank_value_name in self.ranking_dir_dict.keys():
-                if rank_value_name == 'GIM' or rank_value_name == 'GIM2t' or rank_value_name== 'EG':
+                if rank_value_name == 'GIM' or rank_value_name == 'GIM2t' or rank_value_name == 'EG':
                     rank_value_dict = self.get_GIM_rank_value(rank_value_name)
                 else:
                     rank_value_dict = self.get_markov_rank_value(rank_value_name)
                 correlation_rank_list = []
-                for interest_metric in self.interested_standard_metric.get(category):
+                for interest_metric in interest_metric_all:
                     correlation = self.compute_correlation(rank_value_dict, interest_metric, category)
                     correlation_rank_list.append(correlation)
                 str_line = rank_value_name + ' '

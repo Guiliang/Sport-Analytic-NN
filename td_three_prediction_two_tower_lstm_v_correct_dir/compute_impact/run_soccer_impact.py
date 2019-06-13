@@ -94,7 +94,7 @@ def compute_impact(soccer_data_store_dir, game_data_dir, data_name, player_id_na
         if difference_type == 'expected_goal':
             PI.aggregate_match_diff_values(game_name_dir, action_selected='shot')
         else:
-            PI.aggregate_match_diff_values(game_name_dir, action_selected=None)
+            PI.aggregate_match_diff_values(game_name_dir, action_selected='shot')
     PI.transfer2player_name_dict(player_id_name_pair_dir)
     PI.save_player_impact()
 
@@ -107,7 +107,7 @@ if __name__ == '__main__':
 
     # tt_lstm_config_path = '../icehockey-config.yaml'
     tt_lstm_config_path = "../soccer-config-v5.yaml"
-    difference_type = 'expected_goal'
+    difference_type = 'back_difference_'
     soccer_dir_all = os.listdir(data_path)
 
     tt_lstm_config = TTLSTMCongfig.load(tt_lstm_config_path)
@@ -122,7 +122,7 @@ if __name__ == '__main__':
     model_number = 2101  # 2101, 7201, 7801 ,10501 ,13501 ,15301 ,18301*, 20701*
     # data_name = compute_values_for_all_games(config=tt_lstm_config, data_store_dir=soccer_data_store_dir,
     #                                          dir_all=soccer_dir_all, model_number=model_number)
-    if difference_type == 'expected_goal':
+    if difference_type == 'back_difference_':
         data_name = get_data_name(config=tt_lstm_config)
     else:
         data_name = get_data_name(config=tt_lstm_config)
