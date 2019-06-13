@@ -95,7 +95,7 @@ class RoundByRoundCorrelation:
         for event_Index in range(0, len(playerIds)):
 
             if action_selected is not None:
-                if actions[event_Index] != action_selected:
+                if action_selected not in actions[event_Index]:
                     continue
 
             if home_identifier[event_Index] != ha_id:
@@ -277,8 +277,8 @@ class RoundByRoundCorrelation:
             assistant_correlation = self.compute_correlation(rank_value_dict=partial_player_value_dict_assist,
                                                              interest_metric='Assists')
             rate = -1 if metric_name == 'SI' else 1
-            correlated_coefficient_round_by_round.update({round_num: {'assistant': rate*assistant_correlation,
-                                                                      'goal': rate*goal_correlation}})
+            correlated_coefficient_round_by_round.update({round_num: {'assistant': rate * assistant_correlation,
+                                                                      'goal': rate * goal_correlation}})
             print 'correlation for round {0} is assist:{1} and goal:{2}'.format(str(round_num),
                                                                                 str(assistant_correlation),
                                                                                 str(goal_correlation))
