@@ -250,7 +250,7 @@ class RoundByRoundCorrelation:
                 partial_player_value_dict_assist = \
                     self.aggregate_partial_impact_values(dir_game=game_dir.split('.')[0],
                                                          ha_id=h_a_id,
-                                                         partial_player_value_dict=partial_player_value_dict_goal,
+                                                         partial_player_value_dict=partial_player_value_dict_assist,
                                                          action_selected=action_selected)
 
             # player_assist_list = []
