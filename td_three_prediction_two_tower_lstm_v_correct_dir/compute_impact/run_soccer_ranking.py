@@ -1,3 +1,4 @@
+import csv
 import sys
 
 print sys.path
@@ -16,7 +17,7 @@ from td_three_prediction_two_tower_lstm_v_correct_dir.support.data_processing_to
 
 
 def compute_ranking(soccer_data_store_dir, game_data_dir, data_name, player_summary_info_dir,
-                    action_selected_lists):
+                    action_selected_lists, game_info_all):
     PI = PlayerImpact(data_name=data_name, game_data_dir=game_data_dir, model_data_store_dir=soccer_data_store_dir)
     dir_all = os.listdir(soccer_data_store_dir)
     for action_selected_list in action_selected_lists:
@@ -26,19 +27,28 @@ def compute_ranking(soccer_data_store_dir, game_data_dir, data_name, player_summ
         else:
             write_file = open('./player_ranking/soccer_player_ranking_all', 'w')
         for game_name_dir in dir_all:
+            if game_name_dir == '.DS_Store':
+                continue
             PI.aggregate_match_diff_values(game_name_dir, action_selected_list=action_selected_list)
         # PI.transfer2player_name_dict(player_id_name_pair_dir)
-        PI.rank_player_by_impact(player_summary_info_dir, write_file=write_file, action_selected=action_selected_list)
+        PI.rank_player_by_impact(player_summary_info_dir,
+                                 write_file=write_file,
+                                 action_selected=action_selected_list,
+                                 game_info_all = game_info_all)
         write_file.close()
 
 
 if __name__ == '__main__':
+    test_flag = True
     action_selected_lists = [['shot'], ['pass'], None]
-    data_path = "/cs/oschulte/soccer-data/sequences_append_goal/"
-    soccer_data_store_dir = "/cs/oschulte/Galen/Soccer-data/"
-    player_id_name_pair_dir = '/Local-Scratch/PycharmProjects/Sport-Analytic-NN/' \
-                              'td_three_prediction_two_tower_lstm_v_correct_dir/resource/soccer_id_name_pair.json'
-    player_summary_info_dir = '../resource/Soccer_summary_info.csv'
+    if test_flag:
+        data_path = '/Users/liu/Desktop/soccer-data-sample/sequences_append_goal/'
+        soccer_data_store_dir = "/Users/liu/Desktop/soccer-data-sample/Soccer-data/"
+    else:
+        data_path = "/cs/oschulte/soccer-data/sequences_append_goal/"
+        soccer_data_store_dir = "/cs/oschulte/Galen/Soccer-data/"
+    player_id_name_pair_dir = '../resource/soccer_id_name_pair.json'
+    player_summary_info_dir = '../resource/Soccer_summary.csv'
 
     tt_lstm_config_path = "../soccer-config-v5.yaml"
     soccer_dir_all = os.listdir(data_path)
@@ -52,7 +62,17 @@ if __name__ == '__main__':
 
     # data_name = compute_values_for_all_games(config=tt_lstm_config, data_store_dir=soccer_data_store_dir,
     #                                          dir_all=soccer_dir_all)
+    game_info_path = '../resource/player_team_id_name_value.csv'
+    game_info_file = open(game_info_path)
+    game_reader = csv.DictReader(game_info_file)
+    game_info_all = []
+    for r in game_reader:
+        p_name = r['playerName']
+        t_name = r['teamName']
+        id = r['playerId']
+        game_info_all.append([p_name, t_name, id])
+
     data_name = get_data_name(config=tt_lstm_config)
     compute_ranking(data_name=data_name, game_data_dir=data_path, soccer_data_store_dir=soccer_data_store_dir,
                     player_summary_info_dir=player_summary_info_dir,
-                    action_selected_lists=action_selected_lists)
+                    action_selected_lists=action_selected_lists, game_info_all=game_info_all)
