@@ -19,7 +19,7 @@ from td_three_prediction_two_tower_lstm_v_correct_dir.support.data_processing_to
 
 class RoundByRoundCorrelation:
     def __init__(self, raw_data_path, interested_metric, player_summary_dir,
-                 model_data_store_dir, game_info_path):
+                 model_data_store_dir, game_info_path, metric_seasonal_total_by_player_dirs):
         self.player_summary_dir = player_summary_dir
         self.action_selected_list = None
         self.raw_data_path = raw_data_path
@@ -31,6 +31,7 @@ class RoundByRoundCorrelation:
         self.game_info_path = game_info_path
         self.game_info_file = open(self.game_info_path)
         game_reader = csv.DictReader(self.game_info_file)
+        self.metric_seasonal_total_by_player_dirs = metric_seasonal_total_by_player_dirs
         self.game_info_all = []
         for r in game_reader:
             p_name = r['playerName']
@@ -223,12 +224,13 @@ class RoundByRoundCorrelation:
         return player_id_info_dict
 
     def compute_correlations_by_round(self, game_by_round_dict,
-                                      player_id_info_dict, metric_name):
+                                      player_id_info_dict, metric_name, partial_player_value_dict=None):
         correlated_coefficient_round_by_round = {}
 
         playerIds = player_id_info_dict.keys()
         partial_player_value_dict_goal = {}
         partial_player_value_dict_assist = {}
+        partial_player_value_dict_auto = {}
         for round_num in range(1, self.round_number + 1):  # TODO: too slow, fix it
             # partial_player_value_dict = {}
             game_info_lists = game_by_round_dict.get(round_num)
@@ -253,6 +255,12 @@ class RoundByRoundCorrelation:
                                                          partial_player_value_dict=partial_player_value_dict_assist,
                                                          action_selected=action_selected)
 
+                partial_player_value_dict_auto = \
+                    self.aggregate_partial_impact_values(dir_game=game_dir.split('.')[0],
+                                                         ha_id=h_a_id,
+                                                         partial_player_value_dict=partial_player_value_dict_auto,
+                                                         action_selected=None)
+
             # player_assist_list = []
             # player_goal_list = []
             # partial_player_GIM_list = []
@@ -272,16 +280,21 @@ class RoundByRoundCorrelation:
             #                                                             player_assist_list)
             # print ('matched player number is {0}'.format(len(partial_player_GIM_list)))
 
-            goal_correlation = self.compute_correlation(rank_value_dict=partial_player_value_dict_goal,
-                                                        interest_metric='Goals')
-            assistant_correlation = self.compute_correlation(rank_value_dict=partial_player_value_dict_assist,
-                                                             interest_metric='Assists')
+            auto_correlation = self.compute_auto_correlation(rank_value_dict=partial_player_value_dict_auto,
+                                                             interest_metric=metric_name)
+
+            goal_correlation = self.compute_standard_correlation(rank_value_dict=partial_player_value_dict_goal,
+                                                                 interest_metric='Goals')
+            assistant_correlation = self.compute_standard_correlation(rank_value_dict=partial_player_value_dict_assist,
+                                                                      interest_metric='Assists')
             rate = -1 if metric_name == 'SI' else 1
             correlated_coefficient_round_by_round.update({round_num: {'assistant': rate * assistant_correlation,
-                                                                      'goal': rate * goal_correlation}})
-            print 'correlation for round {0} is assist:{1} and goal:{2}'.format(str(round_num),
-                                                                                str(assistant_correlation),
-                                                                                str(goal_correlation))
+                                                                      'goal': rate * goal_correlation,
+                                                                      'auto': auto_correlation}})
+            print 'correlation for round {0} is assist:{1}, goal:{2} and auto:{3}'.format(str(round_num),
+                                                                                          str(assistant_correlation),
+                                                                                          str(goal_correlation),
+                                                                                          str(auto_correlation))
         return correlated_coefficient_round_by_round
 
     def compute_correlated_coefficient(self, listA, listB):
@@ -298,9 +311,29 @@ class RoundByRoundCorrelation:
                 return True, info[2]
         return False, ''
 
-    def compute_correlation(self, rank_value_dict, interest_metric):
-        online_value_list = []
-        game_value_list = []
+    def compute_auto_correlation(self, rank_value_dict, interest_metric):
+        season_value_list = []
+        round_value_list = []
+        with open(self.metric_seasonal_total_by_player_dirs.get(interest_metric)[1]) as metric_file:
+            metric_season_values = json.load(metric_file)
+
+            for play_id in rank_value_dict.keys():
+                player_value = metric_season_values.get(str(play_id))
+                if player_value is not None:
+                    if type(player_value) == float:
+                        season_value_list.append(player_value)
+                        round_value_list.append(rank_value_dict.get(play_id).get('value'))
+                    else:
+                        player_inner_value = player_value.get('GIM')
+                        if player_inner_value is not None:
+                            season_value_list.append(player_inner_value.get('value'))
+                            round_value_list.append(rank_value_dict.get(play_id).get('value'))
+
+        return np.corrcoef(season_value_list, round_value_list)[0][1]
+
+    def compute_standard_correlation(self, rank_value_dict, interest_metric):
+        season_value_list = []
+        round_value_list = []
         with open(self.player_summary_dir) as online_info_file:
             online_reader = csv.DictReader(online_info_file)
             i = 0
@@ -324,15 +357,15 @@ class RoundByRoundCorrelation:
                     continue
                 value = rank_value_dict[id]['value']
                 # print(value)
-                online_value_list.append(float(standard_value))
+                season_value_list.append(float(standard_value))
                 # print(value)
-                game_value_list.append(float(value))
+                round_value_list.append(float(value))
                 i += 1
 
         # print(len(online_value_list))
         # print(len(game_value_list))
         # print('matched number is ' + str(i))
-        return np.corrcoef(online_value_list, game_value_list)[0][1]
+        return np.corrcoef(season_value_list, round_value_list)[0][1]
 
     def normalization(self, player_impacts):
         impact_all = []

@@ -1,3 +1,8 @@
+import sys
+
+print sys.path
+sys.path.append('/Local-Scratch/PycharmProjects/Sport-Analytic-NN/')
+
 from td_three_prediction_two_tower_lstm_v_correct_dir.correlation.correlation import Correlation
 
 if __name__ == '__main__':

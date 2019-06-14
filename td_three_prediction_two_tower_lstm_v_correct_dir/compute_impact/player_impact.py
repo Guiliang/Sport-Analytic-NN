@@ -28,7 +28,7 @@ class PlayerImpact:
                   'compute_impact/player_impact/' + save_name_write, 'w') as f:
             json.dump(self.player_name_dict_all, f)
 
-    def rank_player_by_impact(self, player_summary_info_dir, rank_store_file_dir):
+    def rank_player_by_impact(self, player_summary_info_dir, write_file, action_selected):
         with open(player_summary_info_dir) as f:
             lines = f.readlines()
         player_id_info_dir = {}
@@ -42,19 +42,28 @@ class PlayerImpact:
             Assist = items[7]
             player_id_info_dir.update({playerId: [name, team, Goals, Assist]})
 
-        rank_file = open(rank_store_file_dir, 'w')
         sorted_id_GIM = sorted(self.player_id_dict_all.items(), key=operator.itemgetter(1), reverse=True)
-        rank_file.write('id, name, team, Goal, Assist, GIM \n')
-        print 'id & name & team & Goal & Assist & GIM \\\\'
+        if action_selected == 'shot':
+            write_file.write('name & team & GIM & Goal \\\\')
+        elif action_selected == 'pass':
+            write_file.write('name & team & GIM & Assist \\\\')
+        else:
+            write_file.write('name & team & GIM & Goal & Assist \\\\')
         for (id, GIM) in sorted_id_GIM:
             info = player_id_info_dir.get(str(id))
             name = info[0]
             team = info[1]
             goals = info[2]
             assist = info[3]
-            rank_file.write('{0} , {1} , {2} , {3} , {4} , {5} \n'.format(str(id), name, team, goals, assist, GIM))
-            print '{0} & {1} & {2} & {3} & {4} & {5} \\\\'.format(str(id), name, team, goals, assist, GIM)
-        print '\line'
+            if action_selected == 'shot':
+                # write_file.write('name & team & GIM & Goal \\\\')
+                write_file.write('{0} & {1} & {2} & {3} \n'.format(name, team, goals, GIM))
+            elif action_selected == 'pass':
+                # write_file.write('name & team & GIM & Assist \\\\')
+                write_file.write('{0} & {1} & {2} & {3} \n'.format(name, team, assist, GIM))
+            else:
+                # write_file.write('name & team & GIM & Goal & Assist \\\\')
+                write_file.write('{0} & {1} & {2} & {3} & {4} \n'.format(name, team, goals, assist, GIM))
 
     def transfer2player_name_dict(self, player_id_name_pair_dir):
         with open(player_id_name_pair_dir, 'r') as f:
@@ -71,7 +80,6 @@ class PlayerImpact:
 
     def aggregate_match_diff_values(self, dir_game, action_selected_list=None):
         """compute impact"""
-        print dir_game
         for file_name in os.listdir(self.model_data_store_dir + "/" + dir_game):
             # print file_name
             if file_name == self.data_name:
@@ -101,15 +109,17 @@ class PlayerImpact:
         #                                           feature_name='teamIds')
         # print len(playerIds)
         # print len(actions)
+        skip_number = 0
         for player_Index in range(0, len(playerIds)):
-
-            continue_flag = False if len(action_selected_list) == 0 else True
-            for f_action in action_selected_list:
-                if f_action in actions[player_Index]:
-                    # print action
-                    continue_flag = False
-            if continue_flag:
-                continue
+            if action_selected_list is not None:
+                continue_flag = False if len(action_selected_list) == 0 else True
+                for f_action in action_selected_list:
+                    if f_action in actions[player_Index]:
+                        # print action
+                        continue_flag = False
+                if continue_flag:
+                    skip_number += 1
+                    continue
 
             playerId = playerIds[player_Index]
             # teamId = teamIds[player_Index]
@@ -187,3 +197,5 @@ class PlayerImpact:
                     player_value_number = player_value.get("value") + value
                     self.player_id_dict_all.update(
                         {playerId: {"value": player_value_number}})
+
+        print('finish game {0} and solve {1} events'.format(dir_game, str(len(playerIds) - skip_number)))

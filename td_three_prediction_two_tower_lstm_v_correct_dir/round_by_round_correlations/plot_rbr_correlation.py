@@ -16,8 +16,8 @@ mpl.rcParams['ytick.labelsize'] = label_size
 class DrawRoundCorrelation:
     def __init__(self, rbr_results_dir):
         self.rbr_results_dir = rbr_results_dir
-        self.metric_names_all = ['EG', 'GIM2t']
-        self.field_dict = {'assistant': {}, 'goal': {}}
+        self.metric_names_all = ['GIM2t', 'GIM', 'SI', 'EG']
+        self.field_dict = {'assistant': {}, 'goal': {}, 'auto':{}}
         for field_name in self.field_dict.keys():
             field_dict = self.field_dict.get(field_name)
             for method in self.metric_names_all:
@@ -27,10 +27,10 @@ class DrawRoundCorrelation:
 
     def read_round_by_round_correlation(self):
         # methods_record_all = {}
-        with open(self.rbr_results_dir) as fp:
-            record_rbr_dict = json.load(fp)
-        for metric_name in record_rbr_dict.keys():
-            metric_values = record_rbr_dict.get(metric_name)
+
+        for metric_name in self.metric_names_all:
+            with open('./round_by_round_correlation' + '_{0}.json'.format(metric_name)) as fp:
+                metric_values = json.load(fp)
             round_number_all = map(str, sorted(map(int, metric_values.keys()), reverse=False))
             for round_number in round_number_all:
                 values = metric_values.get(round_number)
@@ -51,10 +51,11 @@ class DrawRoundCorrelation:
     def draw_round_by_round_correlation(self, methods_record_all, scale=2):
 
         field_names = {'assistant': 'Assists', 'goal': 'Goals', 'point': 'Points', 'auto': 'Auto'}
-        # methods_marker_all = {'plusminus': '^', 'EG': '*', 'SI': 'x', 'GIM': 'P'}
+        # methods_marker_dict = {'plusminus': '^', 'EG': '*', 'SI': 'x', 'GIM': 'P'}
         # methods_color_all = {'plusminus': 'b', 'EG': 'y', 'SI': 'g', 'GIM': 'r'}
-        methods_marker_all = {'GIM-T1': '^', 'EG': '*', 'SI': 'x', 'GIM2t': 'P'}
-        methods_color_all = {'GIM-T1': 'b', 'EG': 'y', 'SI': 'g', 'GIM2t': 'r'}
+        methods_marker_dict = {'GIM': '^', 'EG': '*', 'SI': 'x', 'GIM2t': 'P'}
+        methods_color_dict = {'GIM': 'b', 'EG': 'y', 'SI': 'g', 'GIM2t': 'r'}
+        methods_name_dict = {'GIM': 'GIM-Merge', 'EG': 'EG', 'SI': 'SI', 'GIM2t': 'GIM'}
 
         x_list = range(1, self.ROUND_NUMBER + 1, scale)
 
@@ -63,7 +64,8 @@ class DrawRoundCorrelation:
             plt.figure(figsize=(8, 7))
 
             for method in self.metric_names_all:
-                field_name = method if field == 'auto' else field
+                # field_name = method if field == 'auto' else field
+                field_name = field
                 correlations = methods_record_all.get(field_name).get(method)
 
                 for pop_number in range(0, self.ROUND_NUMBER / scale):
@@ -71,7 +73,8 @@ class DrawRoundCorrelation:
 
                 # plt.plot(x_list, correlations, label=method)
                 plt.plot(x_list, correlations,
-                         label=method, marker=methods_marker_all.get(method), color=methods_color_all.get(method),
+                         label=methods_name_dict.get(method), marker=methods_marker_dict.get(method),
+                         color=methods_color_dict.get(method),
                          linewidth=2.0, markersize=15, alpha=0.5)
                 # plt.show()
             # if field != 'auto':
@@ -79,7 +82,7 @@ class DrawRoundCorrelation:
             #     for pop_number in range(0, self.ROUND_NUMBER / scale):
             #         correlations.pop(pop_number + 1)
             #     plt.plot(x_list, correlations,
-            #              label=field.title(), marker=methods_marker_all.get('Sta'), color=methods_color_all.get('Sta'),
+            #              label=field.title(), marker=methods_marker_dict.get('Sta'), color=methods_color_all.get('Sta'),
             #              linewidth=3.0, markersize=15, alpha=0.5, ls='--')
             plt.legend(loc='lower right', fontsize=25)
             # plt.title("Round by Round Correlation in 2015-2016 NHL season", fontsize=14)
