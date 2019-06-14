@@ -1,3 +1,4 @@
+import csv
 import os
 
 import datetime
@@ -28,19 +29,35 @@ class PlayerImpact:
                   'compute_impact/player_impact/' + save_name_write, 'w') as f:
             json.dump(self.player_name_dict_all, f)
 
-    def rank_player_by_impact(self, player_summary_info_dir, write_file, action_selected):
-        with open(player_summary_info_dir) as f:
-            lines = f.readlines()
+    def get_id(self, playername, teamname, game_info_all):
+        for info in game_info_all:
+            p_name = info[0]
+            t_name = info[1]
+            # if playername == p_name:
+            #     print('find name')
+            if playername in p_name and teamname in t_name:
+                return True, info[2]
+        return False, None
+
+    def rank_player_by_impact(self, player_summary_info_dir, write_file, action_selected, game_info_all):
         player_id_info_dir = {}
-        for line in lines[1:]:
-            # name,playerId,team,teamId,Apps,Mins,Goals,Assists,Yel,Red,SpG,PS,AeriaisWon,MotM,Rating
-            items = line.split(',')
-            name = items[0]
-            playerId = items[1]
-            team = items[2]
-            Goals = items[6]
-            Assist = items[7]
-            player_id_info_dir.update({playerId: [name, team, Goals, Assist]})
+        with open(player_summary_info_dir) as online_info_file:
+            online_reader = csv.DictReader(online_info_file)
+            for r in online_reader:
+                playername = r['name']
+                teamname = r['team']
+                if teamname[0] == '"':
+                    teamname = teamname[1:-1]
+                teamname = teamname.split(',')[0]
+                Goals = r['Goals']
+                Assist = r['Assists']
+                Flag, id = self.get_id(playername, teamname, game_info_all)
+                if id is None:
+                    continue
+                if int(id) not in self.player_id_dict_all:
+                    continue
+                player_id_info_dir.update({id: [playername, teamname, Goals, Assist]})
+                print 'find player {0}'.format(playername)
 
         sorted_id_GIM = sorted(self.player_id_dict_all.items(), key=operator.itemgetter(1), reverse=True)
         if action_selected == 'shot':
@@ -51,6 +68,8 @@ class PlayerImpact:
             write_file.write('name & team & GIM & Goal & Assist \\\\')
         for (id, GIM) in sorted_id_GIM:
             info = player_id_info_dir.get(str(id))
+            if info is None:
+                continue
             name = info[0]
             team = info[1]
             goals = info[2]
@@ -80,6 +99,7 @@ class PlayerImpact:
 
     def aggregate_match_diff_values(self, dir_game, action_selected_list=None):
         """compute impact"""
+
         for file_name in os.listdir(self.model_data_store_dir + "/" + dir_game):
             # print file_name
             if file_name == self.data_name:
