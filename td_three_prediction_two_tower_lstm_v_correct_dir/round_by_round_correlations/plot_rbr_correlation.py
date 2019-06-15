@@ -23,13 +23,13 @@ class DrawRoundCorrelation:
             for method in self.metric_names_all:
                 field_dict.update({method: []})
             self.field_dict.update({field_name: field_dict})
-        self.ROUND_NUMBER = 50
+        self.ROUND_NUMBER = 40
 
     def read_round_by_round_correlation(self):
         # methods_record_all = {}
 
         for metric_name in self.metric_names_all:
-            with open('./round_by_round_correlation' + '_{0}.json'.format(metric_name)) as fp:
+            with open('./bak_rbr_correlations/round_by_round_correlation' + '_{0}.json'.format(metric_name)) as fp:
                 metric_values = json.load(fp)
             round_number_all = map(str, sorted(map(int, metric_values.keys()), reverse=False))
             for round_number in round_number_all:
@@ -57,21 +57,22 @@ class DrawRoundCorrelation:
         methods_color_dict = {'GIM': 'b', 'EG': 'y', 'SI': 'g', 'GIM2t': 'r'}
         methods_name_dict = {'GIM': 'GIM-Merge', 'EG': 'EG', 'SI': 'SI', 'GIM2t': 'GIM'}
 
-        x_list = range(1, self.ROUND_NUMBER + 1, scale)
+        x_list = range(0, self.ROUND_NUMBER + 1, scale)
 
         for field in self.field_dict.keys():
 
-            plt.figure(figsize=(8, 7))
+            plt.figure(figsize=(12, 7))
 
             for method in self.metric_names_all:
                 # field_name = method if field == 'auto' else field
                 field_name = field
-                correlations = methods_record_all.get(field_name).get(method)
+                correlations = methods_record_all.get(field_name).get(method)[:self.ROUND_NUMBER]
 
                 for pop_number in range(0, self.ROUND_NUMBER / scale):
                     correlations.pop(pop_number)
 
                 # plt.plot(x_list, correlations, label=method)
+                correlations = [0] + correlations[:self.ROUND_NUMBER]  # when round=0, correl=0
                 plt.plot(x_list, correlations,
                          label=methods_name_dict.get(method), marker=methods_marker_dict.get(method),
                          color=methods_color_dict.get(method),

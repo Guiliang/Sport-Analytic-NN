@@ -27,7 +27,12 @@ if __name__ == "__main__":
     # team_game_dict = rbr_correlation.read_team_by_date()
     # pickle.dump(team_game_dict, open('./tmp_stores/team_game_dict.pkl', 'w'))
     team_game_dict = pickle.load(open('./tmp_stores/team_game_dict.pkl', 'r'))
+    for key in team_game_dict.keys():
+        value = team_game_dict.get(key)
+        if len(value) < 30:
+            team_game_dict.pop(key)
     game_by_round_dict = rbr_correlation.compute_game_by_round(team_game_dict=team_game_dict)
+
     total_game = 0
     game_ste = {}
     for values in game_by_round_dict.values():

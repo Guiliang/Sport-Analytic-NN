@@ -123,7 +123,7 @@ class Correlation:
                     plus_minus_dict = plus_minus.pm
                     rank_value_dict = {}
                     for player_id in plus_minus_dict:
-                        rank_value_dict.update({str(player_id):plus_minus_dict.get(player_id)})
+                        rank_value_dict.update({str(player_id): plus_minus_dict.get(player_id)})
                 correlation_rank_list = []
                 for interest_metric in interest_metric_all:
                     correlation = self.compute_correlation(rank_value_dict, interest_metric, category)

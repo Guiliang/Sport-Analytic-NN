@@ -7,6 +7,7 @@ import json
 import operator
 import unicodedata
 import td_three_prediction_two_tower_lstm_v_correct_dir.support.data_processing_tools as tools
+import td_three_prediction_two_tower_lstm_v_correct_dir.resource.salary_1718 as salary_1718
 
 
 class PlayerImpact:
@@ -65,8 +66,10 @@ class PlayerImpact:
         elif action_selected == 'pass':
             write_file.write('name & team & GIM & Assist \\\\ \n')
         else:
-            write_file.write('name & team & GIM & Goal & Assist \\\\ \n')
+            write_file.write('name & team & GIM & Goal & Assist $ Salary \\\\ \n')
         for (id, GIM) in sorted_id_GIM:
+            salary = salary_1718.salary.get(int(id))
+            salary = str(salary) if salary is not None else '-'
             info = player_id_info_dir.get(str(id))
             if info is None:
                 continue
@@ -82,7 +85,8 @@ class PlayerImpact:
                 write_file.write('{0} & {1} & {2} & {3} \\\\ \n'.format(name, team, round(GIM['value'], 3), assist))
             else:
                 # write_file.write('name & team & GIM & Goal & Assist \\\\')
-                write_file.write('{0} & {1} & {2} & {3} & {4} \\\\ \n'.format(name, team, round(GIM['value'], 3), goals, assist))
+                write_file.write('{0} & {1} & {2} & {3} & {4} & {5} \\\\ \n'.format(name, team, round(GIM['value'], 3),
+                                                                                    goals, assist, salary))
 
     def transfer2player_name_dict(self, player_id_name_pair_dir):
         with open(player_id_name_pair_dir, 'r') as f:
