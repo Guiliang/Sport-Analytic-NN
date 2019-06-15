@@ -116,8 +116,9 @@ def generate_final_cali_latex_table(tt_result_file_dir, markov_result_file_dir):
                                 # raise ValueError('something wrong')
                                 print eles
                                 raise ValueError('something wrong')
-
-                    str_all += '{0} & {1} & {2} & {3} & {4} & {5} & {6} & {7} & {8} \\\\ \n'.format(
+                    if pitch == 'left':
+                        continue
+                    str_all += '{0} & {1} & {2} & {4} & {5} & {6} & {7} & {8} \\\\ \n'.format(
                         str(score_diff), str(manpower), str(period), str(pitch),
                         str(number), str(h_model), str(a_model), str(tt_mae), str(markov_mae)
                     )

@@ -61,11 +61,11 @@ class PlayerImpact:
 
         sorted_id_GIM = sorted(self.player_id_dict_all.items(), key=operator.itemgetter(1), reverse=True)
         if action_selected == 'shot':
-            write_file.write('name & team & GIM & Goal \\\\')
+            write_file.write('name & team & GIM & Goal \\\\ \n')
         elif action_selected == 'pass':
-            write_file.write('name & team & GIM & Assist \\\\')
+            write_file.write('name & team & GIM & Assist \\\\ \n')
         else:
-            write_file.write('name & team & GIM & Goal & Assist \\\\')
+            write_file.write('name & team & GIM & Goal & Assist \\\\ \n')
         for (id, GIM) in sorted_id_GIM:
             info = player_id_info_dir.get(str(id))
             if info is None:
@@ -76,13 +76,13 @@ class PlayerImpact:
             assist = info[3]
             if action_selected == 'shot':
                 # write_file.write('name & team & GIM & Goal \\\\')
-                write_file.write('{0} & {1} & {2} & {3} \n'.format(name, team, goals, GIM))
+                write_file.write('{0} & {1} & {2} & {3} \\\\  \n'.format(name, team, round(GIM['value'], 3), goals))
             elif action_selected == 'pass':
                 # write_file.write('name & team & GIM & Assist \\\\')
-                write_file.write('{0} & {1} & {2} & {3} \n'.format(name, team, assist, GIM))
+                write_file.write('{0} & {1} & {2} & {3} \\\\ \n'.format(name, team, round(GIM['value'], 3), assist))
             else:
                 # write_file.write('name & team & GIM & Goal & Assist \\\\')
-                write_file.write('{0} & {1} & {2} & {3} & {4} \n'.format(name, team, goals, assist, GIM))
+                write_file.write('{0} & {1} & {2} & {3} & {4} \\\\ \n'.format(name, team, round(GIM['value'], 3), goals, assist))
 
     def transfer2player_name_dict(self, player_id_name_pair_dir):
         with open(player_id_name_pair_dir, 'r') as f:

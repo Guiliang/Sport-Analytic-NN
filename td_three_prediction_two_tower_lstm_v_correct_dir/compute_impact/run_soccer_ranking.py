@@ -31,15 +31,16 @@ def compute_ranking(soccer_data_store_dir, game_data_dir, data_name, player_summ
                 continue
             PI.aggregate_match_diff_values(game_name_dir, action_selected_list=action_selected_list)
         # PI.transfer2player_name_dict(player_id_name_pair_dir)
+        action_selected = action_selected_list[0] if action_selected_list is not None else None
         PI.rank_player_by_impact(player_summary_info_dir,
                                  write_file=write_file,
-                                 action_selected=action_selected_list,
-                                 game_info_all = game_info_all)
+                                 action_selected=action_selected,
+                                 game_info_all=game_info_all)
         write_file.close()
 
 
 if __name__ == '__main__':
-    test_flag = True
+    test_flag = False
     action_selected_lists = [['shot'], ['pass'], None]
     if test_flag:
         data_path = '/Users/liu/Desktop/soccer-data-sample/sequences_append_goal/'

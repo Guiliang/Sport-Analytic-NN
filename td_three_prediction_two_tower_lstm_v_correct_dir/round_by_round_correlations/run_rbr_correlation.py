@@ -64,9 +64,9 @@ if __name__ == "__main__":
             data_name = get_data_name(config=tt_lstm_config, if_old=True)
             rbr_correlation.data_name = data_name
         elif metric == 'SI':
-            rbr_correlation.difference_type = 'back_difference_'
+            rbr_correlation.difference_type = 'expected_goal'
             rbr_correlation.action_selected_list = None
-            data_name = 'markov_values_iter100'
+            data_name = 'markov_impact_values.json'
             rbr_correlation.data_name = data_name
         correlated_coefficient_round_by_round = rbr_correlation.compute_correlations_by_round(
             player_id_info_dict=player_id_info_dict, game_by_round_dict=game_by_round_dict,
