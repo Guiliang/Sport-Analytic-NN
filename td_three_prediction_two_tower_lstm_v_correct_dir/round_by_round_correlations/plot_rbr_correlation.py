@@ -61,7 +61,7 @@ class DrawRoundCorrelation:
 
         for field in self.field_dict.keys():
 
-            plt.figure(figsize=(12, 7))
+            plt.figure(figsize=(11, 7))
 
             for method in self.metric_names_all:
                 # field_name = method if field == 'auto' else field

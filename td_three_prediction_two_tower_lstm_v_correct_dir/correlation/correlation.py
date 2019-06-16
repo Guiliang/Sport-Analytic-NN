@@ -5,26 +5,36 @@ import td_three_prediction_two_tower_lstm_v_correct_dir.resource.plus_minus_1718
 
 
 class Correlation:
-    def __init__(self, game_info_path, online_info_path_list):
-        self.online_info_path_dict = {'summary': online_info_path_list[0],
-                                      'defensive': online_info_path_list[1],
-                                      'offensive': online_info_path_list[2]}
+    def __init__(self, game_info_path, online_info_path_dict_all={}):
+        self.online_info_path_dict = {'summary': [],
+                                      'defensive': [],
+                                      'offensive': [],
+                                      'passing': []}
+        for key in online_info_path_dict_all.keys():
+            online_info_path_list = online_info_path_dict_all.get(key)
+            self.online_info_path_dict.get('summary').append(online_info_path_list[0])
+            self.online_info_path_dict.get('defensive').append(online_info_path_list[1])
+            self.online_info_path_dict.get('offensive').append(online_info_path_list[2])
+            self.online_info_path_dict.get('passing').append(online_info_path_list[3])
+
         self.game_info_path = game_info_path
         self.ranking_dir_dict = {
             'PM': ['', ''],
             'GIM': ['GIM', '../compute_impact/player_impact/ijcai_soccer_player_GIM_2019June01.json'],
             'SI': ['', '../resource/soccer_player_markov_impact-2019June13.json'],
-            'GIM2t': ['GIM', '../compute_impact/player_impact/soccer_player_GIM_2019June13_back_difference_.json'],
+            'GIM2t': ['GIM', '../compute_impact/player_impact/soccer_player_GIM_2019June12_back_difference_.json'],
             'EG': ['GIM', '../compute_impact/player_impact/bak-soccer_player_GIM_2019June05_expected_goal.json'],
             # 'PM': ['', ''],
             # 'ALG': ''
         }
         self.interested_standard_metric = {'summary': ['Mins', 'Goals', 'Assists', 'Yel', 'Red',
-                                                       'SpG', 'PS', 'AeriaisWon', 'MotM'],
+                                                       'SpG', 'PS', 'AerialsWon', 'MotM'],
                                            'defensive': ['Mins', 'Tackles', 'Inter', 'Fouls', 'Offsides',
                                                          'Clear', 'Drb', 'Blocks', 'OwnG'],
                                            'offensive': ['Mins', 'Goals', 'SpG', 'KeyP', 'Drb', 'Fouled',
-                                                         'Off', 'Disp', 'UnsTch']
+                                                         'Off', 'Disp', 'UnsTch'],
+                                           'passing': ['Mins', 'Assists', 'KeyP', 'AvgP', 'PS', 'Crosses', 'LongB',
+                                                       'ThrB']
                                            }
         self.game_info_file = open(self.game_info_path)
         game_reader = csv.DictReader(self.game_info_file)
@@ -72,30 +82,34 @@ class Correlation:
     def compute_correlation(self, rank_value_dict, interest_metric, category):
         mins_online_list = []
         mins_game_list = []
-        with open(self.online_info_path_dict[category]) as online_info_file:
-            online_reader = csv.DictReader(online_info_file)
-            i = 0
-            for r in online_reader:
-                playername = r['name']
-                teamname = r['team']
-                if teamname[0] == '"':
-                    teamname = teamname[1:-1]
-                teamname = teamname.split(',')[0]
-                standard_value = r[interest_metric]
-                if standard_value == '-':
-                    continue
-                # print(playername, ' ', teamname)
-                Flag, id = self.get_id(playername, teamname)
-                if id not in rank_value_dict:
-                    continue
-                value = rank_value_dict[id]
-                if not Flag:
-                    continue
-                # print(value)
-                mins_online_list.append(float(standard_value))
-                # print(value)
-                mins_game_list.append(float(value))
-                i += 1
+        for online_path in self.online_info_path_dict[category]:
+            with open(online_path) as online_info_file:
+                online_reader = csv.DictReader(online_info_file)
+                i = 0
+                for r in online_reader:
+                    playername = r['name']
+                    teamname = r['team']
+                    if teamname[0] == '"':
+                        teamname = teamname[1:-1]
+                    teamname = teamname.split(',')[0]
+                    try:
+                        standard_value = r[interest_metric]
+                    except:
+                        print('find')
+                    if standard_value == '-':
+                        continue
+                    # print(playername, ' ', teamname)
+                    Flag, id = self.get_id(playername, teamname)
+                    if id not in rank_value_dict:
+                        continue
+                    value = rank_value_dict[id]
+                    if not Flag:
+                        continue
+                    # print(value)
+                    mins_online_list.append(float(standard_value))
+                    # print(value)
+                    mins_game_list.append(float(value))
+                    i += 1
 
         # print(len(mins_online_list))
         # print(len(mins_game_list))
@@ -105,9 +119,10 @@ class Correlation:
     def compute_all_correlations(self):
         correlation_record_all_dict = {'summary': {},
                                        'defensive': {},
-                                       'offensive': {}}
+                                       'offensive': {},
+                                       'passing': {}}
 
-        for category in ['summary', 'defensive', 'offensive']:
+        for category in ['summary', 'defensive', 'offensive', 'passing']:
             interest_metric_all = self.interested_standard_metric.get(category)
             metric_string = 'model'
             for interest_metric in interest_metric_all:
