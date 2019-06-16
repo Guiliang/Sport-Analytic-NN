@@ -68,6 +68,9 @@ class PlayerImpact:
         else:
             write_file.write('name & team & GIM & Goal & Assist $ Salary \\\\ \n')
         for (id, GIM) in sorted_id_GIM:
+            if id is None:
+                print (id, GIM)
+                continue
             salary = salary_1718.salary.get(int(id))
             salary = str(salary) if salary is not None else '-'
             info = player_id_info_dir.get(str(id))
