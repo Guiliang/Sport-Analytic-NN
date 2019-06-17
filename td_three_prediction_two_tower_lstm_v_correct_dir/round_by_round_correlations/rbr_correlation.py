@@ -209,10 +209,13 @@ class RoundByRoundCorrelation:
         return game_by_round_dict
 
     def compute_player_season_totals(self):
-        with open(self.player_summary_dir_list) as f:
-            lines = f.readlines()
+        lines_all = []
+        for player_summary_dir in self.player_summary_dir_list:
+            with open(player_summary_dir) as f:
+                lines = f.readlines()
+                lines_all += lines[1:]
         player_id_info_dict = {}
-        for line in lines[1:]:
+        for line in lines_all:
             # name,playerId,team,teamId,Apps,Mins,Goals,Assists,Yel,Red,SpG,PS,AeriaisWon,MotM,Rating
             items = line.split(',')
             name = items[0]
