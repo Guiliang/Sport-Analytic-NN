@@ -19,9 +19,10 @@ if __name__ == "__main__":
         'SI': ['', '../resource/bak_soccer_player_markov_impact-2019June04.json'],
         'EG': ['GIM', '../compute_impact/player_impact/bak-soccer_player_GIM_2019June05_expected_goal.json']}
     # interested_metric = ['GIM2t', 'GIM', 'EG', 'SI']
-    player_summary_dir = '../resource/Soccer_summary.csv'
+    player_summary_dir_list = ['../resource/whoScored/Championship/Championship_summary.csv',
+                               '../resource/whoScored/PremierLeague/Premier_League_summary.csv']
     game_info_path = '../resource/player_team_id_name_value.csv'
-    rbr_correlation = RoundByRoundCorrelation(raw_data_path, interested_metric, player_summary_dir,
+    rbr_correlation = RoundByRoundCorrelation(raw_data_path, interested_metric, player_summary_dir_list,
                                               model_data_store_dir, game_info_path,
                                               metric_seasonal_total_by_player_dirs)
     # team_game_dict = rbr_correlation.read_team_by_date()

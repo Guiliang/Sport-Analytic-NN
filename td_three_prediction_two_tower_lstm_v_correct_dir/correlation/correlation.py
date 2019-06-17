@@ -20,9 +20,10 @@ class Correlation:
         self.game_info_path = game_info_path
         self.ranking_dir_dict = {
             'PM': ['', ''],
+            'ALG': ['', ''],
             'GIM': ['GIM', '../compute_impact/player_impact/ijcai_soccer_player_GIM_2019June01.json'],
             'SI': ['', '../resource/soccer_player_markov_impact-2019June13.json'],
-            'GIM2t': ['GIM', '../compute_impact/player_impact/soccer_player_GIM_2019June12_back_difference_.json'],
+            'GIM2t': ['GIM', '../compute_impact/player_impact/soccer_player_GIM_2019June17_back_difference_.json'],
             'EG': ['GIM', '../compute_impact/player_impact/bak-soccer_player_GIM_2019June05_expected_goal.json'],
             # 'PM': ['', ''],
             # 'ALG': ''
@@ -39,10 +40,13 @@ class Correlation:
         self.game_info_file = open(self.game_info_path)
         game_reader = csv.DictReader(self.game_info_file)
         self.game_info_all = []
+        self.ALG_value_dict = {}
         for r in game_reader:
             p_name = r['playerName']
             t_name = r['teamName']
             id = r['playerId']
+            ALG_value = float(r['value'])
+            self.ALG_value_dict.update({id: ALG_value})
             self.game_info_all.append([p_name, t_name, id])
 
     def __del__(self):
@@ -139,6 +143,8 @@ class Correlation:
                     rank_value_dict = {}
                     for player_id in plus_minus_dict:
                         rank_value_dict.update({str(player_id): plus_minus_dict.get(player_id)})
+                elif rank_value_name == 'ALG':
+                    rank_value_dict = self.ALG_value_dict
                 correlation_rank_list = []
                 for interest_metric in interest_metric_all:
                     correlation = self.compute_correlation(rank_value_dict, interest_metric, category)

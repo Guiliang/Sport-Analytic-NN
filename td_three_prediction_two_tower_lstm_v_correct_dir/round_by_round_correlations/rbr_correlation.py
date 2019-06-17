@@ -18,9 +18,9 @@ from td_three_prediction_two_tower_lstm_v_correct_dir.support.data_processing_to
 
 
 class RoundByRoundCorrelation:
-    def __init__(self, raw_data_path, interested_metric, player_summary_dir,
+    def __init__(self, raw_data_path, interested_metric, player_summary_dir_list,
                  model_data_store_dir, game_info_path, metric_seasonal_total_by_player_dirs):
-        self.player_summary_dir = player_summary_dir
+        self.player_summary_dir_list = player_summary_dir_list
         self.action_selected_list = None
         self.raw_data_path = raw_data_path
         self.interested_metric = interested_metric
@@ -209,7 +209,7 @@ class RoundByRoundCorrelation:
         return game_by_round_dict
 
     def compute_player_season_totals(self):
-        with open(self.player_summary_dir) as f:
+        with open(self.player_summary_dir_list) as f:
             lines = f.readlines()
         player_id_info_dict = {}
         for line in lines[1:]:
@@ -334,33 +334,34 @@ class RoundByRoundCorrelation:
     def compute_standard_correlation(self, rank_value_dict, interest_metric):
         season_value_list = []
         round_value_list = []
-        with open(self.player_summary_dir) as online_info_file:
-            online_reader = csv.DictReader(online_info_file)
-            i = 0
-            for r in online_reader:
-                playername = r['name']
-                teamname = r['team']
-                if teamname[0] == '"':
-                    teamname = teamname[1:-1]
-                teamname = teamname.split(',')[0]
-                standard_value = r[interest_metric]
-                if standard_value == '-':
-                    continue
-                # print(playername, ' ', teamname)
-                Flag, id = self.get_id(playername, teamname)
-                if not Flag:
-                    continue
-                # print type(id)
-                id = int(id)
-                # print rank_value_dict
-                if id not in rank_value_dict:
-                    continue
-                value = rank_value_dict[id]['value']
-                # print(value)
-                season_value_list.append(float(standard_value))
-                # print(value)
-                round_value_list.append(float(value))
-                i += 1
+        for player_summary_dir in self.player_summary_dir_list:
+            with open(player_summary_dir) as online_info_file:
+                online_reader = csv.DictReader(online_info_file)
+                i = 0
+                for r in online_reader:
+                    playername = r['name']
+                    teamname = r['team']
+                    if teamname[0] == '"':
+                        teamname = teamname[1:-1]
+                    teamname = teamname.split(',')[0]
+                    standard_value = r[interest_metric]
+                    if standard_value == '-':
+                        continue
+                    # print(playername, ' ', teamname)
+                    Flag, id = self.get_id(playername, teamname)
+                    if not Flag:
+                        continue
+                    # print type(id)
+                    id = int(id)
+                    # print rank_value_dict
+                    if id not in rank_value_dict:
+                        continue
+                    value = rank_value_dict[id]['value']
+                    # print(value)
+                    season_value_list.append(float(standard_value))
+                    # print(value)
+                    round_value_list.append(float(value))
+                    i += 1
 
         # print(len(online_value_list))
         # print(len(game_value_list))
@@ -399,37 +400,37 @@ class RoundByRoundCorrelation:
                 writer.writerow(round_correlated_coefficients_record)
 
 
-if __name__ == "__main__":
-    tt_lstm_config_path = "../soccer-config-v3.yaml"
-
-    tt_lstm_config = TTLSTMCongfig.load(tt_lstm_config_path)
-    raw_data_path = "/cs/oschulte/soccer-data/sequences_append_goal/"
-    model_data_store_dir = "/cs/oschulte/Galen/Soccer-data"
-    interested_metric = ['Goals', 'Assists', 'Auto']
-    player_summary_dir = '../resource/Soccer_summary.csv'
-    game_info_path = '../resource/player_team_id_name_value.csv'
-    data_name = get_data_name(config=tt_lstm_config)
-    rbr_correlation = RoundByRoundCorrelation(raw_data_path, interested_metric, player_summary_dir,
-                                              model_data_store_dir, data_name, game_info_path)
-    # team_game_dict = rbr_correlation.read_team_by_date()
-    # pickle.dump(team_game_dict, open('./tmp_stores/team_game_dict.pkl', 'w'))
-    team_game_dict = pickle.load(open('./tmp_stores/team_game_dict.pkl', 'r'))
-    game_by_round_dict = rbr_correlation.compute_game_by_round(team_game_dict=team_game_dict)
-    total_game = 0
-    game_ste = {}
-    for values in game_by_round_dict.values():
-        total_game += len(values)
-        for value in values:
-            if game_ste.get(value.split('$')[-1]) is not None:
-                number = game_ste.get(value.split('$')[-1]) + 1
-            else:
-                number = 1
-            game_ste.update({value.split('$')[-1]: number})
-    print total_game / 2
-    player_id_info_dict = rbr_correlation.compute_player_season_totals()
-    correlated_coefficient_round_by_round = rbr_correlation.compute_correlations_by_round(
-        player_id_info_dict=player_id_info_dict, game_by_round_dict=game_by_round_dict)
-    with open('round_by_round_correlation.json', 'w') as outfile:
-        json.dump(obj=correlated_coefficient_round_by_round, fp=outfile)
-
-    print 'still working'
+# if __name__ == "__main__":
+#     tt_lstm_config_path = "../soccer-config-v3.yaml"
+#
+#     tt_lstm_config = TTLSTMCongfig.load(tt_lstm_config_path)
+#     raw_data_path = "/cs/oschulte/soccer-data/sequences_append_goal/"
+#     model_data_store_dir = "/cs/oschulte/Galen/Soccer-data"
+#     interested_metric = ['Goals', 'Assists', 'Auto']
+#     player_summary_dir = '../resource/Soccer_summary.csv'
+#     game_info_path = '../resource/player_team_id_name_value.csv'
+#     data_name = get_data_name(config=tt_lstm_config)
+#     rbr_correlation = RoundByRoundCorrelation(raw_data_path, interested_metric, player_summary_dir,
+#                                               model_data_store_dir, data_name, game_info_path)
+#     # team_game_dict = rbr_correlation.read_team_by_date()
+#     # pickle.dump(team_game_dict, open('./tmp_stores/team_game_dict.pkl', 'w'))
+#     team_game_dict = pickle.load(open('./tmp_stores/team_game_dict.pkl', 'r'))
+#     game_by_round_dict = rbr_correlation.compute_game_by_round(team_game_dict=team_game_dict)
+#     total_game = 0
+#     game_ste = {}
+#     for values in game_by_round_dict.values():
+#         total_game += len(values)
+#         for value in values:
+#             if game_ste.get(value.split('$')[-1]) is not None:
+#                 number = game_ste.get(value.split('$')[-1]) + 1
+#             else:
+#                 number = 1
+#             game_ste.update({value.split('$')[-1]: number})
+#     print total_game / 2
+#     player_id_info_dict = rbr_correlation.compute_player_season_totals()
+#     correlated_coefficient_round_by_round = rbr_correlation.compute_correlations_by_round(
+#         player_id_info_dict=player_id_info_dict, game_by_round_dict=game_by_round_dict)
+#     with open('round_by_round_correlation.json', 'w') as outfile:
+#         json.dump(obj=correlated_coefficient_round_by_round, fp=outfile)
+#
+#     print 'still working'
