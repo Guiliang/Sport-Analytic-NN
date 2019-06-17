@@ -752,6 +752,7 @@ def get_GIM_rank_value(metric_name, ranking_dir_dict):
     return rank_value_dict
 
 
+
 if __name__ == '__main__':
     combine_player_data(player_info_csv='../resource/player_team_id_name_value.csv',
                         player_stats='../resource/Soccer_summary.csv',
