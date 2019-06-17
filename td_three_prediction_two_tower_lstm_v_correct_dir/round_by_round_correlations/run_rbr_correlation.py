@@ -12,13 +12,13 @@ from td_three_prediction_two_tower_lstm_v_correct_dir.round_by_round_correlation
 if __name__ == "__main__":
     raw_data_path = "/cs/oschulte/soccer-data/sequences_append_goal/"
     model_data_store_dir = "/cs/oschulte/Galen/Soccer-data"
-    interested_metric = ['SI']  # ['GIM', 'SI']
+    # interested_metric = ['SI']  # ['GIM', 'SI']
     metric_seasonal_total_by_player_dirs = {
         'GIM': ['GIM', '../compute_impact/player_impact/ijcai_soccer_player_GIM_2019June01.json'],
         'GIM2t': ['GIM', '../compute_impact/player_impact/soccer_player_GIM_back_difference_.json'],
         'SI': ['', '../resource/bak_soccer_player_markov_impact-2019June04.json'],
         'EG': ['GIM', '../compute_impact/player_impact/bak-soccer_player_GIM_2019June05_expected_goal.json']}
-    # interested_metric = ['GIM2t', 'GIM', 'EG', 'SI']
+    interested_metric = ['GIM2t', 'GIM', 'EG', 'SI']
     player_summary_dir_list = ['../resource/whoScored/Championship/Championship_summary.csv',
                                '../resource/whoScored/PremierLeague/Premier_League_summary.csv']
     game_info_path = '../resource/player_team_id_name_value.csv'
