@@ -1,9 +1,13 @@
+import sys
+
+print sys.path
+sys.path.append('/Local-Scratch/PycharmProjects/Sport-Analytic-NN/')
 import json
 import os
 from data_processing_tools import read_features_within_events
 
 if __name__ == '__main__':
-    test_flag = True
+    test_flag = False
     store_pm_dir = '../resource/pm_player_all.json'
     if test_flag:
         data_path = '/Users/liu/Desktop/soccer-data-sample/sequences_append_goal/'
