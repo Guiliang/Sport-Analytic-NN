@@ -19,7 +19,7 @@ class Correlation:
 
         self.game_info_path = game_info_path
         self.ranking_dir_dict = {
-            'PM': ['', ''],
+            'PM': ['', '../resource/pm_player_all.json'],
             'ALG': ['', ''],
             'GIM': ['GIM', '../compute_impact/player_impact/ijcai_soccer_player_GIM_2019June01.json'],
             'SI': ['', '../resource/soccer_player_markov_impact-2019June13.json'],
@@ -62,7 +62,7 @@ class Correlation:
                 return True, info[2]
         return False, ' '
 
-    def get_markov_rank_value(self, metric_name):
+    def get_general_rank_value(self, metric_name):
         metric_info = self.ranking_dir_dict.get(metric_name)
         with open(metric_info[1]) as f:
             d = json.load(f)
@@ -136,13 +136,13 @@ class Correlation:
             for rank_value_name in self.ranking_dir_dict.keys():
                 if rank_value_name == 'GIM' or rank_value_name == 'GIM2t' or rank_value_name == 'EG':
                     rank_value_dict = self.get_GIM_rank_value(rank_value_name)
-                elif rank_value_name == 'SI':
-                    rank_value_dict = self.get_markov_rank_value(rank_value_name)
-                elif rank_value_name == 'PM':
-                    plus_minus_dict = plus_minus.pm
-                    rank_value_dict = {}
-                    for player_id in plus_minus_dict:
-                        rank_value_dict.update({str(player_id): plus_minus_dict.get(player_id)})
+                elif rank_value_name == 'SI' or rank_value_name == 'PM':
+                    rank_value_dict = self.get_general_rank_value(rank_value_name)
+                # elif rank_value_name == 'PM':
+                #     plus_minus_dict = plus_minus.pm
+                #     rank_value_dict = {}
+                #     for player_id in plus_minus_dict:
+                #         rank_value_dict.update({str(player_id): plus_minus_dict.get(player_id)})
                 elif rank_value_name == 'ALG':
                     rank_value_dict = self.ALG_value_dict
                 correlation_rank_list = []

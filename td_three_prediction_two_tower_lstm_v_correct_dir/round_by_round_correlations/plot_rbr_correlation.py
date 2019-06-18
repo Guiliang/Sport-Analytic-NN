@@ -29,7 +29,7 @@ class DrawRoundCorrelation:
         # methods_record_all = {}
 
         for metric_name in self.metric_names_all:
-            with open('./bak_rbr_correlations/round_by_round_correlation' + '_{0}.json'.format(metric_name)) as fp:
+            with open('./rbr_correlations/round_by_round_correlation' + '_{0}.json'.format(metric_name)) as fp:
                 metric_values = json.load(fp)
             round_number_all = map(str, sorted(map(int, metric_values.keys()), reverse=False))
             for round_number in round_number_all:
