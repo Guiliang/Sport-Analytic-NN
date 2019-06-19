@@ -107,7 +107,7 @@ if __name__ == '__main__':
 
     # tt_lstm_config_path = '../icehockey-config.yaml'
     tt_lstm_config_path = "../soccer-config-v5.yaml"
-    difference_type = 'back_difference_'
+    difference_type = 'expected_goal'
     soccer_dir_all = os.listdir(data_path)
 
     tt_lstm_config = TTLSTMCongfig.load(tt_lstm_config_path)

@@ -1,3 +1,4 @@
+import json
 import sys
 
 print sys.path
@@ -15,10 +16,23 @@ from td_three_prediction_two_tower_lstm_v_correct_dir.support.data_processing_to
     compromise_state_trace_length, \
     get_together_training_batch, write_game_average_csv
 
+# fine-tuning testing
+FINE_TUNING = True
+if FINE_TUNING:
+    league_number = 10
+    league_name = "_English_Npower_Championship"
+    model_train_continue = True
+    print('fine-tuning on the {0} league'.format(league_name))
+else:
+    model_train_continue = False
+    league_name = ''
+
 tt_lstm_config_path = "../soccer-config-v5.yaml"
 tt_lstm_config = TTLSTMCongfig.load(tt_lstm_config_path)
-DATA_STORE = "/cs/oschulte/Galen/Soccer-data/"
-DIR_GAMES_ALL = os.listdir(DATA_STORE)
+DATA_PATH = "/cs/oschulte/soccer-data/sequences_append_goal/"
+SOCCER_DATA_STORE_DIR = "/cs/oschulte/Galen/Soccer-data/"
+DIR_GAMES_ALL = os.listdir(SOCCER_DATA_STORE_DIR)
+DIR_DATA_ALL = os.listdir(DATA_PATH)
 number_of_total_game = len(DIR_GAMES_ALL)
 TRAIN_FLAG = False
 if TRAIN_FLAG:
@@ -27,37 +41,41 @@ if TRAIN_FLAG:
 else:
     train_msg = ''
 
-
 if tt_lstm_config.learn.merge_tower:
     merge_msg = 'm'
 else:
     merge_msg = 's'
 
-LOG_DIR = "{0}/oschulte/Galen/soccer-models/hybrid_sl_log_NN" \
-          "/{1}Scale-tt{9}-three-cut_together_log_feature{2}" \
-          "_batch{3}_iterate{4}_lr{5}_{6}{7}_MaxTL{8}".format(tt_lstm_config.learn.save_mother_dir,
-                                                              train_msg,
-                                                              str(tt_lstm_config.learn.feature_type),
-                                                              str(tt_lstm_config.learn.batch_size),
-                                                              str(tt_lstm_config.learn.iterate_num),
-                                                              str(tt_lstm_config.learn.learning_rate),
-                                                              str(tt_lstm_config.learn.model_type),
-                                                              str(tt_lstm_config.learn.if_correct_velocity),
-                                                              str(tt_lstm_config.learn.max_trace_length),
-                                                              merge_msg)
 
-SAVED_NETWORK = "{0}/oschulte/Galen/soccer-models/hybrid_sl_saved_NN/" \
-                "{1}Scale-tt{9}-three-cut_together_saved_networks_feature{2}" \
-                "_batch{3}_iterate{4}_lr{5}_{6}{7}_MaxTL{8}".format(tt_lstm_config.learn.save_mother_dir,
-                                                                    train_msg,
-                                                                    str(tt_lstm_config.learn.feature_type),
-                                                                    str(tt_lstm_config.learn.batch_size),
-                                                                    str(tt_lstm_config.learn.iterate_num),
-                                                                    str(tt_lstm_config.learn.learning_rate),
-                                                                    str(tt_lstm_config.learn.model_type),
-                                                                    str(tt_lstm_config.learn.if_correct_velocity),
-                                                                    str(tt_lstm_config.learn.max_trace_length),
-                                                                    merge_msg)
+def get_network_dir(league_name):
+    LOG_DIR = "{0}/oschulte/Galen/soccer-models/hybrid_sl_log_NN" \
+              "/{1}Scale-tt{9}-three-cut_together_log_feature{2}" \
+              "_batch{3}_iterate{4}_lr{5}_{6}{7}_MaxTL{8}{10}".format(tt_lstm_config.learn.save_mother_dir,
+                                                                      train_msg,
+                                                                      str(tt_lstm_config.learn.feature_type),
+                                                                      str(tt_lstm_config.learn.batch_size),
+                                                                      str(tt_lstm_config.learn.iterate_num),
+                                                                      str(tt_lstm_config.learn.learning_rate),
+                                                                      str(tt_lstm_config.learn.model_type),
+                                                                      str(tt_lstm_config.learn.if_correct_velocity),
+                                                                      str(tt_lstm_config.learn.max_trace_length),
+                                                                      merge_msg,
+                                                                      league_name)
+
+    SAVED_NETWORK = "{0}/oschulte/Galen/soccer-models/hybrid_sl_saved_NN/" \
+                    "{1}Scale-tt{9}-three-cut_together_saved_networks_feature{2}" \
+                    "_batch{3}_iterate{4}_lr{5}_{6}{7}_MaxTL{8}{10}".format(tt_lstm_config.learn.save_mother_dir,
+                                                                            train_msg,
+                                                                            str(tt_lstm_config.learn.feature_type),
+                                                                            str(tt_lstm_config.learn.batch_size),
+                                                                            str(tt_lstm_config.learn.iterate_num),
+                                                                            str(tt_lstm_config.learn.learning_rate),
+                                                                            str(tt_lstm_config.learn.model_type),
+                                                                            str(tt_lstm_config.learn.if_correct_velocity),
+                                                                            str(tt_lstm_config.learn.max_trace_length),
+                                                                            merge_msg,
+                                                                            league_name)
+    return LOG_DIR, SAVED_NETWORK
 
 
 def train_network(sess, model, print_parameters=False):
@@ -68,10 +86,12 @@ def train_network(sess, model, print_parameters=False):
     # loading network
     saver = tf.train.Saver(max_to_keep=300)
     merge = tf.summary.merge_all()
-    train_writer = tf.summary.FileWriter(LOG_DIR, sess.graph)
+    load_log_dir, load_network_dir = get_network_dir(league_name='')
+    save_log_dir, save_network_dir = get_network_dir(league_name=league_name)
+    train_writer = tf.summary.FileWriter(save_log_dir, sess.graph)
     sess.run(tf.global_variables_initializer())
-    if tt_lstm_config.learn.model_train_continue:  # resume the training
-        checkpoint = tf.train.get_checkpoint_state(SAVED_NETWORK)
+    if model_train_continue:  # resume the training
+        checkpoint = tf.train.get_checkpoint_state(load_network_dir)
         if checkpoint and checkpoint.model_checkpoint_path:
             check_point_game_number = int((checkpoint.model_checkpoint_path.split("-"))[-1])
             game_number_checkpoint = check_point_game_number % number_of_total_game
@@ -94,7 +114,19 @@ def train_network(sess, model, print_parameters=False):
             break
         else:
             converge_flag = True
-        for dir_game in DIR_GAMES_ALL:
+
+        for index in range(0, len(DIR_GAMES_ALL)):
+
+            if FINE_TUNING:
+                with open(DATA_PATH + DIR_DATA_ALL[index]) as f:
+                    data_lines = json.load(f)
+                competitionId = data_lines.get('competitionId')
+                # print(competitionId)
+                # print(league_number)
+                if competitionId != league_number:
+                    continue
+
+            dir_game = DIR_GAMES_ALL[index]
 
             if tt_lstm_config.learn.model_train_continue:
                 # if checkpoint and checkpoint.model_checkpoint_path:
@@ -106,7 +138,7 @@ def train_network(sess, model, print_parameters=False):
             v_diff_record = []
             game_number += 1
             game_cost_record = []
-            game_files = os.listdir(DATA_STORE + "/" + dir_game)
+            game_files = os.listdir(SOCCER_DATA_STORE_DIR + "/" + dir_game)
             for filename in game_files:
                 if "reward" in filename:
                     reward_name = filename
@@ -117,14 +149,14 @@ def train_network(sess, model, print_parameters=False):
                 elif "home_away" in filename:
                     ha_id_name = filename
 
-            reward = sio.loadmat(DATA_STORE + "/" + dir_game + "/" + reward_name)['reward']
-            state_input = sio.loadmat(DATA_STORE + "/" + dir_game + "/" + state_input_name)['state']
-            ha_id = sio.loadmat(DATA_STORE + "/" + dir_game + "/" + ha_id_name)["home_away"][0].astype(int)
+            reward = sio.loadmat(SOCCER_DATA_STORE_DIR + "/" + dir_game + "/" + reward_name)['reward']
+            state_input = sio.loadmat(SOCCER_DATA_STORE_DIR + "/" + dir_game + "/" + state_input_name)['state']
+            ha_id = sio.loadmat(SOCCER_DATA_STORE_DIR + "/" + dir_game + "/" + ha_id_name)["home_away"][0].astype(int)
             # state_input = (state_input['dynamic_feature_input'])
             # state_output = sio.loadmat(DATA_STORE + "/" + dir_game + "/" + state_output_name)
             # state_output = state_output['hybrid_output_state']
             state_trace_length = sio.loadmat(
-                DATA_STORE + "/" + dir_game + "/" + state_trace_length_name)['trace_length'][0]
+                SOCCER_DATA_STORE_DIR + "/" + dir_game + "/" + state_trace_length_name)['trace_length'][0]
             # state_trace_length = (state_trace_length['hybrid_trace_length'])[0]
             state_trace_length = handle_trace_length(state_trace_length)
             state_trace_length, state_input, reward = compromise_state_trace_length(
@@ -235,7 +267,7 @@ def train_network(sess, model, print_parameters=False):
                     if (game_number - 1) % 300 == 0:
                         # save progress after a game
                         print 'saving game', game_number
-                        saver.save(sess, SAVED_NETWORK + '/' + tt_lstm_config.learn.sport + '-game-',
+                        saver.save(sess, save_network_dir + '/' + tt_lstm_config.learn.sport + '-game-',
                                    global_step=game_number)
                     v_diff_record_average = sum(v_diff_record) / len(v_diff_record)
                     game_diff_record_dict.update({dir_game: v_diff_record_average})
@@ -245,7 +277,7 @@ def train_network(sess, model, print_parameters=False):
             cost_per_game_average = sum(game_cost_record) / len(game_cost_record)
             write_game_average_csv([{"iteration": str(game_number / number_of_total_game + 1), "game": game_number,
                                      "cost_per_game_average": cost_per_game_average}],
-                                   log_dir=LOG_DIR)
+                                   log_dir=save_log_dir)
 
         game_diff_record_all.append(game_diff_record_dict)
 
