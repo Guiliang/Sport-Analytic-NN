@@ -1,0 +1,594 @@
+name & team & GIM & Goal \\ 
+Matej Vydra & Derby & 4.747 & 21 \\  
+Leon Clarke & Sheffield United & 4.024 & 19 \\  
+Lewis Grabban & Sunderland & 3.775 & 12 \\  
+Kouassi Ryan Sessegnon & Fulham & 3.657 & 15 \\  
+Harry Wilson & Hull & 3.135 & 7 \\  
+Famara Diedhiou & Bristol & 3.015 & 13 \\  
+Sean Maguire & Preston & 2.5 & 10 \\  
+Joe Garner & Ipswich & 2.44 & 10 \\  
+Jarrod Bowen & Hull & 2.408 & 14 \\  
+Callum Paterson & Cardiff & 2.29 & 10 \\  
+Oliver McBurnie & Barnsley & 2.179 & 9 \\  
+Chris Wood & Leeds & 1.995 & 1 \\  
+Martyn Waghorn & Ipswich & 1.959 & 16 \\  
+Sam Winnall & Derby & 1.923 & 6 \\  
+Albert Adomah & Aston & 1.907 & 14 \\  
+Abel Hernández & Hull & 1.898 & 8 \\  
+Anthony Pilkington & Cardiff & 1.834 & 3 \\  
+Bersant Celina & Ipswich & 1.8 & 7 \\  
+Modou Barrow & Reading & 1.792 & 10 \\  
+Kemar Roofe & Leeds & 1.742 & 11 \\  
+Aden Flint & Bristol & 1.567 & 8 \\  
+Fernando Forestieri & Sheffield Wednesday & 1.472 & 5 \\  
+Pierre-Michel Lasogga & Leeds & 1.416 & 10 \\  
+Gary Hooper & Sheffield Wednesday & 1.415 & 10 \\  
+Daniel Ayala & Middlesbrough & 1.397 & 7 \\  
+Stefan Johansen & Fulham & 1.397 & 8 \\  
+Alfred N'Diaye & Wolverhampton & 1.325 & 3 \\  
+Cauley Woodrow & Bristol & 1.304 & 2 \\  
+George Saville & Millwall & 1.264 & 10 \\  
+Gustavo Lucas Domingues Piazon & Fulham & 1.223 & 5 \\  
+Barry Douglas & Wolverhampton & 1.199 & 5 \\  
+Billy Sharp & Sheffield United & 1.175 & 13 \\  
+Ethan Pinnock & Barnsley & 1.161 & 2 \\  
+George Honeyman & Sunderland & 1.12 & 6 \\  
+Massimo Luongo & Queens & 1.118 & 6 \\  
+Lucas Eduardo Santos João & Sheffield Wednesday & 1.04 & 9 \\  
+Wahbi Khazri & Sunderland & 1.036 & - \\  
+Patrick Bamford & Middlesbrough & 1.028 & 11 \\  
+Roy Beerens & Reading & 1.015 & 2 \\  
+Milan Djuric & Bristol & 1.014 & 3 \\  
+Lucas Akins & Burton & 0.987 & 5 \\  
+Fraizer Campbell & Hull & 0.982 & 6 \\  
+Aleksandar Mitrovic & Fulham & 0.968 & 12 \\  
+Omar Bogle & Cardiff & 0.944 & 3 \\  
+Stuart Dallas & Leeds & 0.935 & 2 \\  
+Joe Bryan & Bristol & 0.925 & 5 \\  
+Ryan Manning & Queens & 0.919 & 2 \\  
+Che Adams & Birmingham & 0.919 & 5 \\  
+Conor Hourihane & Aston & 0.91 & 11 \\  
+Danny Ward & Cardiff & 0.88 & 4 \\  
+Tom Naylor & Burton & 0.877 & 3 \\  
+Jack Rodwell & Sunderland & 0.856 & 1 \\  
+Craig Bryson & Derby & 0.835 & 1 \\  
+Adam Le Fondre & Bolton & 0.834 & 7 \\  
+Ivo Daniel Ferreira Mendonça Pinto & Norwich & 0.826 & 2 \\  
+George Boyd & Sheffield Wednesday & 0.818 & 2 \\  
+Maxime Colin & Birmingham & 0.813 & 2 \\  
+Bobby De Cordova-Reid & Bristol & 0.79 & 19 \\  
+Atdhe Nuhiu & Sheffield Wednesday & 0.78 & 11 \\  
+Lloyd Kelly & Bristol & 0.769 & 1 \\  
+Kalvin Phillips & Leeds & 0.763 & 7 \\  
+Timm Klose & Norwich & 0.754 & 4 \\  
+Patrick McNair & Sunderland & 0.752 & 5 \\  
+Aboubakar Kamara & Fulham & 0.737 & 7 \\  
+Oskar Buur & Wolverhampton & 0.712 & 1 \\  
+David McGoldrick & Ipswich & 0.692 & 6 \\  
+Louis Moult & Preston & 0.684 & 2 \\  
+Liam Boyce & Burton & 0.673 & 3 \\  
+Conor Washington & Queens & 0.598 & 6 \\  
+James Chester & Aston & 0.591 & 4 \\  
+George Evans & Reading & 0.587 & 1 \\  
+Samir Carruthers & Sheffield United & 0.583 & 1 \\  
+Tyler Walker & Bolton & 0.578 & - \\  
+Tom Trybull & Norwich & 0.559 & 2 \\  
+Aaron Wilbraham & Bolton & 0.553 & 2 \\  
+Yeni N'Gbakoto & Queens & 0.55 & - \\  
+Cameron Jerome & Norwich & 0.542 & 1 \\  
+Idrissa Sylla & Queens & 0.53 & 7 \\  
+Clayton Donaldson & Sheffield United & 0.512 & 5 \\  
+Kieron Freeman & Sheffield United & 0.503 & 1 \\  
+Barrie McKay & Nottingham & 0.495 & 5 \\  
+Michael Dawson & Hull & 0.494 & 3 \\  
+Kamil Grosicki & Hull & 0.482 & 9 \\  
+Jón Dadi Bödvarsson & Reading & 0.479 & 7 \\  
+Neal Maupay & Brentford & 0.476 & 12 \\  
+Ilias Chair & Queens & 0.468 & 1 \\  
+Ryan Woods & Brentford & 0.467 & 1 \\  
+Souleymane Bamba & Cardiff & 0.465 & 4 \\  
+Jonathan Williams & Sunderland & 0.45 & 1 \\  
+Kasey Palmer & Derby & 0.449 & 2 \\  
+Willy Boly & Wolverhampton & 0.447 & 3 \\  
+Jack Robinson & Queens & 0.439 & 2 \\  
+Ben Turner & Burton & 0.412 & 2 \\  
+Dimitri Kevin Cavaré & Barnsley & 0.411 & 1 \\  
+Joe Mason & Burton & 0.411 & 1 \\  
+Gary Madine & Cardiff & 0.407 & - \\  
+Liam Moore & Reading & 0.382 & 3 \\  
+Mark Little & Bolton & 0.377 & 1 \\  
+Denis Odoi & Fulham & 0.376 & 1 \\  
+Ke Li & Brentford & 0.355 & 4 \\  
+David Nugent & Derby & 0.352 & 9 \\  
+Jordan Spence & Ipswich & 0.345 & 4 \\  
+Lloyd Dyer & Burton & 0.334 & 7 \\  
+Richard Stearman & Sheffield United & 0.332 & 2 \\  
+Alex Pearce & Derby & 0.324 & 1 \\  
+Birkir Bjarnason & Aston & 0.297 & 3 \\  
+Martin Braithwaite & Middlesbrough & 0.286 & 5 \\  
+Rúben Gonçalo Silva Nascimento Vinagre & Wolverhampton & 0.285 & 1 \\  
+John Lundstram & Sheffield United & 0.275 & 3 \\  
+Ben Osborn & Nottingham & 0.273 & 4 \\  
+Josh Onomah & Aston & 0.272 & 4 \\  
+David Wheeler & Queens & 0.267 & 1 \\  
+Chris Martin & Reading & 0.266 & 1 \\  
+Diogo José Teixeira da Silva & Wolverhampton & 0.265 & 17 \\  
+Omar Richards & Reading & 0.263 & 2 \\  
+Apostolos Vellios & Nottingham & 0.248 & 1 \\  
+James Maddison & Norwich & 0.237 & 14 \\  
+Ryan Hedges & Barnsley & 0.234 & 2 \\  
+David Meyler & Hull & 0.231 & 5 \\  
+Aiden O'Brien & Millwall & 0.225 & 4 \\  
+Conor McLaughlin & Millwall & 0.221 & 1 \\  
+Johnny Russell & Derby & 0.206 & 4 \\  
+Danny Batth & Wolverhampton & 0.19 & 1 \\  
+Evandro Goebel & Hull & 0.188 & 1 \\  
+Markus Henriksen & Hull & 0.181 & 2 \\  
+Tom Clarke & Preston & 0.176 & 2 \\  
+Kieran Dowell & Nottingham & 0.171 & 9 \\  
+Ivan Cavaleiro & Wolverhampton & 0.167 & 9 \\  
+Matty Taylor & Bristol & 0.163 & 1 \\  
+Jamie Paterson & Bristol & 0.158 & 5 \\  
+Jamie Mackie & Queens & 0.154 & 4 \\  
+Ezekiel Fryers & Barnsley & 0.154 & 1 \\  
+Tom Flanagan & Burton & 0.15 & 2 \\  
+Sean Clare & Sheffield Wednesday & 0.149 & 1 \\  
+Kieran Lee & Sheffield Wednesday & 0.136 & 3 \\  
+Henri Lansbury & Aston & 0.134 & 2 \\  
+Aramide Oteh & Queens & 0.134 & 1 \\  
+Veijeany Christopher Samba & Aston & 0.134 & 1 \\  
+David Edwards & Wolverhampton & 0.129 & - \\  
+Eric Lichaj & Nottingham & 0.127 & 1 \\  
+Tom Elliott & Millwall & 0.119 & 4 \\  
+Matthew Palmer & Burton & 0.115 & 1 \\  
+Alan Browne & Preston & 0.107 & 7 \\  
+Lee Tomlin & Cardiff & 0.101 & 1 \\  
+Adama Diomande & Hull & 0.093 & 1 \\  
+Callum Connolly & Ipswich & 0.092 & 4 \\  
+Joe Lolley & Nottingham & 0.092 & 3 \\  
+Jay-Roy Grot & Leeds & 0.087 & 1 \\  
+Gabriel Agbonlahor & Aston & 0.082 & 1 \\  
+Marcus Tavernier & Middlesbrough & 0.078 & 1 \\  
+Lloyd Isgrove & Barnsley & 0.076 & 1 \\  
+Ryan Bennett & Wolverhampton & 0.075 & 1 \\  
+John Egan & Brentford & 0.072 & 2 \\  
+Connor Ronan & Wolverhampton & 0.07 & - \\  
+Daniel Johnson & Preston & 0.07 & 3 \\  
+Matthew Lund & Burton & 0.066 & 1 \\  
+Grant Hall & Queens & 0.063 & - \\  
+Josh Maja & Sunderland & 0.061 & 1 \\  
+Sam Hutchinson & Sheffield Wednesday & 0.058 & - \\  
+Joe Ledley & Derby & 0.058 & 1 \\  
+Jake Clarke-Salter & Sunderland & 0.049 & - \\  
+Sebastian Larsson & Hull & 0.042 & 2 \\  
+Jack Colback & Nottingham & 0.041 & 1 \\  
+Mark Duffy & Sheffield United & 0.039 & 3 \\  
+Mile Jedinak & Aston & 0.035 & 1 \\  
+Frederico André Ferrão Venâncio & Sheffield Wednesday & 0.035 & 1 \\  
+Liam Bridcutt & Nottingham & 0.034 & 1 \\  
+Bryan Oviedo & Sunderland & 0.033 & 2 \\  
+Chris Basham & Sheffield United & 0.03 & 2 \\  
+Matt Doherty & Wolverhampton & 0.027 & 4 \\  
+Andre Green & Aston & 0.02 & 1 \\  
+Danny Rowe & Ipswich & 0.019 & - \\  
+Tim Cahill & Millwall & 0.018 & - \\  
+John Mousinho & Burton & 0.015 & - \\  
+Joey van den Berg & Reading & 0.014 & 1 \\  
+Luke Varney & Burton & 0.011 & - \\  
+Tommy Smith & Ipswich & 0.009 & - \\  
+Glenn Whelan & Aston & 0.007 & 1 \\  
+Andre Dozzell & Ipswich & 0.004 & - \\  
+Jason Shackell & Millwall & 0.003 & - \\  
+Marten de Roon & Middlesbrough & 0.002 & - \\  
+Brendan Galloway & Sunderland & 0.0 & - \\  
+Lee Peltier & Cardiff & -0.001 & - \\  
+Ben Folami & Ipswich & -0.002 & - \\  
+Ben Alnwick & Bolton & -0.004 & - \\  
+Greg Cunningham & Preston & -0.005 & 1 \\  
+Reece Burke & Bolton & -0.007 & 1 \\  
+Barry Cotter & Ipswich & -0.007 & - \\  
+Osman Kakay & Queens & -0.008 & - \\  
+Daryl Murphy & Nottingham & -0.008 & 7 \\  
+Daniel Lafferty & Sheffield United & -0.008 & - \\  
+Ritchie de Laet & Aston & -0.011 & - \\  
+Martin Cranie & Middlesbrough & -0.013 & - \\  
+Alex Smithies & Queens & -0.013 & - \\  
+Adam Jackson & Barnsley & -0.016 & 1 \\  
+Kamohelo Mokotjo & Brentford & -0.02 & 1 \\  
+Axel Tuanzebe & Aston & -0.021 & - \\  
+Marco André Silva Lopes Matias & Sheffield Wednesday & -0.022 & - \\  
+Jack Hobbs & Nottingham & -0.023 & - \\  
+James Perch & Queens & -0.027 & - \\  
+David Stockdale & Birmingham & -0.027 & - \\  
+Laurens De Bock & Leeds & -0.027 & - \\  
+Marvin Johnson & Middlesbrough & -0.028 & 1 \\  
+James Bree & Aston & -0.029 & - \\  
+Edward Bishop & Ipswich & -0.035 & - \\  
+James Hanson & Sheffield United & -0.037 & - \\  
+Aiden McGeady & Sunderland & -0.038 & 7 \\  
+Jon Flanagan & Bolton & -0.039 & - \\  
+Cameron Borthwick-Jackson & Leeds & -0.039 & - \\  
+Christoph Zimmermann & Norwich & -0.039 & 1 \\  
+Luke Chambers & Ipswich & -0.041 & 1 \\  
+Ryan Edmondson & Leeds & -0.041 & - \\  
+Stefan Payne & Barnsley & -0.044 & - \\  
+John Welsh & Preston & -0.048 & - \\  
+Ashley Darel Jazz Richards & Cardiff & -0.048 & - \\  
+Beryly Lubala & Birmingham & -0.048 & - \\  
+Kevin Bru & Ipswich & -0.049 & - \\  
+Jared Bird & Barnsley & -0.049 & - \\  
+George Friend & Middlesbrough & -0.053 & 2 \\  
+Marnick Vermijl & Preston & -0.053 & - \\  
+Ashley Baker & Sheffield Wednesday & -0.055 & - \\  
+Josh Cullen & Bolton & -0.056 & - \\  
+Liam Walsh & Birmingham & -0.057 & - \\  
+Denver Hume & Sunderland & -0.058 & - \\  
+Caolan Lavery & Sheffield United & -0.059 & - \\  
+Garath McCleary & Reading & -0.059 & - \\  
+Didier Ndong & Sunderland & -0.061 & - \\  
+Tomas Egert & Burton & -0.062 & - \\  
+Jordan Hugill & Preston & -0.067 & 8 \\  
+Jacob Davenport & Burton & -0.069 & 1 \\  
+Daniel Pinillos & Barnsley & -0.069 & - \\  
+Andrew Boyle & Preston & -0.07 & - \\  
+Jason Lowe & Birmingham & -0.07 & - \\  
+Paudie O'Connor & Leeds & -0.071 & - \\  
+Cohen Bramall & Birmingham & -0.072 & - \\  
+Damien McCrory & Burton & -0.074 & - \\  
+Jake Cooper & Millwall & -0.079 & 4 \\  
+James Vaughan & Sunderland & -0.08 & 2 \\  
+Ryan Shotton & Birmingham & -0.087 & - \\  
+Rhys Healey & Cardiff & -0.089 & - \\  
+Greg Halford & Cardiff & -0.091 & - \\  
+Ibrahima Cissé & Fulham & -0.091 & - \\  
+Tom Pearce & Leeds & -0.093 & 1 \\  
+Marcus Olsson & Derby & -0.093 & - \\  
+Ricky Holmes & Sheffield United & -0.093 & - \\  
+Niclas Eliasson & Bristol & -0.094 & - \\  
+David Vaughan & Nottingham & -0.094 & - \\  
+Cole Skuse & Ipswich & -0.097 & 1 \\  
+Andreas Bjelland & Brentford & -0.098 & 1 \\  
+Rushian Hepburn-Murphy & Aston & -0.098 & - \\  
+Rafael Mir Vicente & Wolverhampton & -0.1 & - \\  
+Kevin O'Connor & Preston & -0.106 & - \\  
+Tom Lees & Sheffield Wednesday & -0.114 & 1 \\  
+Byron Webster & Millwall & -0.116 & - \\  
+Conor Shaughnessy & Leeds & -0.119 & - \\  
+Tim Ream & Fulham & -0.12 & 1 \\  
+Jake Wright & Sheffield United & -0.121 & - \\  
+Hadi Sacko & Leeds & -0.122 & - \\  
+Billy Jones & Sunderland & -0.122 & 1 \\  
+Wes Harding & Birmingham & -0.124 & - \\  
+Pawel Cibicki & Leeds & -0.124 & - \\  
+Ben Brereton & Nottingham & -0.125 & 5 \\  
+Benik Afobe & Wolverhampton & -0.129 & 6 \\  
+Darren Bent & Burton & -0.131 & 2 \\  
+Chris Gunter & Reading & -0.133 & 1 \\  
+Sean Scannell & Burton & -0.133 & - \\  
+Joseph Mendes & Reading & -0.136 & - \\  
+Stephen Gleeson & Birmingham & -0.137 & - \\  
+Roderick Jefferson Gonçalves Miranda & Wolverhampton & -0.141 & - \\  
+Darron Gibson & Sunderland & -0.141 & - \\  
+Jordan Thorniley & Sheffield Wednesday & -0.145 & - \\  
+Harrison Reed & Norwich & -0.146 & 1 \\  
+Andreas Bouchalakis & Nottingham & -0.149 & 2 \\  
+Ikechi Anya & Derby & -0.15 & - \\  
+Ondrej Mazuch & Hull & -0.151 & - \\  
+Jack Harrison & Middlesbrough & -0.152 & - \\  
+David Jones & Sheffield Wednesday & -0.154 & 1 \\  
+Luca De La Torre & Fulham & -0.156 & - \\  
+Nathaniel Mendez-Laing & Cardiff & -0.157 & 6 \\  
+James Husband & Norwich & -0.158 & - \\  
+Andrew Taylor & Bolton & -0.161 & - \\  
+Will Keane & Hull & -0.163 & 1 \\  
+Steven Caulker & Queens & -0.165 & - \\  
+Stephen Mallan & Barnsley & -0.165 & - \\  
+Jack Grealish & Aston & -0.166 & 3 \\  
+Isaac Vassell & Birmingham & -0.166 & 1 \\  
+Donald Love & Sunderland & -0.167 & - \\  
+Carl Jenkinson & Birmingham & -0.167 & - \\  
+Jack Stobbs & Sheffield Wednesday & -0.168 & - \\  
+Stephen Kingsley & Hull & -0.17 & - \\  
+Myles Kenlock & Ipswich & -0.171 & - \\  
+Emyr Huws & Ipswich & -0.172 & - \\  
+Joe Sbarra & Burton & -0.174 & - \\  
+Daryl Horgan & Preston & -0.175 & 1 \\  
+Henrik Dalsgaard & Brentford & -0.175 & 1 \\  
+David Junior Hoilett & Cardiff & -0.175 & 9 \\  
+Adam Clayton & Middlesbrough & -0.181 & - \\  
+Gaetano Berardi & Leeds & -0.186 & - \\  
+Yohan Mollo & Fulham & -0.187 & - \\  
+Eunan O'Kane & Leeds & -0.196 & - \\  
+Thomas Spurr & Preston & -0.198 & - \\  
+Liam Cooper & Leeds & -0.2 & 1 \\  
+Jens Hegeler & Bristol & -0.202 & - \\  
+Dorian Dervite & Bolton & -0.205 & - \\  
+Vurnon Anita & Leeds & -0.206 & - \\  
+Grant Leadbitter & Middlesbrough & -0.209 & 3 \\  
+Pontus Jansson & Leeds & -0.21 & 3 \\  
+Enda Stevens & Sheffield United & -0.21 & 1 \\  
+Aron Gunnarsson & Cardiff & -0.211 & 1 \\  
+Matthew Connolly & Cardiff & -0.211 & - \\  
+Chris Baird & Derby & -0.212 & - \\  
+Rico Henry & Brentford & -0.214 & - \\  
+Oliver Norwood & Fulham & -0.214 & 5 \\  
+Craig Forsyth & Derby & -0.216 & - \\  
+Conor Coady & Wolverhampton & -0.216 & 1 \\  
+Josh Clarke & Brentford & -0.217 & 1 \\  
+Steven Naismith & Norwich & -0.218 & - \\  
+Freddie Sears & Ipswich & -0.22 & 2 \\  
+Lasse Vibe & Brentford & -0.224 & 7 \\  
+Luke Molyneux & Sunderland & -0.224 & - \\  
+Ben Watson & Nottingham & -0.225 & - \\  
+Jordan Cousins & Queens & -0.225 & - \\  
+Chiedozie Ogbene & Brentford & -0.23 & - \\  
+Adam Matthews & Sunderland & -0.232 & 1 \\  
+Christoph Knasmüllner & Barnsley & -0.232 & - \\  
+Jonathan Leko & Bristol & -0.235 & - \\  
+Morgan Fox & Sheffield Wednesday & -0.235 & - \\  
+Joe Bennett & Cardiff & -0.236 & 1 \\  
+Almen Abdi & Sheffield Wednesday & -0.236 & - \\  
+Sam Clucas & Hull & -0.243 & - \\  
+Michael Morrison & Birmingham & -0.244 & 1 \\  
+David Cotterill & Birmingham & -0.245 & - \\  
+Lewis Baker & Middlesbrough & -0.245 & 1 \\  
+Derik Osede & Bolton & -0.248 & - \\  
+Karl Henry & Bolton & -0.25 & 1 \\  
+Joshua Earl & Preston & -0.25 & - \\  
+Darren Pratley & Bolton & -0.253 & 2 \\  
+Stephen Warnock & Burton & -0.259 & 1 \\  
+Kadeem Harris & Cardiff & -0.263 & - \\  
+Ben Marshall & Wolverhampton & -0.266 & - \\  
+Martin Samuelsen & Burton & -0.274 & - \\  
+Adrian Popa & Reading & -0.276 & - \\  
+Jamal Lewis & Norwich & -0.277 & - \\  
+Lamine Koné & Sunderland & -0.278 & - \\  
+Joost van Aken & Sheffield Wednesday & -0.281 & - \\  
+James Meredith & Millwall & -0.283 & - \\  
+Tommy Elphick & Reading & -0.284 & - \\  
+Jan Kirchhoff & Bolton & -0.287 & - \\  
+Josh Harrop & Preston & -0.287 & 2 \\  
+Eros Pisano & Bristol & -0.289 & - \\  
+Mahlon Romeo & Millwall & -0.289 & 1 \\  
+Lee Gregory & Millwall & -0.29 & 10 \\  
+Marc Roberts & Birmingham & -0.294 & 1 \\  
+Jason McCarthy & Barnsley & -0.295 & - \\  
+Ross Wallace & Sheffield Wednesday & -0.302 & 2 \\  
+Jamie Allen & Burton & -0.304 & 1 \\  
+Flynn Downes & Ipswich & -0.304 & - \\  
+Luke Ayling & Leeds & -0.307 & - \\  
+Mason Bennett & Derby & -0.307 & - \\  
+Glenn Loovens & Sheffield Wednesday & -0.308 & - \\  
+Andy Yiadom & Barnsley & -0.317 & - \\  
+Rúben Diogo da Silva Neves & Wolverhampton & -0.318 & 6 \\  
+Paul Smyth & Queens & -0.318 & 2 \\  
+Eberechi Eze & Queens & -0.319 & 2 \\  
+Alex Baptiste & Queens & -0.328 & - \\  
+Marco Stiepermann & Norwich & -0.336 & 1 \\  
+Callum McManaman & Sunderland & -0.336 & 1 \\  
+Matthew Pennington & Leeds & -0.338 & - \\  
+Korey Smith & Bristol & -0.339 & 1 \\  
+John O'Shea & Sunderland & -0.339 & 1 \\  
+William Miller & Burton & -0.34 & - \\  
+Filipe Alexandre Morais & Bolton & -0.341 & 1 \\  
+Shane Ferguson & Millwall & -0.344 & - \\  
+Luke Hyam & Ipswich & -0.346 & - \\  
+Tendayi Darikwa & Nottingham & -0.348 & - \\  
+Stephy Mavididi & Preston & -0.348 & - \\  
+Chinedum Onuoha & Queens & -0.35 & - \\  
+Tom Adeyemi & Ipswich & -0.35 & - \\  
+Max Clark & Hull & -0.352 & - \\  
+Marc Wilson & Sunderland & -0.353 & - \\  
+Hördur Magnússon & Bristol & -0.358 & - \\  
+Dominic Iorfa & Ipswich & -0.361 & 1 \\  
+Dael Fry & Middlesbrough & -0.361 & - \\  
+Michael Mancienne & Nottingham & -0.366 & - \\  
+Ryan Tunnicliffe & Millwall & -0.366 & 1 \\  
+Jack Hunt & Sheffield Wednesday & -0.367 & - \\  
+Adam Webster & Ipswich & -0.368 & - \\  
+Russell Martin & Norwich & -0.369 & - \\  
+Pelle Clement & Reading & -0.372 & - \\  
+Bright Osayi-Samuel & Queens & -0.376 & 1 \\  
+Harvey Barnes & Barnsley & -0.379 & 5 \\  
+Steven Fletcher & Sheffield Wednesday & -0.38 & 2 \\  
+Cyrus Christie & Fulham & -0.382 & - \\  
+Tobias Pereira Figueiredo & Nottingham & -0.387 & - \\  
+Jamie Ward & Nottingham & -0.388 & - \\  
+Emilio Nsue & Birmingham & -0.388 & - \\  
+Matthew Pearson & Barnsley & -0.395 & - \\  
+Dennis Srbeny & Norwich & -0.395 & 1 \\  
+Cameron Carter-Vickers & Sheffield United & -0.397 & 1 \\  
+Jacob Butterfield & Derby & -0.407 & - \\  
+Tristan Nydam & Ipswich & -0.408 & - \\  
+Armand Traore & Nottingham & -0.413 & - \\  
+Connor Mahoney & Barnsley & -0.416 & - \\  
+Alexander Tettey & Norwich & -0.423 & - \\  
+Adam Forshaw & Middlesbrough & -0.424 & - \\  
+Tyler Blackett & Reading & -0.425 & - \\  
+Lynden Gooch & Sunderland & -0.428 & 1 \\  
+Matt Targett & Fulham & -0.43 & 1 \\  
+Darnell Furlong & Queens & -0.434 & - \\  
+Calum Woods & Preston & -0.437 & - \\  
+Liam Feeney & Cardiff & -0.438 & - \\  
+Zach Clough & Nottingham & -0.441 & - \\  
+John Brayford & Burton & -0.443 & - \\  
+Wes Hoolahan & Norwich & -0.446 & 1 \\  
+Sammy Ameobi & Bolton & -0.446 & 4 \\  
+Ethan Robson & Sunderland & -0.449 & - \\  
+Shaun Williams & Millwall & -0.453 & 2 \\  
+Mateusz Klich & Leeds & -0.454 & - \\  
+Antonee Robinson & Bolton & -0.456 & - \\  
+Josh Vela & Bolton & -0.457 & 1 \\  
+Duncan Watmore & Sunderland & -0.457 & - \\  
+Daniel Pudil & Sheffield Wednesday & -0.458 & - \\  
+James Wilson & Sheffield United & -0.458 & 1 \\  
+Oviemuno Ejaria & Sunderland & -0.46 & 1 \\  
+Ched Evans & Sheffield United & -0.46 & - \\  
+Moritz Leitner & Norwich & -0.461 & - \\  
+Jonathan Grounds & Birmingham & -0.482 & - \\  
+Ezgjan Alioski & Leeds & -0.486 & 7 \\  
+Bright Enobakhare & Wolverhampton & -0.49 & 1 \\  
+Fikayo Tomori & Hull & -0.49 & - \\  
+George Baldock & Sheffield United & -0.495 & 1 \\  
+William Buckley & Bolton & -0.495 & 2 \\  
+Britt Assombalonga & Middlesbrough & -0.499 & 15 \\  
+Josh McEachran & Brentford & -0.5 & - \\  
+Kevin Stewart & Hull & -0.501 & - \\  
+Darnell Fisher & Preston & -0.502 & - \\  
+David Davis & Birmingham & -0.51 & 2 \\  
+Tyias Browning & Sunderland & -0.512 & - \\  
+Tomas Kalas & Fulham & -0.514 & - \\  
+John Swift & Reading & -0.514 & 2 \\  
+Jackson Irvine & Burton & -0.517 & 1 \\  
+Matt Mills & Barnsley & -0.518 & - \\  
+Jacques Maghoma & Birmingham & -0.52 & 5 \\  
+Joe Williams & Barnsley & -0.523 & 1 \\  
+Sam Smith & Reading & -0.528 & 1 \\  
+Josh Brownhill & Bristol & -0.53 & 5 \\  
+Neil Taylor & Aston & -0.533 & - \\  
+Liam Palmer & Sheffield Wednesday & -0.534 & - \\  
+David Brooks & Sheffield United & -0.536 & 3 \\  
+Tiago Abiola Delfim Almeida Ilori & Reading & -0.537 & - \\  
+Daniel Fox & Nottingham & -0.539 & - \\  
+Lukas Jutkiewicz & Birmingham & -0.547 & 5 \\  
+Bradley Johnson & Derby & -0.553 & 4 \\  
+Lewis MacLeod & Brentford & -0.557 & 1 \\  
+Emiliano Marcondes Camargo Hansen & Brentford & -0.561 & - \\  
+Chris Mepham & Brentford & -0.568 & 1 \\  
+Florian Jozefzoon & Brentford & -0.572 & 7 \\  
+Cameron McGeehan & Barnsley & -0.574 & 1 \\  
+Ryan Kent & Bristol & -0.587 & - \\  
+Joel Lynch & Queens & -0.593 & 1 \\  
+Mustapha Carayol & Nottingham & -0.597 & 1 \\  
+Alex Pritchard & Norwich & -0.598 & 1 \\  
+Nouha Dicko & Wolverhampton & -0.599 & 1 \\  
+Jonny Howson & Middlesbrough & -0.599 & 3 \\  
+Michael Hector & Hull & -0.606 & 1 \\  
+Hélder Wander Sousa de Azevedo e Costa & Wolverhampton & -0.636 & 5 \\  
+Liam Kelly & Reading & -0.641 & 5 \\  
+Paul Coutts & Sheffield United & -0.646 & 1 \\  
+Barry Bannan & Sheffield Wednesday & -0.649 & - \\  
+Angus MacDonald & Barnsley & -0.651 & - \\  
+Tom Cairney & Fulham & -0.658 & 5 \\  
+Yann Kermorgant & Reading & -0.658 & 2 \\  
+Luke Murphy & Burton & -0.666 & 1 \\  
+Bailey Wright & Bristol & -0.669 & - \\  
+Ryan Leonard & Sheffield United & -0.672 & - \\  
+Alan Judge & Brentford & -0.677 & - \\  
+Ahmed Eissa El Mohamady Abdel Fattah & Aston & -0.68 & - \\  
+Jordan Rhodes & Sheffield Wednesday & -0.687 & 5 \\  
+Mathieu Smith & Queens & -0.688 & 11 \\  
+Ben Pearson & Preston & -0.688 & - \\  
+John Terry & Aston & -0.693 & 1 \\  
+Andreas Weimann & Derby & -0.694 & 5 \\  
+Josh Murphy & Norwich & -0.701 & 7 \\  
+Lee Evans & Sheffield United & -0.708 & 2 \\  
+Andre Wisdom & Derby & -0.711 & - \\  
+Rui Pedro da Rocha Fonte & Fulham & -0.723 & 3 \\  
+Jake Buxton & Burton & -0.726 & - \\  
+Jake Bidwell & Queens & -0.735 & 2 \\  
+Pablo Hernández & Leeds & -0.743 & 7 \\  
+Grant Ward & Ipswich & -0.748 & 2 \\  
+Jem Karacan & Bolton & -0.75 & - \\  
+Harlee Dean & Birmingham & -0.752 & 1 \\  
+Craig Noone & Bolton & -0.759 & 1 \\  
+Onel Hernández & Norwich & -0.761 & - \\  
+Kazenga LuaLua & Sunderland & -0.763 & - \\  
+Fred Onyedinma & Millwall & -0.77 & 1 \\  
+Paul Gallagher & Preston & -0.776 & 2 \\  
+Hope Akpan & Burton & -0.782 & 2 \\  
+Jon-Miquel Toral & Hull & -0.786 & 1 \\  
+Ike Ugbo & Barnsley & -0.788 & 1 \\  
+Marlon Pack & Bristol & -0.788 & 3 \\  
+Loïc Damour & Cardiff & -0.789 & - \\  
+Joey Pelupessy & Sheffield Wednesday & -0.821 & 1 \\  
+Callum O'Dowda & Bristol & -0.824 & 1 \\  
+Adlène Guédioura & Middlesbrough & -0.832 & - \\  
+Ryan Fredericks & Fulham & -0.841 & - \\  
+Joe Worrall & Nottingham & -0.844 & 1 \\  
+Ronaldo Vieira & Leeds & -0.844 & - \\  
+Marcel Franke & Norwich & -0.847 & - \\  
+Joe Ralls & Cardiff & -0.848 & 7 \\  
+Alan Hutton & Aston & -0.859 & - \\  
+Morgan Gibbs-White & Wolverhampton & -0.861 & - \\  
+Yanic Wildschut & Cardiff & -0.863 & - \\  
+Callum Robinson & Preston & -0.864 & 7 \\  
+Muhamed Besic & Middlesbrough & -0.868 & 1 \\  
+Kevin McDonald & Fulham & -0.869 & 3 \\  
+George Thorne & Derby & -0.875 & - \\  
+Paul McShane & Reading & -0.879 & - \\  
+Maikel Kieftenbeld & Birmingham & -0.883 & - \\  
+Tom Lawrence & Derby & -0.893 & 6 \\  
+Fabio Pereira da Silva & Middlesbrough & -0.895 & 1 \\  
+Marko Grujic & Cardiff & -0.899 & 1 \\  
+Sean Morrison & Cardiff & -0.902 & 7 \\  
+Grant Hanley & Norwich & -0.918 & 1 \\  
+Adama Traoré & Middlesbrough & -0.935 & 5 \\  
+Jonas Knudsen & Ipswich & -0.939 & 1 \\  
+Rudy Gestede & Middlesbrough & -0.951 & 3 \\  
+Lois Diony & Bristol & -0.953 & - \\  
+Ben Gibson & Middlesbrough & -0.954 & 1 \\  
+Oliver Watkins & Brentford & -0.96 & 10 \\  
+David Wheater & Bolton & -0.98 & 1 \\  
+Adam Armstrong & Bolton & -0.982 & 1 \\  
+Craig Gardner & Birmingham & -0.986 & 2 \\  
+Pawel Wszolek & Queens & -0.994 & 2 \\  
+Marvin Sordell & Burton & -0.996 & 3 \\  
+Richard Keogh & Derby & -1.002 & 1 \\  
+Nathan Baker & Bristol & -1.003 & - \\  
+Romain Saïss & Wolverhampton & -1.008 & 4 \\  
+Billy Bodin & Preston & -1.012 & 1 \\  
+Scott Hogan & Aston & -1.017 & 6 \\  
+Kyle McFadzean & Burton & -1.02 & - \\  
+Temitayo Olufisayo Olaoluwa Aina & Hull & -1.038 & - \\  
+Lee Cattermole & Sunderland & -1.067 & 1 \\  
+Nélson Miguel Castro Oliveira & Norwich & -1.075 & 8 \\  
+George Moncur & Barnsley & -1.076 & 2 \\  
+Robert Snodgrass & Aston & -1.089 & 7 \\  
+Shaun Hutchinson & Millwall & -1.097 & 2 \\  
+Curtis Davies & Derby & -1.122 & 1 \\  
+Matthew Cash & Nottingham & -1.148 & 2 \\  
+Steve Morison & Millwall & -1.206 & 5 \\  
+Tom Bradshaw & Barnsley & -1.224 & 9 \\  
+Jeremie Boga & Birmingham & -1.237 & 2 \\  
+Romaine Sawyers & Brentford & -1.244 & 4 \\  
+Kenneth Zohore & Cardiff & -1.258 & 9 \\  
+Liam Lindsay & Barnsley & -1.277 & 1 \\  
+Luke Freeman & Queens & -1.278 & 5 \\  
+Yoann Barbet & Brentford & -1.288 & 3 \\  
+Josh Scowen & Queens & -1.292 & 1 \\  
+Oluwaseyi Ojo & Fulham & -1.31 & 4 \\  
+Joel Asoro & Sunderland & -1.32 & 3 \\  
+Leandro Bacuna & Aston & -1.336 & - \\  
+Brad Potts & Barnsley & -1.342 & 3 \\  
+Bruno Ecuele Manga & Cardiff & -1.37 & - \\  
+Thomas Barkhuizen & Preston & -1.39 & 8 \\  
+Marley Watkins & Norwich & -1.478 & - \\  
+Neeskens Kebano & Fulham & -1.486 & 3 \\  
+Jack O'Connell & Sheffield United & -1.513 & - \\  
+Gary Gardner & Barnsley & -1.519 & 2 \\  
+Floyd Ayité & Fulham & -1.547 & 4 \\  
+Ben Davies & Preston & -1.596 & 1 \\  
+Sam Gallagher & Birmingham & -1.656 & 6 \\  
+Leonardo Bonatini Lohner Maia & Wolverhampton & -1.677 & 12 \\  
+Jason Cummings & Nottingham & -1.689 & 1 \\  
+Mark Beevers & Bolton & -1.709 & 1 \\  
+Adam Reach & Sheffield Wednesday & -1.713 & 4 \\  
+José Ignacio Peleteiro Ramallo & Birmingham & -1.723 & 5 \\  
+Caleb Ekuban & Leeds & -1.798 & 1 \\  
+Paul Huntington & Preston & -1.89 & 1 \\  
+Ashley Fletcher & Middlesbrough & -1.895 & 1 \\  
+John Fleck & Sheffield United & -1.939 & 2 \\  
+Kieffer Moore & Barnsley & -1.944 & 4 \\  
+Sergi Canos & Brentford & -1.955 & 3 \\  
+Samuel Sáiz Alonso & Leeds & -1.967 & 5 \\  
+Jed Wallace & Millwall & -2.028 & 6 \\  
+Stewart Downing & Middlesbrough & -2.038 & 3 \\  
+Mario Vrancic & Norwich & -2.115 & 1 \\  
+Tom Huddlestone & Derby & -2.195 & 2 \\  
+Keinan Davis & Aston & -2.235 & 2 \\  
+Jonathan Kodjia & Aston & -2.409 & 1 \\  
+Mamadou Thiam & Barnsley & -2.516 & 1 \\  
+Cheikh N'Doye & Birmingham & -2.82 & - \\  
+Adam Hammill & Barnsley & -2.824 & - \\  
+Omatsone Aluko & Fulham & -2.912 & - \\  
