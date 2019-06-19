@@ -23,7 +23,7 @@ class Correlation:
             'ALG': ['', ''],
             'GIM': ['GIM', '../compute_impact/player_impact/ijcai_soccer_player_GIM_2019June01.json'],
             'SI': ['', '../resource/soccer_player_markov_impact-2019June13.json'],
-            'GIM2t': ['GIM', '../compute_impact/player_impact/bak_soccer_player_GIM_2019June19_back_difference__English_Npower_Championship.json'],
+            'GIM2t': ['GIM', '../compute_impact/player_impact/soccer_player_GIM_2019June18_back_difference__English_Npower_Championship.json'],
             'EG': ['GIM', '../compute_impact/player_impact/bak-soccer_player_GIM_2019June05_expected_goal.json'],
             # 'PM': ['', ''],
             # 'ALG': ''
