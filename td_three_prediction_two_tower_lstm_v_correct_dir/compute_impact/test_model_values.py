@@ -33,7 +33,7 @@ def get_data_name(config):
     return data_name
 
 
-def compute_games_values_for_different_model(config, data_store_dir, game_name_dir):
+def compute_games_values_for_different_model(config, data_store_dir, game_name_dir, fine_tune=False):
     sess_nn = tf.InteractiveSession()
 
     model_nn = td_prediction_tt_embed(
@@ -58,6 +58,11 @@ def compute_games_values_for_different_model(config, data_store_dir, game_name_d
     else:
         merge_msg = 's'
 
+    if fine_tune:
+        league_name = "_English_Npower_Championship"
+    else:
+        league_name = ""
+
     saved_network_path = "{0}/oschulte/Galen/soccer-models/" \
                          "hybrid_sl_saved_NN/{1}Scale-tt{9}-" \
                          "three-cut_together_saved_networks_" \
@@ -69,9 +74,10 @@ def compute_games_values_for_different_model(config, data_store_dir, game_name_d
                                                             str(tt_lstm_config.learn.iterate_num),
                                                             str(tt_lstm_config.learn.learning_rate),
                                                             str(tt_lstm_config.learn.model_type),
-                                                            str( tt_lstm_config.learn.if_correct_velocity),
+                                                            str(tt_lstm_config.learn.if_correct_velocity),
                                                             str(tt_lstm_config.learn.max_trace_length),
-                                                            merge_msg)
+                                                            merge_msg,
+                                                            league_name)
 
     # data_name = get_data_name(config)
     saver = tf.train.Saver()
@@ -131,8 +137,8 @@ if __name__ == '__main__':
     elif learning_rate == 0.0005:
         learning_rate_write = '5_5'
 
-    data_name = compute_games_values_for_different_model(config=tt_lstm_config, data_store_dir=soccer_data_store_dir,
-                                                         game_name_dir=soccer_dir_all[0])
+    compute_games_values_for_different_model(config=tt_lstm_config, data_store_dir=soccer_data_store_dir,
+                                             game_name_dir=soccer_dir_all[0], fine_tune=True)
     # data_name = get_data_name(config=tt_lstm_config)
     # compute_impact(data_name=data_name, game_data_dir=data_path, soccer_data_store_dir=soccer_data_store_dir,
     #                player_id_name_pair_dir=player_id_name_pair_dir)
