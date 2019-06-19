@@ -107,13 +107,13 @@ if __name__ == '__main__':
     if fine_tune_flag:
         model_number = 4801
         league_name = "_English_Npower_Championship"
-        data_name = compute_values_for_all_games(config=tt_lstm_config, data_store_dir=soccer_data_store_dir,
-                                                 dir_all=soccer_dir_all, model_number=model_number, league_name=league_name)
+       #  data_name = compute_values_for_all_games(config=tt_lstm_config, data_store_dir=soccer_data_store_dir,
+       #                                          dir_all=soccer_dir_all, model_number=model_number, league_name=league_name)
     else:
         model_number = 2101  # 2101, 7201, 7801 ,10501 ,13501 ,15301 ,18301*, 20701*
         league_name = ''
-        data_name = compute_values_for_all_games(config=tt_lstm_config, data_store_dir=soccer_data_store_dir,
-                                                 dir_all=soccer_dir_all, model_number=model_number, league_name=None)
+        # data_name = compute_values_for_all_games(config=tt_lstm_config, data_store_dir=soccer_data_store_dir,
+        #                                         dir_all=soccer_dir_all, model_number=model_number, league_name=None)
     if difference_type == 'back_difference_':
         data_name = get_data_name(config=tt_lstm_config, league_name=league_name)
     else:
