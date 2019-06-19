@@ -58,24 +58,25 @@ def compute_games_values_for_different_model(config, data_store_dir, game_name_d
     else:
         merge_msg = 's'
 
-    saved_network_path = "{0}/oschulte/Galen/soccer-models/hybrid_sl_saved_NN/" \
-                         "{1}Scale-tt{9}-three-cut_together_saved_networks_feature{2}" \
-                         "_batch{3}_iterate{4}_lr{5}_{6}{7}_MaxTL{8}".format(tt_lstm_config.learn.save_mother_dir,
-                                                                             '',
-                                                                             str(tt_lstm_config.learn.feature_type),
-                                                                             str(tt_lstm_config.learn.batch_size),
-                                                                             str(tt_lstm_config.learn.iterate_num),
-                                                                             str(tt_lstm_config.learn.learning_rate),
-                                                                             str(tt_lstm_config.learn.model_type),
-                                                                             str(
-                                                                                 tt_lstm_config.learn.if_correct_velocity),
-                                                                             str(tt_lstm_config.learn.max_trace_length),
-                                                                             merge_msg)
+    saved_network_path = "{0}/oschulte/Galen/soccer-models/" \
+                         "hybrid_sl_saved_NN/{1}Scale-tt{9}-" \
+                         "three-cut_together_saved_networks_" \
+                         "feature{2}_batch{3}_iterate{4}_" \
+                         "lr{5}_{6}{7}_MaxTL{8}{10}".format(tt_lstm_config.learn.save_mother_dir,
+                                                            '',
+                                                            str(tt_lstm_config.learn.feature_type),
+                                                            str(tt_lstm_config.learn.batch_size),
+                                                            str(tt_lstm_config.learn.iterate_num),
+                                                            str(tt_lstm_config.learn.learning_rate),
+                                                            str(tt_lstm_config.learn.model_type),
+                                                            str( tt_lstm_config.learn.if_correct_velocity),
+                                                            str(tt_lstm_config.learn.max_trace_length),
+                                                            merge_msg)
 
     # data_name = get_data_name(config)
     saver = tf.train.Saver()
     for i in range(1, 301):
-        store_game_number = i*300+1
+        store_game_number = i * 300 + 1
         model_path = saved_network_path + '/Soccer-game--{0}'.format(store_game_number)
         saver.restore(sess_nn, model_path)
         print 'successfully load data from' + model_path
@@ -94,11 +95,11 @@ def compute_games_values_for_different_model(config, data_store_dir, game_name_d
                                                    'away': float(model_value[value_index][1]),
                                                    'end': float(model_value[value_index][2])}})
 
-        print str(model_value_json)+'\n'
+        print str(model_value_json) + '\n'
 
 
-            # sio.savemat(data_store_dir + "/" + game_name_dir + "/" + data_name,
-            #             {'model_value': np.asarray(model_value)})
+        # sio.savemat(data_store_dir + "/" + game_name_dir + "/" + data_name,
+        #             {'model_value': np.asarray(model_value)})
         # return data_name
 
 
