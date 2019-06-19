@@ -23,9 +23,10 @@ def compute_ranking(soccer_data_store_dir, game_data_dir, data_name, player_summ
     for action_selected_list in action_selected_lists:
         print ("working on action {0}".format(str(action_selected_list)))
         if action_selected_list is not None:
-            write_file = open('./player_ranking/soccer_player_ranking_{0}'.format(action_selected_list[0]), 'w')
+            write_file = open('./player_ranking/soccer_player_ranking_{0}{1}'.format(action_selected_list[0],
+                                                                                     league_name), 'w')
         else:
-            write_file = open('./player_ranking/soccer_player_ranking_all', 'w')
+            write_file = open('./player_ranking/soccer_player_ranking_all{0}'.format(league_name), 'w')
         for game_name_dir in dir_all:
             if game_name_dir == '.DS_Store':
                 continue
@@ -41,6 +42,7 @@ def compute_ranking(soccer_data_store_dir, game_data_dir, data_name, player_summ
 
 if __name__ == '__main__':
     test_flag = False
+    fine_tune_flag = True
     action_selected_lists = [['shot'], ['pass'], None]
     if test_flag:
         data_path = '/Users/liu/Desktop/soccer-data-sample/sequences_append_goal/'
@@ -73,7 +75,14 @@ if __name__ == '__main__':
         id = r['playerId']
         game_info_all.append([p_name, t_name, id])
 
-    data_name = get_data_name(config=tt_lstm_config)
+    if fine_tune_flag:
+        model_number = 4801
+        league_name = "_English_Npower_Championship"
+    else:
+        model_number = 2101  # 2101, 7201, 7801 ,10501 ,13501 ,15301 ,18301*, 20701*
+        league_name = ''
+
+    data_name = get_data_name(config=tt_lstm_config, league_name=league_name)
     compute_ranking(data_name=data_name, game_data_dir=data_path, soccer_data_store_dir=soccer_data_store_dir,
                     player_summary_info_dir=player_summary_info_dir,
                     action_selected_lists=action_selected_lists, game_info_all=game_info_all)
