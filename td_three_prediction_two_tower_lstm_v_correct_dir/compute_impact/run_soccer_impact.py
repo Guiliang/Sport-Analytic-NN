@@ -12,10 +12,10 @@ from td_three_prediction_two_tower_lstm_v_correct_dir.config.tt_lstm_config impo
 from td_three_prediction_two_tower_lstm_v_correct_dir.nn_structure.td_tt_lstm import td_prediction_tt_embed
 from td_three_prediction_two_tower_lstm_v_correct_dir.support.plot_tools import compute_game_values, read_plot_model
 from td_three_prediction_two_tower_lstm_v_correct_dir.compute_impact.player_impact import PlayerImpact
-from td_three_prediction_two_tower_lstm_v_correct_dir.support.data_processing_tools import get_data_name
+from td_three_prediction_two_tower_lstm_v_correct_dir.support.data_processing_tools import get_data_name, get_network_dir
 
 
-def compute_values_for_all_games(config, data_store_dir, dir_all, model_number=None):
+def compute_values_for_all_games(config, data_store_dir, dir_all, model_number=None, league_name=None):
     sess_nn = tf.InteractiveSession()
 
     model_nn = td_prediction_tt_embed(
@@ -35,26 +35,9 @@ def compute_values_for_all_games(config, data_store_dir, dir_all, model_number=N
     model_nn.build()
     model_nn.call()
 
-    if tt_lstm_config.learn.merge_tower:
-        merge_msg = 'm'
-    else:
-        merge_msg = 's'
+    _, saved_network_path = get_network_dir(league_name, tt_lstm_config, train_msg='')
 
-    saved_network_path = "{0}/oschulte/Galen/soccer-models/hybrid_sl_saved_NN/" \
-                         "{1}Scale-tt{9}-three-cut_together_saved_networks_feature{2}" \
-                         "_batch{3}_iterate{4}_lr{5}_{6}{7}_MaxTL{8}".format(tt_lstm_config.learn.save_mother_dir,
-                                                                             '',
-                                                                             str(tt_lstm_config.learn.feature_type),
-                                                                             str(tt_lstm_config.learn.batch_size),
-                                                                             str(tt_lstm_config.learn.iterate_num),
-                                                                             str(tt_lstm_config.learn.learning_rate),
-                                                                             str(tt_lstm_config.learn.model_type),
-                                                                             str(
-                                                                                 tt_lstm_config.learn.if_correct_velocity),
-                                                                             str(tt_lstm_config.learn.max_trace_length),
-                                                                             merge_msg)
-
-    data_name = get_data_name(config)
+    data_name = get_data_name(config=config, league_name=league_name)
     if model_number is not None:
         saver = tf.train.Saver()
         model_path = saved_network_path + '/Soccer-game--{0}'.format(model_number)
@@ -86,7 +69,9 @@ def compute_values_for_all_games(config, data_store_dir, dir_all, model_number=N
     return data_name
 
 
-def compute_impact(soccer_data_store_dir, game_data_dir, data_name, player_id_name_pair_dir, difference_type):
+def compute_impact(soccer_data_store_dir, game_data_dir,
+                   data_name, player_id_name_pair_dir,
+                   difference_type, league_name):
     PI = PlayerImpact(data_name=data_name, game_data_dir=game_data_dir,
                       model_data_store_dir=soccer_data_store_dir, difference_type=difference_type)
     dir_all = os.listdir(soccer_data_store_dir)
@@ -94,9 +79,9 @@ def compute_impact(soccer_data_store_dir, game_data_dir, data_name, player_id_na
         if difference_type == 'expected_goal':
             PI.aggregate_match_diff_values(game_name_dir, action_selected_list=['shot'])
         else:
-            PI.aggregate_match_diff_values(game_name_dir, action_selected_list=['cross'])
+            PI.aggregate_match_diff_values(game_name_dir, action_selected_list=None)
     PI.transfer2player_name_dict(player_id_name_pair_dir)
-    PI.save_player_impact()
+    PI.save_player_impact(league_name=league_name)
 
 
 if __name__ == '__main__':
@@ -107,8 +92,9 @@ if __name__ == '__main__':
 
     # tt_lstm_config_path = '../icehockey-config.yaml'
     tt_lstm_config_path = "../soccer-config-v5.yaml"
-    difference_type = 'expected_goal'
+    difference_type = 'back_difference_'
     soccer_dir_all = os.listdir(data_path)
+    fine_tune_flag = True
 
     tt_lstm_config = TTLSTMCongfig.load(tt_lstm_config_path)
     learning_rate = tt_lstm_config.learn.learning_rate
@@ -118,15 +104,20 @@ if __name__ == '__main__':
         learning_rate_write = '4'
     elif learning_rate == 0.0005:
         learning_rate_write = '5_5'
-
-    model_number = 2101  # 2101, 7201, 7801 ,10501 ,13501 ,15301 ,18301*, 20701*
-    # data_name = compute_values_for_all_games(config=tt_lstm_config, data_store_dir=soccer_data_store_dir,
-    #                                          dir_all=soccer_dir_all, model_number=model_number)
-    if difference_type == 'back_difference_':
-        data_name = get_data_name(config=tt_lstm_config)
+    if fine_tune_flag:
+        model_number = 4801
+        league_name = "_English_Npower_Championship"
+        data_name = compute_values_for_all_games(config=tt_lstm_config, data_store_dir=soccer_data_store_dir,
+                                                 dir_all=soccer_dir_all, model_number=model_number, league_name=league_name)
     else:
-        data_name = get_data_name(config=tt_lstm_config)
+        model_number = 2101  # 2101, 7201, 7801 ,10501 ,13501 ,15301 ,18301*, 20701*
+        league_name = ''
+        data_name = compute_values_for_all_games(config=tt_lstm_config, data_store_dir=soccer_data_store_dir,
+                                                 dir_all=soccer_dir_all, model_number=model_number, league_name=None)
+    if difference_type == 'back_difference_':
+        data_name = get_data_name(config=tt_lstm_config, league_name=league_name)
+    else:
+        data_name = get_data_name(config=tt_lstm_config, league_name=league_name)
     compute_impact(data_name=data_name, game_data_dir=data_path, soccer_data_store_dir=soccer_data_store_dir,
-                   player_id_name_pair_dir=player_id_name_pair_dir, difference_type=difference_type)
-
-
+                   player_id_name_pair_dir=player_id_name_pair_dir, difference_type=difference_type,
+                   league_name=league_name)

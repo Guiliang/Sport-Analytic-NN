@@ -20,11 +20,11 @@ class PlayerImpact:
         self.game_data_dir = game_data_dir
         self.model_data_store_dir = model_data_store_dir
 
-    def save_player_impact(self, save_name_write=None):
+    def save_player_impact(self, save_name_write=None, league_name=''):
         assert len(self.player_name_dict_all.keys()) > 0
         if not save_name_write:
-            save_name_write = 'soccer_player_GIM_{0}_{1}.json'. \
-                format(datetime.date.today().strftime("%Y%B%d"), self.difference_type)
+            save_name_write = 'soccer_player_GIM_{0}_{1}{2}.json'. \
+                format(datetime.date.today().strftime("%Y%B%d"), self.difference_type, league_name)
         with open('/Local-Scratch/PycharmProjects/Sport-Analytic-NN/'
                   'td_three_prediction_two_tower_lstm_v_correct_dir/'
                   'compute_impact/player_impact/' + save_name_write, 'w') as f:

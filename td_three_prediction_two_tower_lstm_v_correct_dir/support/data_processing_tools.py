@@ -330,7 +330,7 @@ def judge_feature_in_action(feature_input, actions):
     return False
 
 
-def get_data_name(config, if_old=False):
+def get_data_name(config, if_old=False, league_name=None):
     learning_rate = config.learn.learning_rate
     if learning_rate == 1e-5:
         learning_rate_write = '5'
@@ -348,7 +348,7 @@ def get_data_name(config, if_old=False):
     else:
         extra_model_msg = ''
 
-    data_name = "{7}model{6}_three_cut_together_predict_Feature{0}_Iter{1}_lr{2}_Batch{3}_MaxLength{4}_Type{5}.json".format(
+    data_name = "{7}model{6}_three_cut_together_predict_Feature{0}_Iter{1}_lr{2}_Batch{3}_MaxLength{4}_Type{5}{8}.json".format(
         str(config.learn.feature_type),
         str(config.learn.iterate_num),
         str(learning_rate_write),
@@ -357,6 +357,7 @@ def get_data_name(config, if_old=False):
         str(config.learn.model_type),
         merge_model_msg,
         extra_model_msg,
+        league_name
     )
 
     return data_name
@@ -751,6 +752,42 @@ def get_GIM_rank_value(metric_name, ranking_dir_dict):
             rank_value_dict[str(id)] = value
     return rank_value_dict
 
+
+def get_network_dir(league_name, tt_lstm_config, train_msg):
+    if tt_lstm_config.learn.merge_tower:
+        merge_msg = 'm'
+    else:
+        merge_msg = 's'
+    log_dir = "{0}/oschulte/Galen/soccer-models/hybrid_sl_log_NN" \
+              "/{1}Scale-tt{9}-three-cut_together_log_feature{2}" \
+              "_batch{3}_iterate{4}_lr{5}_{6}{7}_MaxTL{8}{10}".format(tt_lstm_config.learn.save_mother_dir,
+                                                                      train_msg,
+                                                                      str(tt_lstm_config.learn.feature_type),
+                                                                      str(tt_lstm_config.learn.batch_size),
+                                                                      str(tt_lstm_config.learn.iterate_num),
+                                                                      str(tt_lstm_config.learn.learning_rate),
+                                                                      str(tt_lstm_config.learn.model_type),
+                                                                      str(tt_lstm_config.learn.if_correct_velocity),
+                                                                      str(tt_lstm_config.learn.max_trace_length),
+                                                                      merge_msg,
+                                                                      league_name)
+
+    save_network_dir = "{0}/oschulte/Galen/soccer-models/hybrid_sl_saved_NN/" \
+                       "{1}Scale-tt{9}-three-cut_together_saved_networks_feature{2}" \
+                       "_batch{3}_iterate{4}_lr{5}_{6}{7}_MaxTL{8}{10}".format(tt_lstm_config.learn.save_mother_dir,
+                                                                               train_msg,
+                                                                               str(tt_lstm_config.learn.feature_type),
+                                                                               str(tt_lstm_config.learn.batch_size),
+                                                                               str(tt_lstm_config.learn.iterate_num),
+                                                                               str(tt_lstm_config.learn.learning_rate),
+                                                                               str(tt_lstm_config.learn.model_type),
+                                                                               str(
+                                                                                   tt_lstm_config.learn.if_correct_velocity),
+                                                                               str(
+                                                                                   tt_lstm_config.learn.max_trace_length),
+                                                                               merge_msg,
+                                                                               league_name)
+    return log_dir, save_network_dir
 
 
 if __name__ == '__main__':

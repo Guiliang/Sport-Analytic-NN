@@ -14,7 +14,7 @@ from td_three_prediction_two_tower_lstm_v_correct_dir.config.tt_lstm_config impo
 from td_three_prediction_two_tower_lstm_v_correct_dir.nn_structure.td_tt_lstm import td_prediction_tt_embed
 from td_three_prediction_two_tower_lstm_v_correct_dir.support.data_processing_tools import handle_trace_length, \
     compromise_state_trace_length, \
-    get_together_training_batch, write_game_average_csv
+    get_together_training_batch, write_game_average_csv, get_network_dir
 
 # fine-tuning testing
 FINE_TUNING = True
@@ -41,42 +41,6 @@ if TRAIN_FLAG:
 else:
     train_msg = ''
 
-if tt_lstm_config.learn.merge_tower:
-    merge_msg = 'm'
-else:
-    merge_msg = 's'
-
-
-def get_network_dir(league_name):
-    LOG_DIR = "{0}/oschulte/Galen/soccer-models/hybrid_sl_log_NN" \
-              "/{1}Scale-tt{9}-three-cut_together_log_feature{2}" \
-              "_batch{3}_iterate{4}_lr{5}_{6}{7}_MaxTL{8}{10}".format(tt_lstm_config.learn.save_mother_dir,
-                                                                      train_msg,
-                                                                      str(tt_lstm_config.learn.feature_type),
-                                                                      str(tt_lstm_config.learn.batch_size),
-                                                                      str(tt_lstm_config.learn.iterate_num),
-                                                                      str(tt_lstm_config.learn.learning_rate),
-                                                                      str(tt_lstm_config.learn.model_type),
-                                                                      str(tt_lstm_config.learn.if_correct_velocity),
-                                                                      str(tt_lstm_config.learn.max_trace_length),
-                                                                      merge_msg,
-                                                                      league_name)
-
-    SAVED_NETWORK = "{0}/oschulte/Galen/soccer-models/hybrid_sl_saved_NN/" \
-                    "{1}Scale-tt{9}-three-cut_together_saved_networks_feature{2}" \
-                    "_batch{3}_iterate{4}_lr{5}_{6}{7}_MaxTL{8}{10}".format(tt_lstm_config.learn.save_mother_dir,
-                                                                            train_msg,
-                                                                            str(tt_lstm_config.learn.feature_type),
-                                                                            str(tt_lstm_config.learn.batch_size),
-                                                                            str(tt_lstm_config.learn.iterate_num),
-                                                                            str(tt_lstm_config.learn.learning_rate),
-                                                                            str(tt_lstm_config.learn.model_type),
-                                                                            str(tt_lstm_config.learn.if_correct_velocity),
-                                                                            str(tt_lstm_config.learn.max_trace_length),
-                                                                            merge_msg,
-                                                                            league_name)
-    return LOG_DIR, SAVED_NETWORK
-
 
 def train_network(sess, model, print_parameters=False):
     game_number = 0
@@ -86,8 +50,9 @@ def train_network(sess, model, print_parameters=False):
     # loading network
     saver = tf.train.Saver(max_to_keep=300)
     merge = tf.summary.merge_all()
-    load_log_dir, load_network_dir = get_network_dir(league_name='')
-    save_log_dir, save_network_dir = get_network_dir(league_name=league_name)
+    load_log_dir, load_network_dir = get_network_dir(league_name='', tt_lstm_config=tt_lstm_config, train_msg=train_msg)
+    save_log_dir, save_network_dir = get_network_dir(league_name=league_name, tt_lstm_config=tt_lstm_config,
+                                                     train_msg=train_msg)
     train_writer = tf.summary.FileWriter(save_log_dir, sess.graph)
     sess.run(tf.global_variables_initializer())
     if model_train_continue:  # resume the training
@@ -224,11 +189,11 @@ def train_network(sess, model, print_parameters=False):
                         break
                     else:
                         y_home = float((r_t_batch[i])[0]) + tt_lstm_config.learn.gamma * \
-                                 ((readout_t1_batch[i]).tolist())[0]
+                                                            ((readout_t1_batch[i]).tolist())[0]
                         y_away = float((r_t_batch[i])[1]) + tt_lstm_config.learn.gamma * \
-                                 ((readout_t1_batch[i]).tolist())[1]
+                                                            ((readout_t1_batch[i]).tolist())[1]
                         y_end = float((r_t_batch[i])[2]) + tt_lstm_config.learn.gamma * \
-                                ((readout_t1_batch[i]).tolist())[2]
+                                                           ((readout_t1_batch[i]).tolist())[2]
                         y_batch.append([y_home, y_away, y_end])
 
                 # perform gradient step
