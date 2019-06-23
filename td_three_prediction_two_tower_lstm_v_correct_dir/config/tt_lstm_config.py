@@ -5,10 +5,10 @@ from td_three_prediction_two_tower_lstm_v_correct_dir.support.config import Init
 class TTLSTMCongfig(object):
 
     def __init__(self, init):
-        self.learn = TTLSTMCongfig.Learn(init["Learn"])
+        self.learn = TTLSTMCongfig.learn(init["learn"])
         self.Arch = TTLSTMCongfig.Arch(init["Arch"])
 
-    class Learn(InitWithDict):
+    class learn(InitWithDict):
         model_type = None
         max_trace_length = None
         feature_number = None

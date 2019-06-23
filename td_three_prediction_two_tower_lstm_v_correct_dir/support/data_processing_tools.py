@@ -758,6 +758,11 @@ def get_network_dir(league_name, tt_lstm_config, train_msg):
         merge_msg = 'm'
     else:
         merge_msg = 's'
+    if len(league_name) > 0:
+        lr = tt_lstm_config.learn.learning_rate/10
+    else:
+        lr = tt_lstm_config.learn.learning_rate
+
     log_dir = "{0}/oschulte/Galen/soccer-models/hybrid_sl_log_NN" \
               "/{1}Scale-tt{9}-three-cut_together_log_feature{2}" \
               "_batch{3}_iterate{4}_lr{5}_{6}{7}_MaxTL{8}{10}".format(tt_lstm_config.learn.save_mother_dir,
@@ -765,7 +770,7 @@ def get_network_dir(league_name, tt_lstm_config, train_msg):
                                                                       str(tt_lstm_config.learn.feature_type),
                                                                       str(tt_lstm_config.learn.batch_size),
                                                                       str(tt_lstm_config.learn.iterate_num),
-                                                                      str(tt_lstm_config.learn.learning_rate),
+                                                                      str(lr),
                                                                       str(tt_lstm_config.learn.model_type),
                                                                       str(tt_lstm_config.learn.if_correct_velocity),
                                                                       str(tt_lstm_config.learn.max_trace_length),
@@ -779,7 +784,7 @@ def get_network_dir(league_name, tt_lstm_config, train_msg):
                                                                                str(tt_lstm_config.learn.feature_type),
                                                                                str(tt_lstm_config.learn.batch_size),
                                                                                str(tt_lstm_config.learn.iterate_num),
-                                                                               str(tt_lstm_config.learn.learning_rate),
+                                                                               str(lr),
                                                                                str(tt_lstm_config.learn.model_type),
                                                                                str(
                                                                                    tt_lstm_config.learn.if_correct_velocity),

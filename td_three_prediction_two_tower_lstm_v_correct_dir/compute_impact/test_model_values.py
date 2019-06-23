@@ -60,8 +60,10 @@ def compute_games_values_for_different_model(config, data_store_dir, game_name_d
 
     if fine_tune:
         league_name = "_English_Npower_Championship"
+        lr = tt_lstm_config.learn.learning_rate / 10
     else:
         league_name = ""
+        lr = tt_lstm_config.learn.learning_rate
 
     saved_network_path = "{0}/oschulte/Galen/soccer-models/" \
                          "hybrid_sl_saved_NN/{1}Scale-tt{9}-" \
@@ -72,7 +74,7 @@ def compute_games_values_for_different_model(config, data_store_dir, game_name_d
                                                             str(tt_lstm_config.learn.feature_type),
                                                             str(tt_lstm_config.learn.batch_size),
                                                             str(tt_lstm_config.learn.iterate_num),
-                                                            str(tt_lstm_config.learn.learning_rate),
+                                                            str(lr),
                                                             str(tt_lstm_config.learn.model_type),
                                                             str(tt_lstm_config.learn.if_correct_velocity),
                                                             str(tt_lstm_config.learn.max_trace_length),
@@ -82,7 +84,7 @@ def compute_games_values_for_different_model(config, data_store_dir, game_name_d
     # data_name = get_data_name(config)
     saver = tf.train.Saver()
     for i in range(1, 301):
-        store_game_number = 3000+i * 300 + 1
+        store_game_number = 3000 + i * 300 + 1
         model_path = saved_network_path + '/Soccer-game--{0}'.format(store_game_number)
         saver.restore(sess_nn, model_path)
         print 'successfully load data from' + model_path
@@ -102,7 +104,6 @@ def compute_games_values_for_different_model(config, data_store_dir, game_name_d
                                                    'end': float(model_value[value_index][2])}})
 
         print str(model_value_json) + '\n'
-
 
         # sio.savemat(data_store_dir + "/" + game_name_dir + "/" + data_name,
         #             {'model_value': np.asarray(model_value)})

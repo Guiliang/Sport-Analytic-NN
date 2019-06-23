@@ -16,17 +16,6 @@ from td_three_prediction_two_tower_lstm_v_correct_dir.support.data_processing_to
     compromise_state_trace_length, \
     get_together_training_batch, write_game_average_csv, get_network_dir
 
-# fine-tuning testing
-FINE_TUNING = True
-if FINE_TUNING:
-    league_number = 10
-    league_name = "_English_Npower_Championship"
-    model_train_continue = True
-    print('fine-tuning on the {0} league'.format(league_name))
-else:
-    model_train_continue = False
-    league_name = ''
-
 tt_lstm_config_path = "../soccer-config-v5.yaml"
 tt_lstm_config = TTLSTMCongfig.load(tt_lstm_config_path)
 DATA_PATH = "/cs/oschulte/soccer-data/sequences_append_goal/"
@@ -40,6 +29,17 @@ if TRAIN_FLAG:
     DIR_GAMES_ALL = DIR_GAMES_ALL[:2400]
 else:
     train_msg = ''
+
+# fine-tuning testing
+FINE_TUNING = True
+if FINE_TUNING:
+    league_number = 10
+    league_name = "_English_Npower_Championship"
+    model_train_continue = True
+    print('fine-tuning on the {0} league'.format(league_name))
+else:
+    model_train_continue = False
+    league_name = ''
 
 
 def train_network(sess, model, print_parameters=False):
@@ -189,11 +189,11 @@ def train_network(sess, model, print_parameters=False):
                         break
                     else:
                         y_home = float((r_t_batch[i])[0]) + tt_lstm_config.learn.gamma * \
-                                                            ((readout_t1_batch[i]).tolist())[0]
+                                 ((readout_t1_batch[i]).tolist())[0]
                         y_away = float((r_t_batch[i])[1]) + tt_lstm_config.learn.gamma * \
-                                                            ((readout_t1_batch[i]).tolist())[1]
+                                 ((readout_t1_batch[i]).tolist())[1]
                         y_end = float((r_t_batch[i])[2]) + tt_lstm_config.learn.gamma * \
-                                                           ((readout_t1_batch[i]).tolist())[2]
+                                ((readout_t1_batch[i]).tolist())[2]
                         y_batch.append([y_home, y_away, y_end])
 
                 # perform gradient step
@@ -249,12 +249,17 @@ def train_network(sess, model, print_parameters=False):
 
 def run():
     sess = tf.Session()
+    if FINE_TUNING:
+        lr = tt_lstm_config.learn.learning_rate/10
+    else:
+        lr = tt_lstm_config.learn.learning_rate
+    print tt_lstm_config.learn.learning_rate
     model = td_prediction_tt_embed(
         feature_number=tt_lstm_config.learn.feature_number,
         home_h_size=tt_lstm_config.Arch.HomeTower.home_h_size,
         away_h_size=tt_lstm_config.Arch.AwayTower.away_h_size,
         max_trace_length=tt_lstm_config.learn.max_trace_length,
-        learning_rate=tt_lstm_config.learn.learning_rate,
+        learning_rate=lr,
         embed_size=tt_lstm_config.learn.embed_size,
         output_layer_size=tt_lstm_config.learn.output_layer_size,
         home_lstm_layer_num=tt_lstm_config.Arch.HomeTower.lstm_layer_num,

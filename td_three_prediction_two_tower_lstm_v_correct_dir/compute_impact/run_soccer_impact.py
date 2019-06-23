@@ -12,7 +12,8 @@ from td_three_prediction_two_tower_lstm_v_correct_dir.config.tt_lstm_config impo
 from td_three_prediction_two_tower_lstm_v_correct_dir.nn_structure.td_tt_lstm import td_prediction_tt_embed
 from td_three_prediction_two_tower_lstm_v_correct_dir.support.plot_tools import compute_game_values, read_plot_model
 from td_three_prediction_two_tower_lstm_v_correct_dir.compute_impact.player_impact import PlayerImpact
-from td_three_prediction_two_tower_lstm_v_correct_dir.support.data_processing_tools import get_data_name, get_network_dir
+from td_three_prediction_two_tower_lstm_v_correct_dir.support.data_processing_tools import get_data_name, \
+    get_network_dir
 
 
 def compute_values_for_all_games(config, data_store_dir, dir_all, model_number=None, league_name=None):
@@ -79,7 +80,7 @@ def compute_impact(soccer_data_store_dir, game_data_dir,
         if difference_type == 'expected_goal':
             PI.aggregate_match_diff_values(game_name_dir, action_selected_list=['shot'])
         else:
-            PI.aggregate_match_diff_values(game_name_dir, action_selected_list=['cross'])
+            PI.aggregate_match_diff_values(game_name_dir, action_selected_list=['shot', 'goal'])
     PI.transfer2player_name_dict(player_id_name_pair_dir)
     PI.save_player_impact(league_name=league_name)
 
@@ -105,15 +106,16 @@ if __name__ == '__main__':
     elif learning_rate == 0.0005:
         learning_rate_write = '5_5'
     if fine_tune_flag:
-        model_number = 4801
+        model_number = 24601
         league_name = "_English_Npower_Championship"
-       #  data_name = compute_values_for_all_games(config=tt_lstm_config, data_store_dir=soccer_data_store_dir,
-       #                                          dir_all=soccer_dir_all, model_number=model_number, league_name=league_name)
+        # data_name = compute_values_for_all_games(config=tt_lstm_config, data_store_dir=soccer_data_store_dir,
+        #                                          dir_all=soccer_dir_all, model_number=model_number,
+        #                                          league_name=league_name)
     else:
         model_number = 2101  # 2101, 7201, 7801 ,10501 ,13501 ,15301 ,18301*, 20701*
         league_name = ''
         # data_name = compute_values_for_all_games(config=tt_lstm_config, data_store_dir=soccer_data_store_dir,
-        #                                         dir_all=soccer_dir_all, model_number=model_number, league_name=None)
+        #                                          dir_all=soccer_dir_all, model_number=model_number, league_name=None)
     if difference_type == 'back_difference_':
         data_name = get_data_name(config=tt_lstm_config, league_name=league_name)
     else:
