@@ -6,7 +6,10 @@
 - Possession Model: Average length of a possession
 - It would be nice to focus on *sparsity.* Tarrak didn't see how to deal with the sparsity problem, other than by reward shaping and upsampling. We could argue that soccer is the major sport with the most reward sparsity and our method deals with it. 
   - Are there special training methods we use to deal with it?
-  - In Sloan I proposed using conditional value for impact: instead of using $Q_{home}$, use $Q_{home}/(Q_{home}+Q_{away})$. If this works better than plain Q values it would be another contribution for dealing with sparisity.
+  - In Sloan I proposed using *conditional value* for impact: instead of using $Q_{home}$, use $Q_{home}/(Q_{home}+Q_{away})$. If this works better than plain Q values it would be another contribution for dealing with sparisity.
+  - Another idea: *initialize* so that `goal` actions (or successful shots) are mapped to value 1. This helps with interpretability too, because that's what the reader expects.
+- The deep mind architecture, where each action is represented as a separate node. Might help with the problem that Q(goal) isn't equal to 1.
+- Using "possessing" vs. "defending" team rather than home or away team.
 
 ## Model Validation
 
@@ -36,12 +39,19 @@ Features for bins:
 - The eye test: ranges we expect:
   - free kick should be high, should increase close to goal
   - throw-ins? Tarrak gets high values
-  - penalty kicks should be very high, higher than free kick
+  - penalty kicks should be very high, higher than free kick. About 70% success according to Ican McHale.
+    - are these represented as `penalty_obtained`?
   - goal kicks should be small value
   - corner shots pretty high
   - goal kick < throw-in < corner shot < free kick < shots < penalty kick
 
 ### Ablation/Lesion/Sensitivity Analysis
+
+Baselines comparisons
+
+- IJCAI 2018 architecture
+- van Haaren (Monte Carlo approach)
+- fine-tuning for specific league
 
 ## Model Application
 
