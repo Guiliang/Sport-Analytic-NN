@@ -10,6 +10,9 @@
   - Another idea: *initialize* so that `goal` actions (or successful shots) are mapped to value 1. This helps with interpretability too, because that's what the reader expects.
 - The deep mind architecture, where each action is represented as a separate node. Might help with the problem that Q(goal) isn't equal to 1.
 - Using "possessing" vs. "defending" team rather than home or away team.
+- Puterman's idea: train the model to learn the difference $Q_{home}-Q_{away}$. This is also recommended by Gelman. Puterman proves nice convergence properties. If we also learn $Q_{neither}$, we can recover the Q-values through normalization.
+- These ideas can be combined. For example, training on the difference and initialize the model so that $Q_{home}(goal(home))-Q_{away(goal(home))}=1$ and  $Q_{home}(goal(away))-Q_{away(goal(away))}=-1$ makes a lot of sense.
+- Btw, we may be able to get a theoretical convergence guarantee by adapting Puterman's ideas to TD-Sarsa.
 
 ## Model Validation
 
