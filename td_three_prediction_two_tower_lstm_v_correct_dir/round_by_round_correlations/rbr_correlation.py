@@ -66,7 +66,7 @@ class RoundByRoundCorrelation:
                 team_game_dict.update({away_teamId: game_date_dict})
         return team_game_dict
 
-    def aggregate_partial_impact_values(self, dir_game, ha_id, partial_player_value_dict, action_selected=None):
+    def aggregate_partial_impact_values(self, dir_game, ha_id, partial_player_value_dict, action_selected_list=None):
         ha_id = 1 if ha_id == 'home' else 0
         print('processing game {0} with ha_id {1}'.format(dir_game, str(ha_id)))
         """compute impact"""
@@ -95,8 +95,17 @@ class RoundByRoundCorrelation:
 
         for event_Index in range(0, len(playerIds)):
 
-            if action_selected is not None:
-                if action_selected not in actions[event_Index]:
+            # if action_selected_list is not None:
+            #     if action_selected_list not in actions[event_Index]:
+            #         continue
+
+            if action_selected_list is not None:
+                continue_flag = False if len(action_selected_list) == 0 else True
+                for f_action in action_selected_list:
+                    if f_action in actions[event_Index]:
+                        # print action
+                        continue_flag = False
+                if continue_flag:
                     continue
 
             if home_identifier[event_Index] != ha_id:
@@ -245,24 +254,24 @@ class RoundByRoundCorrelation:
                 game_ha_id_all.append(h_a_id)
                 game_dir = game_info_items[2]
                 game_dir_all.append(game_dir)
-                action_selected = None if self.action_selected_list is None else self.action_selected_list[0]
+                # action_selected = None if self.action_selected_list is None else self.action_selected_list[0]
                 partial_player_value_dict_goal = \
                     self.aggregate_partial_impact_values(dir_game=game_dir.split('.')[0],
                                                          ha_id=h_a_id,
                                                          partial_player_value_dict=partial_player_value_dict_goal,
-                                                         action_selected=action_selected)
+                                                         action_selected_list=self.action_selected_list)
                 action_selected = None if self.action_selected_list is None else self.action_selected_list[1]
                 partial_player_value_dict_assist = \
                     self.aggregate_partial_impact_values(dir_game=game_dir.split('.')[0],
                                                          ha_id=h_a_id,
                                                          partial_player_value_dict=partial_player_value_dict_assist,
-                                                         action_selected=action_selected)
+                                                         action_selected_list=self.action_selected_list)
 
                 partial_player_value_dict_auto = \
                     self.aggregate_partial_impact_values(dir_game=game_dir.split('.')[0],
                                                          ha_id=h_a_id,
                                                          partial_player_value_dict=partial_player_value_dict_auto,
-                                                         action_selected=None)
+                                                         action_selected_list=None)
 
             # player_assist_list = []
             # player_goal_list = []

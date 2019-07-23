@@ -33,7 +33,7 @@ if __name__ == "__main__":
     team_game_dict = pickle.load(open('./tmp_stores/team_game_dict.pkl', 'r'))
     for key in team_game_dict.keys():
         value = team_game_dict.get(key)
-        if len(value) < 30:
+        if len(value) < 30:  # TODO: might influence final result
             team_game_dict.pop(key)
     game_by_round_dict = rbr_correlation.compute_game_by_round(team_game_dict=team_game_dict)
 
