@@ -18,7 +18,8 @@ if __name__ == "__main__":
     #     'GIM2t': ['GIM', '../compute_impact/player_impact/soccer_player_GIM_back_difference_.json'],
     #     'SI': ['', '../resource/bak_soccer_player_markov_impact-2019June04.json'],
     #     'EG': ['GIM', '../compute_impact/player_impact/bak-soccer_player_GIM_2019June05_expected_goal.json']}
-    interested_metric = ['GIM2t', 'GIM', 'EG', 'SI', 'GIM2t-ft']
+    # interested_metric = ['GIM2t', 'GIM', 'EG', 'SI', 'GIM2t-ft']
+    interested_metric = ['GIM2t-ft']
     if league_name == 'champion':
         player_summary_dir_list = ['../resource/whoScored/Championship/Championship_summary.csv']
     else:
@@ -53,10 +54,9 @@ if __name__ == "__main__":
         if metric == 'GIM2t-ft':
             rbr_correlation.difference_type = 'back_difference_'
             rbr_correlation.action_selected_list = ['shot', 'goal']
-            rbr_correlation.action_selected_list = None
             tt_lstm_config_path = "../soccer-config-v5.yaml"
             tt_lstm_config = TTLSTMCongfig.load(tt_lstm_config_path)
-            data_name = get_data_name(config=tt_lstm_config)
+            data_name = get_data_name(config=tt_lstm_config, league_name='_English_Npower_Championship')
             rbr_correlation.data_name = data_name
         if metric == 'GIM2t':
             rbr_correlation.difference_type = 'back_difference_'
