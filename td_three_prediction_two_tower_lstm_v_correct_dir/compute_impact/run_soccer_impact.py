@@ -93,7 +93,7 @@ if __name__ == '__main__':
 
     # tt_lstm_config_path = '../icehockey-config.yaml'
     tt_lstm_config_path = "../soccer-config-v5.yaml"
-    difference_type = 'expected_goal'
+    difference_type = 'back_difference_'
     soccer_dir_all = os.listdir(data_path)
     fine_tune_flag = True
 
