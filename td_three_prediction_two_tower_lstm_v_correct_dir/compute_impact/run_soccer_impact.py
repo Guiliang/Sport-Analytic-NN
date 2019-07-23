@@ -95,7 +95,7 @@ if __name__ == '__main__':
     tt_lstm_config_path = "../soccer-config-v5.yaml"
     difference_type = 'expected_goal'
     soccer_dir_all = os.listdir(data_path)
-    fine_tune_flag = False
+    fine_tune_flag = True
 
     tt_lstm_config = TTLSTMCongfig.load(tt_lstm_config_path)
     learning_rate = tt_lstm_config.learn.learning_rate
@@ -106,13 +106,13 @@ if __name__ == '__main__':
     elif learning_rate == 0.0005:
         learning_rate_write = '5_5'
     if fine_tune_flag:
-        model_number = 24601
+        # model_number = 24601
         league_name = "_English_Npower_Championship"
         # data_name = compute_values_for_all_games(config=tt_lstm_config, data_store_dir=soccer_data_store_dir,
         #                                          dir_all=soccer_dir_all, model_number=model_number,
         #                                          league_name=league_name)
     else:
-        model_number = 2101  # 2101, 7201, 7801 ,10501 ,13501 ,15301 ,18301*, 20701*
+        # model_number = 2101  # 2101, 7201, 7801 ,10501 ,13501 ,15301 ,18301*, 20701*
         league_name = ''
         # data_name = compute_values_for_all_games(config=tt_lstm_config, data_store_dir=soccer_data_store_dir,
         #                                          dir_all=soccer_dir_all, model_number=model_number, league_name=None)
