@@ -330,7 +330,7 @@ def judge_feature_in_action(feature_input, actions):
     return False
 
 
-def get_data_name(config, if_old=False, league_name=None):
+def get_data_name(config, if_old=False, league_name=''):
     learning_rate = config.learn.learning_rate
     if learning_rate == 1e-5:
         learning_rate_write = '5'

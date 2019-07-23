@@ -12,19 +12,21 @@ from td_three_prediction_two_tower_lstm_v_correct_dir.round_by_round_correlation
 if __name__ == "__main__":
     raw_data_path = "/cs/oschulte/soccer-data/sequences_append_goal/"
     model_data_store_dir = "/cs/oschulte/Galen/Soccer-data"
-    # interested_metric = ['SI']  # ['GIM', 'SI']
-    metric_seasonal_total_by_player_dirs = {
-        'GIM': ['GIM', '../compute_impact/player_impact/ijcai_soccer_player_GIM_2019June01.json'],
-        'GIM2t': ['GIM', '../compute_impact/player_impact/soccer_player_GIM_back_difference_.json'],
-        'SI': ['', '../resource/bak_soccer_player_markov_impact-2019June04.json'],
-        'EG': ['GIM', '../compute_impact/player_impact/bak-soccer_player_GIM_2019June05_expected_goal.json']}
-    interested_metric = ['GIM2t', 'GIM', 'EG', 'SI']
-    player_summary_dir_list = ['../resource/whoScored/Championship/Championship_summary.csv',
-                               '../resource/whoScored/PremierLeague/Premier_League_summary.csv']
+    league_name = 'champion'
+    # metric_seasonal_total_by_player_dirs = {
+    #     'GIM': ['GIM', '../compute_impact/player_impact/ijcai_soccer_player_GIM_2019June01.json'],
+    #     'GIM2t': ['GIM', '../compute_impact/player_impact/soccer_player_GIM_back_difference_.json'],
+    #     'SI': ['', '../resource/bak_soccer_player_markov_impact-2019June04.json'],
+    #     'EG': ['GIM', '../compute_impact/player_impact/bak-soccer_player_GIM_2019June05_expected_goal.json']}
+    interested_metric = ['GIM2t', 'GIM', 'EG', 'SI', 'GIM2t-ft']
+    if league_name == 'champion':
+        player_summary_dir_list = ['../resource/whoScored/Championship/Championship_summary.csv']
+    else:
+        player_summary_dir_list = ['../resource/whoScored/Championship/Championship_summary.csv',
+                                   '../resource/whoScored/PremierLeague/Premier_League_summary.csv']
     game_info_path = '../resource/player_team_id_name_value.csv'
     rbr_correlation = RoundByRoundCorrelation(raw_data_path, interested_metric, player_summary_dir_list,
-                                              model_data_store_dir, game_info_path,
-                                              metric_seasonal_total_by_player_dirs)
+                                              model_data_store_dir, game_info_path)
     # team_game_dict = rbr_correlation.read_team_by_date()
     # pickle.dump(team_game_dict, open('./tmp_stores/team_game_dict.pkl', 'w'))
     team_game_dict = pickle.load(open('./tmp_stores/team_game_dict.pkl', 'r'))
@@ -48,9 +50,18 @@ if __name__ == "__main__":
     player_id_info_dict = rbr_correlation.compute_player_season_totals()
     correlated_coefficient_round_by_round_all = {}
     for metric in interested_metric:
+        if metric == 'GIM2t-ft':
+            rbr_correlation.difference_type = 'back_difference_'
+            rbr_correlation.action_selected_list = ['shot', 'goal']
+            rbr_correlation.action_selected_list = None
+            tt_lstm_config_path = "../soccer-config-v5.yaml"
+            tt_lstm_config = TTLSTMCongfig.load(tt_lstm_config_path)
+            data_name = get_data_name(config=tt_lstm_config)
+            rbr_correlation.data_name = data_name
         if metric == 'GIM2t':
             rbr_correlation.difference_type = 'back_difference_'
-            rbr_correlation.action_selected_list = ['shot', 'cross']  # None
+            # rbr_correlation.action_selected_list = ['shot', 'cross']  # None
+            rbr_correlation.action_selected_list = None
             tt_lstm_config_path = "../soccer-config-v5.yaml"
             tt_lstm_config = TTLSTMCongfig.load(tt_lstm_config_path)
             data_name = get_data_name(config=tt_lstm_config)
@@ -78,7 +89,7 @@ if __name__ == "__main__":
             player_id_info_dict=player_id_info_dict, game_by_round_dict=game_by_round_dict,
             metric_name=metric)
         correlated_coefficient_round_by_round_all.update({metric: correlated_coefficient_round_by_round})
-        with open('round_by_round_correlation_{0}.json'.format(metric), 'w') as outfile:
+        with open('rbr_correlations_{1}/round_by_round_correlation_{0}.json'.format(metric, league_name), 'w') as outfile:
             json.dump(obj=correlated_coefficient_round_by_round, fp=outfile)
 
     print 'still working'

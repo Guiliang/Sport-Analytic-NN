@@ -19,7 +19,7 @@ from td_three_prediction_two_tower_lstm_v_correct_dir.support.data_processing_to
 
 class RoundByRoundCorrelation:
     def __init__(self, raw_data_path, interested_metric, player_summary_dir_list,
-                 model_data_store_dir, game_info_path, metric_seasonal_total_by_player_dirs):
+                 model_data_store_dir, game_info_path, metric_seasonal_total_by_player_dirs=None):
         self.player_summary_dir_list = player_summary_dir_list
         self.action_selected_list = None
         self.raw_data_path = raw_data_path
@@ -31,7 +31,7 @@ class RoundByRoundCorrelation:
         self.game_info_path = game_info_path
         self.game_info_file = open(self.game_info_path)
         game_reader = csv.DictReader(self.game_info_file)
-        self.metric_seasonal_total_by_player_dirs = metric_seasonal_total_by_player_dirs
+        # self.metric_seasonal_total_by_player_dirs = metric_seasonal_total_by_player_dirs
         self.game_info_all = []
         for r in game_reader:
             p_name = r['playerName']
@@ -283,17 +283,17 @@ class RoundByRoundCorrelation:
             #                                                             player_assist_list)
             # print ('matched player number is {0}'.format(len(partial_player_GIM_list)))
 
-            auto_correlation = self.compute_auto_correlation(rank_value_dict=partial_player_value_dict_auto,
-                                                             interest_metric=metric_name)
-
+            # auto_correlation = self.compute_auto_correlation(rank_value_dict=partial_player_value_dict_auto,
+            #                                                  interest_metric=metric_name)
+            auto_correlation = None
             goal_correlation = self.compute_standard_correlation(rank_value_dict=partial_player_value_dict_goal,
                                                                  interest_metric='Goals')
             assistant_correlation = self.compute_standard_correlation(rank_value_dict=partial_player_value_dict_assist,
                                                                       interest_metric='Assists')
             rate = -1 if metric_name == 'SI' else 1
             correlated_coefficient_round_by_round.update({round_num: {'assistant': rate * assistant_correlation,
-                                                                      'goal': rate * goal_correlation,
-                                                                      'auto': auto_correlation}})
+                                                                      'goal': rate * goal_correlation}})
+                                                                      # 'auto': auto_correlation}})
             print 'correlation for round {0} is assist:{1}, goal:{2} and auto:{3}'.format(str(round_num),
                                                                                           str(assistant_correlation),
                                                                                           str(goal_correlation),
