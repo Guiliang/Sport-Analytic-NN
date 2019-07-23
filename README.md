@@ -13,6 +13,7 @@
 - Puterman's idea: train the model to learn the difference $Q_{home}-Q_{away}$. This is also recommended by Gelman. Puterman proves nice convergence properties. If we also learn $Q_{neither}$, we can recover the Q-values through normalization.
 - These ideas can be combined. For example, training on the difference and initialize the model so that $Q_{home}(goal(home))-Q_{away(goal(home))}=1$ and  $Q_{home}(goal(away))-Q_{away(goal(away))}=-1$ makes a lot of sense.
 - Btw, we may be able to get a theoretical convergence guarantee by adapting Puterman's ideas to TD-Sarsa.
+- It may be tricky to train a model to map a Boolean indicator (home vs. away = 1 v 0 or 1 v -1) into flipping a sign (e.g. $Q_(goal)$ flips depending on whether the home or away team scores). Another option is to *use the difference as a convergence criterion*. So keep updating weights until the max difference between iteration $n$ and $n+1$ is small, for the expected difference quantitity $Q_{home}(s) - Q_{away}(s)$. (Also converge for $Q_{neither}$). We know this works in the discrete case from the previous discrete models by Kurt. 
 
 ## Model Validation
 
