@@ -58,9 +58,9 @@ if __name__ == "__main__":
             tt_lstm_config = TTLSTMCongfig.load(tt_lstm_config_path)
             data_name = get_data_name(config=tt_lstm_config, league_name='_English_Npower_Championship')
             rbr_correlation.data_name = data_name
-        if metric == 'GIM2t':
+        elif metric == 'GIM2t':
             rbr_correlation.difference_type = 'back_difference_'
-            # rbr_correlation.action_selected_list = ['shot', 'cross']  # None
+            # rbr_correlation.action_selected_list = ['shot', 'cross']
             rbr_correlation.action_selected_list = None
             tt_lstm_config_path = "../soccer-config-v5.yaml"
             tt_lstm_config = TTLSTMCongfig.load(tt_lstm_config_path)
