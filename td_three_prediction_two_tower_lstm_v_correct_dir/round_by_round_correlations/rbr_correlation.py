@@ -21,7 +21,7 @@ class RoundByRoundCorrelation:
     def __init__(self, raw_data_path, interested_metric, player_summary_dir_list,
                  model_data_store_dir, game_info_path, metric_seasonal_total_by_player_dirs=None):
         self.player_summary_dir_list = player_summary_dir_list
-        self.action_selected_list = None
+        self.action_selected_list_all = None
         self.raw_data_path = raw_data_path
         self.interested_metric = interested_metric
         self.model_data_store_dir = model_data_store_dir
@@ -254,18 +254,18 @@ class RoundByRoundCorrelation:
                 game_ha_id_all.append(h_a_id)
                 game_dir = game_info_items[2]
                 game_dir_all.append(game_dir)
-                # action_selected = None if self.action_selected_list is None else self.action_selected_list[0]
+                action_selected_list = None if self.action_selected_list_all is None else self.action_selected_list_all[0]
                 partial_player_value_dict_goal = \
                     self.aggregate_partial_impact_values(dir_game=game_dir.split('.')[0],
                                                          ha_id=h_a_id,
                                                          partial_player_value_dict=partial_player_value_dict_goal,
-                                                         action_selected_list=self.action_selected_list)
-                action_selected = None if self.action_selected_list is None else self.action_selected_list[1]
+                                                         action_selected_list=action_selected_list)
+                action_selected_list = None if self.action_selected_list_all is None else self.action_selected_list_all[1]
                 partial_player_value_dict_assist = \
                     self.aggregate_partial_impact_values(dir_game=game_dir.split('.')[0],
                                                          ha_id=h_a_id,
                                                          partial_player_value_dict=partial_player_value_dict_assist,
-                                                         action_selected_list=self.action_selected_list)
+                                                         action_selected_list=action_selected_list)
 
                 partial_player_value_dict_auto = \
                     self.aggregate_partial_impact_values(dir_game=game_dir.split('.')[0],

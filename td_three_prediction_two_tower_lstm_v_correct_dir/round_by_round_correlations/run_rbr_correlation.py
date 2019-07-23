@@ -53,43 +53,44 @@ if __name__ == "__main__":
     for metric in interested_metric:
         if metric == 'GIM2t-ft':
             rbr_correlation.difference_type = 'back_difference_'
-            rbr_correlation.action_selected_list = ['shot', 'goal']
+            rbr_correlation.action_selected_list_all = [['shot', 'goal'], ['cross']]
             tt_lstm_config_path = "../soccer-config-v5.yaml"
             tt_lstm_config = TTLSTMCongfig.load(tt_lstm_config_path)
             data_name = get_data_name(config=tt_lstm_config, league_name='_English_Npower_Championship')
             rbr_correlation.data_name = data_name
         elif metric == 'GIM2t':
             rbr_correlation.difference_type = 'back_difference_'
-            # rbr_correlation.action_selected_list = ['shot', 'cross']
-            rbr_correlation.action_selected_list = None
+            # rbr_correlation.action_selected_list = [['shot'], ['cross']]
+            rbr_correlation.action_selected_list_all = None
             tt_lstm_config_path = "../soccer-config-v5.yaml"
             tt_lstm_config = TTLSTMCongfig.load(tt_lstm_config_path)
             data_name = get_data_name(config=tt_lstm_config)
             rbr_correlation.data_name = data_name
         elif metric == 'EG':  # we might want to recompute EG
             rbr_correlation.difference_type = 'expected_goal'
-            rbr_correlation.action_selected_list = None
+            rbr_correlation.action_selected_list_all = None
             tt_lstm_config_path = "../soccer-config-v3.yaml"
             tt_lstm_config = TTLSTMCongfig.load(tt_lstm_config_path)
             data_name = get_data_name(config=tt_lstm_config)
             rbr_correlation.data_name = data_name
         elif metric == 'GIM':
             rbr_correlation.difference_type = 'back_difference_'
-            rbr_correlation.action_selected_list = None
+            rbr_correlation.action_selected_list_all = None
             tt_lstm_config_path = "../soccer-config.yaml"
             tt_lstm_config = TTLSTMCongfig.load(tt_lstm_config_path)
             data_name = get_data_name(config=tt_lstm_config, if_old=True)
             rbr_correlation.data_name = data_name
         elif metric == 'SI':
             rbr_correlation.difference_type = 'expected_goal'
-            rbr_correlation.action_selected_list = None
+            rbr_correlation.action_selected_list_all = None
             data_name = 'markov_impact_values.json'
             rbr_correlation.data_name = data_name
         correlated_coefficient_round_by_round = rbr_correlation.compute_correlations_by_round(
             player_id_info_dict=player_id_info_dict, game_by_round_dict=game_by_round_dict,
             metric_name=metric)
         correlated_coefficient_round_by_round_all.update({metric: correlated_coefficient_round_by_round})
-        with open('rbr_correlations_{1}/round_by_round_correlation_{0}.json'.format(metric, league_name), 'w') as outfile:
+        with open('rbr_correlations_{1}/round_by_round_correlation_{0}.json'.format(metric, league_name),
+                  'w') as outfile:
             json.dump(obj=correlated_coefficient_round_by_round, fp=outfile)
 
     print 'still working'
