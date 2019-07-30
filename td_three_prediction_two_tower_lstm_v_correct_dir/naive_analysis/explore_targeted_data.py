@@ -1,3 +1,7 @@
+import sys
+
+print sys.path
+sys.path.append('/Local-Scratch/PycharmProjects/Sport-Analytic-NN/')
 import json
 import os
 import numpy as np
