@@ -68,6 +68,19 @@ def padding_hybrid_reward(hybrid_reward):
     return np.asarray(hybrid_reward)
 
 
+def get_team_name(data_path, directory):
+    with open(data_path + str(directory)) as f:
+        data = json.load(f)
+    # print "game time is:" + str(data.get('gameDate'))
+    home_name = data['homeTeamName']
+    away_name = data['awayTeamName']
+    game_date = data['gameDate']
+
+    return unicodedata.normalize('NFKD', home_name).encode('ascii', 'ignore'), \
+           unicodedata.normalize('NFKD', away_name).encode('ascii', 'ignore'), \
+           unicodedata.normalize('NFKD', game_date).encode('ascii', 'ignore')
+
+
 def get_game_time(data_path, directory):
     with open(data_path + str(directory)) as f:
         data = json.load(f)
@@ -86,6 +99,21 @@ def get_game_time(data_path, directory):
         game_time_all.append(game_time)
     game_time_all.sort(reverse=False)
     return game_time_all
+
+
+def get_action_position(data_path, directory):
+    with open(data_path + str(directory)) as f:
+        data = json.load(f)
+    # print "game time is:" + str(data.get('gameDate'))
+    events = data.get('events')
+    time_all = 95
+    action_xy_return = []
+    for event in events:
+        action_name = unicodedata.normalize('NFKD', event.get('action')).encode('ascii', 'ignore')
+        x = event.get('x')
+        y = event.get('y')
+        action_xy_return.append({'action': action_name, 'x': x, 'y': y})
+    return action_xy_return
 
 
 def get_soccer_game_data_old(data_store, dir_game, config):
@@ -405,10 +433,10 @@ def construct_simulation_data(features_train, features_mean, features_scale,
             scale_action = float(0 - features_mean[feature]) / features_scale[feature]
             state.append(scale_action)
         elif feature == 'event_outcome':  # ignore the outcome for soccer
-            scale_event_outcome = float(1 - features_mean[feature]) / features_scale[feature]
+            scale_event_outcome = float(0.6 - features_mean[feature]) / features_scale[feature]
             state.append(scale_event_outcome)
         elif feature == 'outcome':
-            scale_event_outcome = float(1 - features_mean[feature]) / features_scale[feature]
+            scale_event_outcome = float(0.6 - features_mean[feature]) / features_scale[feature]
             state.append(scale_event_outcome)
         # elif feature == 'angel2gate' or feature == 'angle': # TODO: temporally ignore angle
         #     xAdjCoord = set_dict.get('xAdjCoord')
@@ -491,10 +519,10 @@ def start_lstm_generate_spatial_simulation(history_action_type, history_action_t
     elif sports == 'soccer':
         x_min = 0
         x_max = 100
-        x_section_num = 200
+        x_section_num = 100
         y_min = 0
         y_max = 100
-        y_section_num = 200
+        y_section_num = 100
         features_train, features_mean, features_scale, actions = soccer_feature_setting.select_feature_setting(
             feature_type=feature_type)
         gate_x_coord = 100
@@ -759,7 +787,7 @@ def get_network_dir(league_name, tt_lstm_config, train_msg):
     else:
         merge_msg = 's'
     if len(league_name) > 0:
-        lr = tt_lstm_config.learn.learning_rate/10
+        lr = tt_lstm_config.learn.learning_rate / 10
     else:
         lr = tt_lstm_config.learn.learning_rate
 

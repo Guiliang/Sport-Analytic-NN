@@ -9,7 +9,7 @@ from td_three_prediction_two_tower_lstm_v_correct_dir.config.soccer_feature_sett
 
 if __name__ == '__main__':
     features_train, features_mean_dic, features_scale_dic, actions = select_feature_setting(5)
-    tt_lstm_config_path = "../soccer-config.yaml"
+    tt_lstm_config_path = "../soccer-config-v5.yaml"
     tt_lstm_config = TTLSTMCongfig.load(tt_lstm_config_path)
     # history_action_type = ['reception', 'pass', 'reception']
     # history_action_type_coord = [{'xAdjCoord': 0, 'yAdjCoord': 0},
@@ -79,6 +79,12 @@ if __name__ == '__main__':
     read_plot_model(sess_nn, saved_network_path)
 
     for action in actions:
+        if 'shot' not in action \
+                and 'pass' not in action \
+                and 'cross' not in action \
+                and 'tackle' not in action \
+                and 'interception' not in action:
+            continue
         action_type = action
         simulated_data_all = start_lstm_generate_spatial_simulation(history_action_type=history_action_type,
                                                                     history_action_type_coord=history_action_type_coord,

@@ -14,8 +14,8 @@ def image_blending(value_Img_dir, save_dir, value_Img_half_dir, half_save_dir, b
                    sport='ice-hockey'):
     value_Img = cv2.imread(
         value_Img_dir)
-    value_Img_half = cv2.imread(
-        value_Img_half_dir)
+    # value_Img_half = cv2.imread(
+    #     value_Img_half_dir)
     # background = cv2.imread("../resource/hockey-field.png")
     background = cv2.imread(background_image_dir)
     # v_rows, v_cols, v_channels = value_Img.shape
@@ -50,16 +50,16 @@ def image_blending(value_Img_dir, save_dir, value_Img_half_dir, half_save_dir, b
     # cv2.waitKey(0)
     cv2.imwrite(save_dir, blend_all)
 
-    focus_Img_half = value_Img_half[image_h_y[0]:image_h_y[1], image_h_x[0]:image_h_x[1]]
-    # cv2.imshow('res', focus_Img_half)
-    # cv2.waitKey(0)
-    f_h_rows, f_h_cols, f_h_channels = focus_Img_half.shape
-    focus_background_half = cv2.resize(background[:, background_half[0]:background_half[1], :], (f_h_cols, f_h_rows),
-                                       interpolation=cv2.INTER_CUBIC)
-    blend_half_focus = cv2.addWeighted(focus_Img_half, 1, focus_background_half, 0.5, -255 / 2)
-    blend_half_all = value_Img_half
-    blend_half_all[image_h_y[0]:image_h_y[1], image_h_x[0]:image_h_x[1]] = blend_half_focus
-    cv2.imwrite(half_save_dir, blend_half_all)
+    # focus_Img_half = value_Img_half[image_h_y[0]:image_h_y[1], image_h_x[0]:image_h_x[1]]
+    # # cv2.imshow('res', focus_Img_half)
+    # # cv2.waitKey(0)
+    # f_h_rows, f_h_cols, f_h_channels = focus_Img_half.shape
+    # focus_background_half = cv2.resize(background[:, background_half[0]:background_half[1], :], (f_h_cols, f_h_rows),
+    #                                    interpolation=cv2.INTER_CUBIC)
+    # blend_half_focus = cv2.addWeighted(focus_Img_half, 1, focus_background_half, 0.5, -255 / 2)
+    # blend_half_all = value_Img_half
+    # blend_half_all[image_h_y[0]:image_h_y[1], image_h_x[0]:image_h_x[1]] = blend_half_focus
+    # cv2.imwrite(half_save_dir, blend_half_all)
 
 
 def read_plot_model(sess_nn, model_path):
@@ -118,7 +118,7 @@ def nn_simulation(simulate_data,
             home_away_indicator = np.ones(len(x_coord_states))
         else:
             home_away_indicator = np.zeros(len(x_coord_states))
-        readout_x_coord_values = model_nn.readout.eval(
+        readout_x_coord_values = model_nn.read_out.eval(
             feed_dict={model_nn.rnn_input_ph: x_coord_states,
                        model_nn.trace_lengths_ph: trace_length,
                        model_nn.home_away_indicator_ph: home_away_indicator})
@@ -172,24 +172,24 @@ def nn_simulation(simulate_data,
 
     plt.savefig(nn_save_image_dir)
 
-    value_spatial_home_half = [v[half_x[0]:half_x[1]] for v in value_spatial]
-    plt.figure(figsize=(15, 12))
-    sns.set(font_scale=2.5)
-    ax = sns.heatmap(value_spatial_home_half, xticklabels=False, yticklabels=False,
-                     cmap="RdYlBu_r", vmin=vmin_set,
-                     vmax=vmax_set)
-    # plt.xlabel('XAdjcoord', fontsize=26)
-    # plt.ylabel('YAdjcoord', fontsize=26)
-    if len(history_action_type) != 0:
-        plt.title("{2} for {0}\n with history:{1}".format(action_type, str(history_action_type),
-                                                                        draw_target), fontsize=30)
-    elif len(history_action_type) == 0:
-        plt.title("{2} for {0}".format(action_type, "[]", draw_target),
-                  fontsize=30)
-    else:
-        raise ValueError("undefined HIS_ACTION_TYPE{0}:".format(history_action_type))
+    # value_spatial_home_half = [v[half_x[0]:half_x[1]] for v in value_spatial]
+    # plt.figure(figsize=(15, 12))
+    # sns.set(font_scale=2.5)
+    # ax = sns.heatmap(value_spatial_home_half, xticklabels=False, yticklabels=False,
+    #                  cmap="RdYlBu_r", vmin=vmin_set,
+    #                  vmax=vmax_set)
+    # # plt.xlabel('XAdjcoord', fontsize=26)
+    # # plt.ylabel('YAdjcoord', fontsize=26)
+    # if len(history_action_type) != 0:
+    #     plt.title("{2} for {0}\n with history:{1}".format(action_type, str(history_action_type),
+    #                                                                     draw_target), fontsize=30)
+    # elif len(history_action_type) == 0:
+    #     plt.title("{2} for {0}".format(action_type, "[]", draw_target),
+    #               fontsize=30)
+    # else:
+    #     raise ValueError("undefined HIS_ACTION_TYPE{0}:".format(history_action_type))
 
-    plt.savefig(nn_half_save_image_dir)
+    # plt.savefig(nn_half_save_image_dir)
 
 
 def plot_game_value(game_value, save_image_name,
