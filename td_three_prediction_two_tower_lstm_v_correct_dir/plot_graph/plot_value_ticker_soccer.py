@@ -77,7 +77,7 @@ if __name__ == '__main__':
                                          sport='Soccer')
         for value_index in range(0, len(game_value)):
             if game_value[value_index][0] > 0.5 or game_value[value_index][1] > 0.5:
-                print '{0} {1}'.format(str(value_index), str(action_xy_return[value_index]))
+                print '{0} {1}'.format(str(game_time_all[value_index]), str(action_xy_return[value_index]))
 
         save_image_name = './soccer-image/{0} v.s. {1} value_ticker.png'.format(home_team, away_team)
 
