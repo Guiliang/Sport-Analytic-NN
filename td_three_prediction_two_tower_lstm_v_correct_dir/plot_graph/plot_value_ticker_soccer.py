@@ -76,7 +76,7 @@ if __name__ == '__main__':
                                          config=tt_lstm_config,
                                          sport='Soccer')
         for value_index in range(0, len(game_value)):
-            if game_value[value_index][0] > 0.5 or game_value[value_index][1] > 0.5:
+            if game_value[value_index][0] > 0.45 or game_value[value_index][1] > 0.45:
                 print '{0} {1}'.format(str(game_time_all[value_index]), str(action_xy_return[value_index]))
 
         save_image_name = './soccer-image/{0} v.s. {1} value_ticker.png'.format(home_team, away_team)
