@@ -48,10 +48,11 @@ def gather_score_data(directory, data_path, suc_shot_action_all):
         event = events[j]
         action = str(event.get('action'))
         if action == 'goal':
-            x_ = float(events[j - 1].get('x'))
-            y_ = float(events[j - 1].get('y'))
-            print str(events[j - 1].get('action'))
-            suc_shot_action_all.append([x_, y_])
+            if 'own' not in events[j - 1].get('action'):
+                x_ = float(events[j - 1].get('x'))
+                y_ = float(events[j - 1].get('y'))
+                print str(events[j - 1].get('action'))
+                suc_shot_action_all.append([x_, y_])
 
     return suc_shot_action_all
 
@@ -195,8 +196,8 @@ if __name__ == '__main__':
     # find_events_with_idx()
     # check_soccer_data()
     # data_path = "/cs/oschulte/Galen/Hockey-data-entire/Hockey-Match-All-data/"
-    data_path = "/cs/oschulte/soccer-data/sequences_append_goal/"
-    # data_path = '/Users/liu/Desktop/soccer-data-sample/sequences_append_goal/'
+    # data_path = "/cs/oschulte/soccer-data/sequences_append_goal/"
+    data_path = '/Users/liu/Desktop/soccer-data-sample/sequences_append_goal/'
     dir_all = os.listdir(data_path)
     #
     suc_shot_action_all = []
@@ -204,4 +205,6 @@ if __name__ == '__main__':
         gather_score_data(dir, data_path, suc_shot_action_all)
         # find_soccer_target_data(dir, data_path, print_latex=True)
     plot_shot_scatter(np.asarray(suc_shot_action_all))
-    print suc_shot_action_all
+    # print suc_shot_action_all
+
+    print np.asarray(suc_shot_action_all).mean(axis=0)
