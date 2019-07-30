@@ -196,8 +196,8 @@ if __name__ == '__main__':
     # find_events_with_idx()
     # check_soccer_data()
     # data_path = "/cs/oschulte/Galen/Hockey-data-entire/Hockey-Match-All-data/"
-    # data_path = "/cs/oschulte/soccer-data/sequences_append_goal/"
-    data_path = '/Users/liu/Desktop/soccer-data-sample/sequences_append_goal/'
+    data_path = "/cs/oschulte/soccer-data/sequences_append_goal/"
+    # data_path = '/Users/liu/Desktop/soccer-data-sample/sequences_append_goal/'
     dir_all = os.listdir(data_path)
     #
     suc_shot_action_all = []
