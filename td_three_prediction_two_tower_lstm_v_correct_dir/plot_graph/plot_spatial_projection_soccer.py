@@ -1,3 +1,7 @@
+import sys
+
+print sys.path
+sys.path.append('/Local-Scratch/PycharmProjects/Sport-Analytic-NN/')
 import tensorflow as tf
 from td_three_prediction_two_tower_lstm_v_correct_dir.support.plot_tools import image_blending
 from td_three_prediction_two_tower_lstm_v_correct_dir.nn_structure import td_tt_lstm
