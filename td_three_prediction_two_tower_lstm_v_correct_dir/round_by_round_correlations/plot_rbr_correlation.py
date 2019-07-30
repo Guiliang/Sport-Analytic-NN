@@ -14,27 +14,28 @@ mpl.rcParams['ytick.labelsize'] = label_size
 
 
 class DrawRoundCorrelation:
-    def __init__(self, rbr_results_dir):
+    def __init__(self, rbr_results_dir, league):
         self.rbr_results_dir = rbr_results_dir
-        self.metric_names_all = ['GIM2t', 'GIM', 'SI', 'EG']
-        self.field_dict = {'assistant': {}, 'goal': {}, 'auto':{}}
+        self.metric_names_all = {'GIM2t', 'GIM', 'SI', 'EG', 'GIM2t-ft'}
+        self.field_dict = {'assistant': {}, 'goal': {}}
         for field_name in self.field_dict.keys():
             field_dict = self.field_dict.get(field_name)
             for method in self.metric_names_all:
                 field_dict.update({method: []})
             self.field_dict.update({field_name: field_dict})
         self.ROUND_NUMBER = 40
+        self.league = league
 
     def read_round_by_round_correlation(self):
         # methods_record_all = {}
 
         for metric_name in self.metric_names_all:
-            with open('./rbr_correlations/round_by_round_correlation' + '_{0}.json'.format(metric_name)) as fp:
+            with open(self.rbr_results_dir + '/round_by_round_correlation' + '_{0}.json'.format(metric_name)) as fp:
                 metric_values = json.load(fp)
             round_number_all = map(str, sorted(map(int, metric_values.keys()), reverse=False))
             for round_number in round_number_all:
                 values = metric_values.get(round_number)
-                for field_name in values.keys():
+                for field_name in self.field_dict.keys():
                     correl_value = values.get(field_name)
                     metric_dict = self.field_dict.get(field_name)
                     inner_list = metric_dict.get(metric_name)
@@ -53,9 +54,9 @@ class DrawRoundCorrelation:
         field_names = {'assistant': 'Assists', 'goal': 'Goals', 'point': 'Points', 'auto': 'Auto'}
         # methods_marker_dict = {'plusminus': '^', 'EG': '*', 'SI': 'x', 'GIM': 'P'}
         # methods_color_all = {'plusminus': 'b', 'EG': 'y', 'SI': 'g', 'GIM': 'r'}
-        methods_marker_dict = {'GIM': '^', 'EG': '*', 'SI': 'x', 'GIM2t': 'P'}
-        methods_color_dict = {'GIM': 'b', 'EG': 'y', 'SI': 'g', 'GIM2t': 'r'}
-        methods_name_dict = {'GIM': 'GIM-Merge', 'EG': 'EG', 'SI': 'SI', 'GIM2t': 'GIM'}
+        methods_marker_dict = {'GIM': '^', 'EG': '*', 'SI': 'x', 'GIM2t': 'P', 'GIM2t-ft': 'o'}
+        methods_color_dict = {'GIM': 'b', 'EG': 'y', 'SI': 'g', 'GIM2t': 'r', 'GIM2t-ft': 'k'}
+        methods_name_dict = {'GIM': 'M-GIM', 'EG': 'EG', 'SI': 'SI', 'GIM2t': 'GIM', 'GIM2t-ft': 'FT-GIM'}
 
         x_list = range(0, self.ROUND_NUMBER + 1, scale)
 
@@ -93,12 +94,17 @@ class DrawRoundCorrelation:
             else:
                 plt.ylabel("Correlation with {0}".format(field_names.get(field)), fontsize=25)
             # plt.show()
-            plt.savefig("./figures/{0}_round_by_round.png".format(field))
+            league_name = self.league if self.league is not None else ''
+            plt.savefig("./figures/{0}_round_by_round_{1}.png".format(field, league_name))
 
 
 if __name__ == "__main__":
-    rbr_results_dir = './round_by_round_correlation.json'
-    DRC = DrawRoundCorrelation(rbr_results_dir=rbr_results_dir)
+    league = 'champion'
+    if league is not None:
+        rbr_results_dir = './rbr_correlations_{0}'.format(league)
+    else:
+        rbr_results_dir = './rbr_correlations'
+    DRC = DrawRoundCorrelation(rbr_results_dir=rbr_results_dir, league=league)
     record_all_dict = DRC.read_round_by_round_correlation()
     # DRC.read_append_round_by_round_correlation(record_all_dict)
     DRC.draw_round_by_round_correlation(record_all_dict)
