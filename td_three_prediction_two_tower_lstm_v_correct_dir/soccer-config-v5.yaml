@@ -20,7 +20,7 @@ learn:
   reward_type : "NEG_REWARD_GAMMA1_V3"
   save_mother_dir : "/cs"
   if_correct_velocity : "_v_correct_"
-  apply_softmax: 1
+  apply_softmax: 0
   merge_tower: False
 
 Arch:

@@ -3,6 +3,18 @@ import os
 import numpy as np
 from td_three_prediction_two_tower_lstm_v_correct_dir.support.data_processing_tools import get_soccer_game_data
 import scipy.io as sio
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+
+
+def plot_shot_scatter(suc_shot_action_all):
+    plt.figure(figsize=(12, 6))
+    plt.scatter(suc_shot_action_all[:, 0], suc_shot_action_all[:, 1])
+    plt.xlim([0, 100])
+    plt.ylim([0, 100])
+    # plt.show()
+    plt.savefig('./suc_shot_scatter.png')
 
 
 def find_icehockey_target_data(directory, data_path):
@@ -21,6 +33,23 @@ def find_icehockey_target_data(directory, data_path):
             print 'action:{0}, outcome:{1}, team:{2}'.format(action, outcome, team)
             print 'action_nex:{0}, outcome_nex:{1}, team:{2}\\'.format(action_nex, outcome_nex, team_nex)
     print 'ok'
+
+
+def gather_score_data(directory, data_path, suc_shot_action_all):
+    with open(data_path + str(directory)) as f:
+        data = json.load(f)
+
+    events = data.get('events')
+    for j in range(len(events)):
+        event = events[j]
+        action = str(event.get('action'))
+        if action == 'goal':
+            x_ = float(events[j - 1].get('x'))
+            y_ = float(events[j - 1].get('y'))
+            print str(events[j - 1].get('action'))
+            suc_shot_action_all.append([x_, y_])
+
+    return suc_shot_action_all
 
 
 def find_soccer_target_data(directory, data_path, print_latex):
@@ -64,12 +93,12 @@ def find_soccer_target_data(directory, data_path, print_latex):
                 h_a = event_print.get('home_away')
                 sd = event_print.get('scoreDiff')
                 if print_latex:
-                    outcome = 'S' if int(outcome)==1 else 'F'
+                    outcome = 'S' if int(outcome) == 1 else 'F'
                     duration = (float(min) - float(min_pre)) * 60 + (float(sec) - float(sec_pre))
-                    angle  = round(angle, 2)
+                    angle = round(angle, 2)
                     if h_a == 'A':
-                        x = 100-float(x)
-                        y = 100-float(y)
+                        x = 100 - float(x)
+                        y = 100 - float(y)
                     if float(duration) > 0:
                         # if h_a_pre == h_a:
                         velocity_x = round((float(x) - float(x_pre)) / duration, 1)
@@ -149,7 +178,7 @@ def count_event_number():
     for directory in dir_all:
         with open(raw_data_path + str(directory)) as f:
             data = json.load(f)
-        # print "game time is:" + str(data.get('gameDate'))
+        # print "game time is:" + str(data.get('gameDate'))/Users/liu/Desktop/soccer-data-sample/sequences_append_goal
         events = data.get('events')
 
         event_all_number += len(events)
@@ -163,7 +192,12 @@ if __name__ == '__main__':
     # check_soccer_data()
     # data_path = "/cs/oschulte/Galen/Hockey-data-entire/Hockey-Match-All-data/"
     data_path = "/cs/oschulte/soccer-data/sequences_append_goal/"
+    # data_path = '/Users/liu/Desktop/soccer-data-sample/sequences_append_goal/'
     dir_all = os.listdir(data_path)
     #
-    for dir in dir_all[:10]:
-        find_soccer_target_data(dir, data_path, print_latex=True)
+    suc_shot_action_all = []
+    for dir in dir_all:
+        gather_score_data(dir, data_path, suc_shot_action_all)
+        # find_soccer_target_data(dir, data_path, print_latex=True)
+    plot_shot_scatter(np.asarray(suc_shot_action_all))
+    print suc_shot_action_all
