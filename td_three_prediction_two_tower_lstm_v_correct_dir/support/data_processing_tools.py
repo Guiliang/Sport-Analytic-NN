@@ -620,7 +620,10 @@ def read_feature_within_events(directory, data_path, feature_name):
 def read_features_within_events(directory, data_path, feature_name_list):
     with open(data_path + str(directory)) as f:
         data = json.load(f)
-    events = data.get('events')
+    try:
+        events = data.get('events')
+    except:
+        events = data[0].get('events')
     features_all = []
     for event in events:
         feature_values = {}

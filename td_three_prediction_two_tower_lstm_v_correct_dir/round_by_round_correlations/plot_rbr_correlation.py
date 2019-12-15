@@ -99,7 +99,7 @@ class DrawRoundCorrelation:
 
 
 if __name__ == "__main__":
-    league = 'champion'
+    league = None
     if league is not None:
         rbr_results_dir = './rbr_correlations_{0}'.format(league)
     else:

@@ -123,6 +123,20 @@ class Correlation:
         # print('matched number is ' + str(i))
         return np.corrcoef(mins_online_list, mins_game_list)
 
+    def get_rank_value_dict(self, rank_value_name):
+        if rank_value_name == 'GIM' or rank_value_name == 'GIM2t' or rank_value_name == 'GIM2t-chp':
+            rank_value_dict = self.get_GIM_rank_value(rank_value_name)
+        elif rank_value_name == 'SI' or rank_value_name == 'PM' or rank_value_name == 'EG':
+            rank_value_dict = self.get_general_rank_value(rank_value_name)
+        # elif rank_value_name == 'PM':
+        #     plus_minus_dict = plus_minus.pm
+        #     rank_value_dict = {}
+        #     for player_id in plus_minus_dict:
+        #         rank_value_dict.update({str(player_id): plus_minus_dict.get(player_id)})
+        elif rank_value_name == 'ALG':
+            rank_value_dict = self.ALG_value_dict
+        return rank_value_dict
+
     def compute_all_correlations(self):
         correlation_record_all_dict = {'summary': {},
                                        'defensive': {},
@@ -137,17 +151,8 @@ class Correlation:
             print metric_string
             correlation_record_rank_dict = correlation_record_all_dict.get(category)
             for rank_value_name in self.ranking_dir_dict.keys():
-                if rank_value_name == 'GIM' or rank_value_name == 'GIM2t' or rank_value_name == 'GIM2t-chp':
-                    rank_value_dict = self.get_GIM_rank_value(rank_value_name)
-                elif rank_value_name == 'SI' or rank_value_name == 'PM' or rank_value_name == 'EG':
-                    rank_value_dict = self.get_general_rank_value(rank_value_name)
-                # elif rank_value_name == 'PM':
-                #     plus_minus_dict = plus_minus.pm
-                #     rank_value_dict = {}
-                #     for player_id in plus_minus_dict:
-                #         rank_value_dict.update({str(player_id): plus_minus_dict.get(player_id)})
-                elif rank_value_name == 'ALG':
-                    rank_value_dict = self.ALG_value_dict
+
+                rank_value_dict = self.get_rank_value_dict(rank_value_name=rank_value_name)
                 correlation_rank_list = []
                 for interest_metric in interest_metric_all:
                     correlation = self.compute_correlation(rank_value_dict, interest_metric, category)

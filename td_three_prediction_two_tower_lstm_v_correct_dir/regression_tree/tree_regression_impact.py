@@ -24,6 +24,7 @@ class TreeRegression:
         self.max_leaf_node = None
         self.min_sample_leaf = min_sample_leaf
         self.model_store_mother_dir = '/cs/oschulte/Galen/soccer-models/dt_models/'
+        '/cs/oschulte/Galen/soccer-models/dt_datas'
         self.data_name = data_name
         self.write_feature_importance_dir = './dt_record/feature_importance_{0}_tree.txt'.format(action_selected)
         self.write_print_tree_dir = './dt_record/print_{0}_tree.txt'.format(action_selected)
@@ -51,15 +52,18 @@ class TreeRegression:
             for feature_importance in feature_importances_sorted:
                 f.write(str(feature_importance[0]) + '&' + str(feature_importance[1]) + '\\\\ \n')
 
-    def train_cart_validation_model(self, data_train, target_train, data_test, target_test, read_model=True,
-                                    test_flag=False):
+    def train_cart_validation_model(self, data_train, target_train,
+                                    data_test, target_test,
+                                    read_model=True,
+                                    test_flag=False,
+                                    running_number='all'):
 
         self.regressor = DecisionTreeRegressor(random_state=0, max_depth=self.max_depth,
                                                max_leaf_nodes=self.max_leaf_node,
                                                min_samples_leaf=self.min_sample_leaf)
         self.regressor.fit(data_train, target_train)
         if not test_flag:
-            with open(self.model_store_mother_dir + self.cart_model_name, 'wb') as f:
+            with open(self.model_store_mother_dir + self.cart_model_name+'_rn_'+str(running_number), 'wb') as f:
                 pickle.dump(self.regressor, f)
         feature_importances_dict = {}
         feature_importances = self.regressor.feature_importances_
@@ -81,13 +85,16 @@ class TreeRegression:
         mse = sum((target_output - target_test) ** 2) / target_test.size
         var_mse = np.var((target_output - target_test) ** 2, axis=0)
 
+        print(mae, var_mae, mse, var_mse)
+
         return mae, var_mae, mse, var_mse
 
-    def gather_all_training_data(self):
+    def gather_impact_data(self, apply_cv=False, impact_data_dir=None):
         all_input_list = []
         all_impact_list = []
-        all_model_data_dir = os.listdir(self.model_data_store_dir)
-        for model_dir in all_model_data_dir:
+        if not apply_cv:
+            impact_data_dir = os.listdir(self.model_data_store_dir)
+        for model_dir in impact_data_dir:
             if model_dir.startswith('.'):
                 continue
             game_input_list, game_impact_list = self.gather_game_training_data(dir_game=model_dir)

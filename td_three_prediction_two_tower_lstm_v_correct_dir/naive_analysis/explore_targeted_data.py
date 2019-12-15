@@ -8,6 +8,7 @@ import numpy as np
 from td_three_prediction_two_tower_lstm_v_correct_dir.support.data_processing_tools import get_soccer_game_data
 import scipy.io as sio
 import matplotlib
+
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
@@ -176,6 +177,22 @@ def find_events_with_idx():
         print event
 
 
+def count_game_number(league_number):
+    raw_data_path = "/cs/oschulte/soccer-data/sequences_append_goal/"
+    dir_all = os.listdir(raw_data_path)
+    event_all_number = 0
+    for directory in dir_all:
+        with open(raw_data_path + str(directory)) as f:
+            data = json.load(f)
+        competitionId = data.get('competitionId')
+        # print(competitionId)
+        # print(league_number)
+        if competitionId != league_number:
+            continue
+        event_all_number += 1
+    print(event_all_number)
+
+
 def count_event_number():
     raw_data_path = "/cs/oschulte/soccer-data/sequences_append_goal/"
     dir_all = os.listdir(raw_data_path)
@@ -191,20 +208,21 @@ def count_event_number():
 
 
 if __name__ == '__main__':
+    count_game_number(league_number=10)
     # check_soccer_data()
     # count_event_number()
     # find_events_with_idx()
     # check_soccer_data()
     # data_path = "/cs/oschulte/Galen/Hockey-data-entire/Hockey-Match-All-data/"
-    data_path = "/cs/oschulte/soccer-data/sequences_append_goal/"
-    # data_path = '/Users/liu/Desktop/soccer-data-sample/sequences_append_goal/'
-    dir_all = os.listdir(data_path)
+    # data_path = "/cs/oschulte/soccer-data/sequences_append_goal/"
+    # # data_path = '/Users/liu/Desktop/soccer-data-sample/sequences_append_goal/'
+    # dir_all = os.listdir(data_path)
+    # #
+    # suc_shot_action_all = []
+    # for dir in dir_all:
+    #     gather_score_data(dir, data_path, suc_shot_action_all)
+    #     # find_soccer_target_data(dir, data_path, print_latex=True)
+    # plot_shot_scatter(np.asarray(suc_shot_action_all))
+    # # print suc_shot_action_all
     #
-    suc_shot_action_all = []
-    for dir in dir_all:
-        gather_score_data(dir, data_path, suc_shot_action_all)
-        # find_soccer_target_data(dir, data_path, print_latex=True)
-    plot_shot_scatter(np.asarray(suc_shot_action_all))
-    # print suc_shot_action_all
-
-    print np.asarray(suc_shot_action_all).mean(axis=0)
+    # print np.asarray(suc_shot_action_all).mean(axis=0)

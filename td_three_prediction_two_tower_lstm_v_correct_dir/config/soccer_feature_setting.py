@@ -72,3 +72,5 @@ def select_feature_setting(feature_type):
         features_train = interested_raw_features + interested_compute_features + actions
 
         return features_train, features_mean_dic, features_scale_dic, actions
+
+select_feature_setting(5)

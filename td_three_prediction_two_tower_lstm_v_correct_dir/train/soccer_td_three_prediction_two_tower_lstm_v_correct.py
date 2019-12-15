@@ -31,15 +31,21 @@ else:
     train_msg = ''
 
 # fine-tuning testing
-FINE_TUNING = True
-if FINE_TUNING:
+TRAINING_MODE = 'from-scratch'  # fine-tune, from-scratch, general
+if TRAINING_MODE == 'fine-tune':
     league_number = 10
     league_name = "_English_Npower_Championship"
     model_train_continue = True
     print('fine-tuning on the {0} league'.format(league_name))
-else:
+elif TRAINING_MODE == 'from-scratch':
+    league_number = 10
+    league_name = "_English_Npower_Championship_Scratch"
+    model_train_continue = False
+    print('fine-tuning on the {0} league'.format(league_name))
+elif TRAINING_MODE == 'general':
     model_train_continue = False
     league_name = ''
+    print('training a general model for all games')
 
 
 def train_network(sess, model, print_parameters=False):
@@ -82,7 +88,7 @@ def train_network(sess, model, print_parameters=False):
 
         for index in range(0, len(DIR_GAMES_ALL)):
 
-            if FINE_TUNING:
+            if TRAINING_MODE == 'from-scratch' or TRAINING_MODE == 'fine-tune':
                 with open(DATA_PATH + DIR_DATA_ALL[index]) as f:
                     data_lines = json.load(f)
                 competitionId = data_lines.get('competitionId')
@@ -249,8 +255,8 @@ def train_network(sess, model, print_parameters=False):
 
 def run():
     sess = tf.Session()
-    if FINE_TUNING:
-        lr = tt_lstm_config.learn.learning_rate/10
+    if TRAINING_MODE == 'fine-tune':
+        lr = tt_lstm_config.learn.learning_rate / 10
     else:
         lr = tt_lstm_config.learn.learning_rate
     print tt_lstm_config.learn.learning_rate
