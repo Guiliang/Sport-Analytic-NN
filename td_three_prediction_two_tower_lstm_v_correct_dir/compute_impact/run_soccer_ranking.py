@@ -6,6 +6,8 @@ sys.path.append('/Local-Scratch/PycharmProjects/Sport-Analytic-NN/')
 
 import scipy.io as sio
 import os
+
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 import json
 import tensorflow as tf
 import numpy as np
