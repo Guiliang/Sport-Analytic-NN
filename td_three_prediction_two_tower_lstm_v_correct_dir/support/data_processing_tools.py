@@ -81,6 +81,21 @@ def get_team_name(data_path, directory):
            unicodedata.normalize('NFKD', game_date).encode('ascii', 'ignore')
 
 
+def count_players_by_league(data_path, directory, competitionId, player_id_list):
+    with open(data_path + str(directory)) as f:
+        data = json.load(f)
+    game_competition_id = data.get('competitionId')
+    if competitionId != game_competition_id:
+        return player_id_list
+    else:
+        events = data.get('events')
+        for event in events:
+            playerId = event.get('playerId')
+            if playerId not in player_id_list:
+                player_id_list.append(playerId)
+        return player_id_list
+
+
 def get_game_time(data_path, directory):
     with open(data_path + str(directory)) as f:
         data = json.load(f)
@@ -376,7 +391,8 @@ def get_data_name(config, if_old=False, league_name=''):
     else:
         extra_model_msg = ''
 
-    data_name = "{7}model{6}_three_cut_together_predict_Feature{0}_Iter{1}_lr{2}_Batch{3}_MaxLength{4}_Type{5}{8}.json".format(
+    data_name = "{7}model{6}_three_cut_together_predict_Feature{0}_Iter{1}" \
+                "_lr{2}_Batch{3}_MaxLength{4}_Type{5}{8}.json".format(
         str(config.learn.feature_type),
         str(config.learn.iterate_num),
         str(learning_rate_write),
@@ -826,7 +842,34 @@ def get_network_dir(league_name, tt_lstm_config, train_msg):
     return log_dir, save_network_dir
 
 
+def compute_cv_average_performance(cv_results_record_dir):
+    with open(cv_results_record_dir, 'r') as f:
+        results_by_line = f.readlines()
+    all_results_record = []
+    for line in results_by_line:
+        results = line.split(':')[1:]
+        results_line_record = []
+        for result in results:
+            results_line_record.append(float(result.split(',')[0]))
+        all_results_record.append(results_line_record)
+    print(np.mean(np.asarray(all_results_record), axis=0))
+    print(np.var(np.asarray(all_results_record), axis=0))
+
+
 if __name__ == '__main__':
-    combine_player_data(player_info_csv='../resource/player_team_id_name_value.csv',
-                        player_stats='../resource/Soccer_summary.csv',
-                        player_info_stats='../resource/Soccer_summary_info.csv')
+    # combine_player_data(player_info_csv='../resource/player_team_id_name_value.csv',
+    #                     player_stats='../resource/Soccer_summary.csv',
+    #                     player_info_stats='../resource/Soccer_summary_info.csv')
+
+    # compute_cv_average_performance(
+    #     cv_results_record_dir='../regression_tree/dt_record/cv_pass_running_record_leaf100.txt')
+
+    data_path = "/cs/oschulte/soccer-data/sequences_append_goal/"
+    dir_all = os.listdir(data_path)
+    player_id_list = []
+    competitionId = 10
+    for game_name_dir in dir_all:
+        game_name = game_name_dir.split('.')[0]
+        player_id_list = count_players_by_league(data_path, game_name_dir, competitionId, player_id_list)
+    print (player_id_list)
+    print(len(player_id_list))

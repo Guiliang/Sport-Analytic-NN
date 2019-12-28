@@ -6,7 +6,7 @@ sys.path.append('/Local-Scratch/PycharmProjects/Sport-Analytic-NN/')
 
 import os
 
-os.environ["CUDA_VISIBLE_DEVICES"] = "1"
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 import tensorflow as tf
 import scipy.io as sio
 import numpy as np
@@ -33,13 +33,17 @@ else:
 # fine-tuning testing
 TRAINING_MODE = 'from-scratch'  # fine-tune, from-scratch, general
 if TRAINING_MODE == 'fine-tune':
-    league_number = 10
-    league_name = "_English_Npower_Championship"
+    # league_number = 10
+    # league_name = "_English_Npower_Championship"
+    league_number = 8
+    league_name = "_English_Barclays_Premier_League"
     model_train_continue = True
     print('fine-tuning on the {0} league'.format(league_name))
 elif TRAINING_MODE == 'from-scratch':
-    league_number = 10
-    league_name = "_English_Npower_Championship_Scratch"
+    # league_number = 10
+    # league_name = "_English_Npower_Championship_Scratch"
+    league_number = 8
+    league_name = "_English_Barclays_Premier_League"
     model_train_continue = False
     print('fine-tuning on the {0} league'.format(league_name))
 elif TRAINING_MODE == 'general':

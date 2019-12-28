@@ -13,7 +13,7 @@ from td_three_prediction_two_tower_lstm_v_correct_dir.config.soccer_feature_sett
 class TreeRegression:
     def __init__(self, cart_model_name, data_name,
                  model_data_store_dir, game_data_dir,
-                 difference_type, min_sample_leaf,
+                 difference_type,
                  trace_length=10,
                  action_selected=None):
         self.difference_type = difference_type
@@ -22,7 +22,6 @@ class TreeRegression:
         self.cart_model_name = cart_model_name
         self.max_depth = None
         self.max_leaf_node = None
-        self.min_sample_leaf = min_sample_leaf
         self.model_store_mother_dir = '/cs/oschulte/Galen/soccer-models/dt_models/'
         '/cs/oschulte/Galen/soccer-models/dt_datas'
         self.data_name = data_name
@@ -37,8 +36,8 @@ class TreeRegression:
             for feature in features_train[0:16]:  # ignore the actions
                 self.features_train_all.append(feature + '${0}'.format(str(j)))
 
-    def read_cart_model(self):
-        self.regressor = pickle.load(open(self.model_store_mother_dir + self.cart_model_name, 'rb'))
+    def read_cart_model(self, cart_model_name):
+        self.regressor = pickle.load(open(self.model_store_mother_dir + cart_model_name, 'rb'))
         feature_importances_dict = {}
         feature_importances = self.regressor.feature_importances_
         for index in range(0, len(feature_importances)):
@@ -56,14 +55,16 @@ class TreeRegression:
                                     data_test, target_test,
                                     read_model=True,
                                     test_flag=False,
-                                    running_number='all'):
+                                    running_number='all',
+                                    min_sample_leaf=1):
 
         self.regressor = DecisionTreeRegressor(random_state=0, max_depth=self.max_depth,
                                                max_leaf_nodes=self.max_leaf_node,
-                                               min_samples_leaf=self.min_sample_leaf)
+                                               min_samples_leaf=min_sample_leaf)
         self.regressor.fit(data_train, target_train)
         if not test_flag:
-            with open(self.model_store_mother_dir + self.cart_model_name+'_rn_'+str(running_number), 'wb') as f:
+            with open(self.model_store_mother_dir + self.cart_model_name + '_rn_' + str(running_number)
+                      + '_msf_' + str(min_sample_leaf), 'wb') as f:
                 pickle.dump(self.regressor, f)
         feature_importances_dict = {}
         feature_importances = self.regressor.feature_importances_
@@ -89,11 +90,11 @@ class TreeRegression:
 
         return mae, var_mae, mse, var_mse
 
-    def gather_impact_data(self, apply_cv=False, impact_data_dir=None):
+    def gather_impact_data(self):
         all_input_list = []
         all_impact_list = []
-        if not apply_cv:
-            impact_data_dir = os.listdir(self.model_data_store_dir)
+        # if not apply_cv:
+        impact_data_dir = os.listdir(self.model_data_store_dir)
         for model_dir in impact_data_dir:
             if model_dir.startswith('.'):
                 continue

@@ -16,7 +16,8 @@ from td_three_prediction_two_tower_lstm_v_correct_dir.compute_impact.player_impa
 from td_three_prediction_two_tower_lstm_v_correct_dir.support.data_processing_tools import get_data_name
 
 
-def compute_ranking(soccer_data_store_dir, game_data_dir, data_name, player_summary_info_dir,
+def compute_ranking(soccer_data_store_dir, game_data_dir,
+                    data_name, player_summary_info_dir,
                     action_selected_lists, game_info_all):
     PI = PlayerImpact(data_name=data_name, game_data_dir=game_data_dir, model_data_store_dir=soccer_data_store_dir)
     dir_all = os.listdir(soccer_data_store_dir)
