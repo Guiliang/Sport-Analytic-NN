@@ -78,7 +78,7 @@ if __name__ == '__main__':
 
     if fine_tune_flag:
         model_number = 4801
-        league_name = "_English_Npower_Championship"
+        league_name = "_English_Barclays_Premier_League"
     else:
         model_number = 2101  # 2101, 7201, 7801 ,10501 ,13501 ,15301 ,18301*, 20701*
         league_name = ''

@@ -106,20 +106,20 @@ if __name__ == '__main__':
     elif learning_rate == 0.0005:
         learning_rate_write = '5_5'
     if fine_tune_flag:
-        # model_number = 24601
-        league_name = "_English_Npower_Championship"
+        model_number = 24601
+        league_name = "_English_Barclays_Premier_League"
         data_name = compute_values_for_all_games(config=tt_lstm_config, data_store_dir=soccer_data_store_dir,
                                                  dir_all=soccer_dir_all, model_number=model_number,
                                                  league_name=league_name)
     else:
         # model_number = 2101  # 2101, 7201, 7801 ,10501 ,13501 ,15301 ,18301*, 20701*
         league_name = ''
-        # data_name = compute_values_for_all_games(config=tt_lstm_config, data_store_dir=soccer_data_store_dir,
-        #                                          dir_all=soccer_dir_all, model_number=model_number, league_name=None)
-    if difference_type == 'back_difference_':
-        data_name = get_data_name(config=tt_lstm_config, league_name=league_name)
-    else:
-        data_name = get_data_name(config=tt_lstm_config, league_name=league_name)
-    compute_impact(data_name=data_name, game_data_dir=data_path, soccer_data_store_dir=soccer_data_store_dir,
-                   player_id_name_pair_dir=player_id_name_pair_dir, difference_type=difference_type,
-                   league_name=league_name)
+        data_name = compute_values_for_all_games(config=tt_lstm_config, data_store_dir=soccer_data_store_dir,
+                                                 dir_all=soccer_dir_all, model_number=model_number, league_name=None)
+    # if difference_type == 'back_difference_':
+    #     data_name = get_data_name(config=tt_lstm_config, league_name=league_name)
+    # else:
+    #     data_name = get_data_name(config=tt_lstm_config, league_name=league_name)
+    # compute_impact(data_name=data_name, game_data_dir=data_path, soccer_data_store_dir=soccer_data_store_dir,
+    #                player_id_name_pair_dir=player_id_name_pair_dir, difference_type=difference_type,
+    #                league_name=league_name)
