@@ -112,7 +112,7 @@ if __name__ == '__main__':
                                                  dir_all=soccer_dir_all, model_number=model_number,
                                                  league_name=league_name)
     else:
-        # model_number = 2101  # 2101, 7201, 7801 ,10501 ,13501 ,15301 ,18301*, 20701*
+        model_number = 2101  # 2101, 7201, 7801 ,10501 ,13501 ,15301 ,18301*, 20701*
         league_name = ''
         data_name = compute_values_for_all_games(config=tt_lstm_config, data_store_dir=soccer_data_store_dir,
                                                  dir_all=soccer_dir_all, model_number=model_number, league_name=None)
