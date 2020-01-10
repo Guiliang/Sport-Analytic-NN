@@ -235,7 +235,7 @@ def plot_game_value(game_value, save_image_name,
         plt.plot(x, game_value_home, label="Q for Home".format(home_team))
         plt.plot(x, game_value_away, label="Q for Away".format(away_team))
         plt.plot(x[0:len(game_value_end) - 1], game_value_end[0:len(game_value_end) - 1],
-                 label="Q for Game End")
+                 label="Q for Neither")
     else:
         plt.plot(x, game_value_diff, label="q_home-q_away")
     # plt.title("2015-2016 NHL regular season {0}(Away) vs {1}(Home)".format(away_team, home_team), fontsize=15)

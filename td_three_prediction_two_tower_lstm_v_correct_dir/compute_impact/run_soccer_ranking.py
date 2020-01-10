@@ -20,8 +20,10 @@ from td_three_prediction_two_tower_lstm_v_correct_dir.support.data_processing_to
 
 def compute_ranking(soccer_data_store_dir, game_data_dir,
                     data_name, player_summary_info_dir,
-                    action_selected_lists, game_info_all):
-    PI = PlayerImpact(data_name=data_name, game_data_dir=game_data_dir, model_data_store_dir=soccer_data_store_dir)
+                    action_selected_lists, game_info_all,
+                    league_number):
+    PI = PlayerImpact(data_name=data_name, game_data_dir=game_data_dir,
+                      model_data_store_dir=soccer_data_store_dir)
     dir_all = os.listdir(soccer_data_store_dir)
     for action_selected_list in action_selected_lists:
         print ("working on action {0}".format(str(action_selected_list)))
@@ -33,7 +35,9 @@ def compute_ranking(soccer_data_store_dir, game_data_dir,
         for game_name_dir in dir_all:
             if game_name_dir == '.DS_Store':
                 continue
-            PI.aggregate_match_diff_values(game_name_dir, action_selected_list=action_selected_list)
+            PI.aggregate_match_diff_values(game_name_dir,
+                                           action_selected_list=action_selected_list,
+                                           league_id=league_number)
         # PI.transfer2player_name_dict(player_id_name_pair_dir)
         action_selected = action_selected_list[0] if action_selected_list is not None else None
         PI.rank_player_by_impact(player_summary_info_dir,
@@ -80,12 +84,16 @@ if __name__ == '__main__':
 
     if fine_tune_flag:
         model_number = 4801
+        league_number = 8
         league_name = "_English_Barclays_Premier_League"
+        player_summary_info_dir = '../resource/whoScored/PremierLeague/Premier_League_summary.csv'
     else:
         model_number = 2101  # 2101, 7201, 7801 ,10501 ,13501 ,15301 ,18301*, 20701*
+        league_number = None
         league_name = ''
 
     data_name = get_data_name(config=tt_lstm_config, league_name=league_name)
     compute_ranking(data_name=data_name, game_data_dir=data_path, soccer_data_store_dir=soccer_data_store_dir,
                     player_summary_info_dir=player_summary_info_dir,
-                    action_selected_lists=action_selected_lists, game_info_all=game_info_all)
+                    action_selected_lists=action_selected_lists, game_info_all=game_info_all,
+                    league_number=league_number)

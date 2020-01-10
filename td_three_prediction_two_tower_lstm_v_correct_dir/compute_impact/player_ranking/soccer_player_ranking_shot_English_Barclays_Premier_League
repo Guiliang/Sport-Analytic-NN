@@ -1,0 +1,447 @@
+name & team & GIM & Goal \\ 
+Roberto Firmino & Liverpool & 2.632 & 15 \\  
+Christian Eriksen & Tottenham & 1.94 & 10 \\  
+Javier Hernández Balcázar & West Ham & 1.806 & 8 \\  
+Romelu Lukaku & Manchester United & 1.759 & 16 \\  
+Wilfried Zaha & Crystal Palace & 1.533 & 9 \\  
+Juan Mata & Manchester United & 1.382 & 3 \\  
+Kevin De Bruyne & Manchester City & 1.373 & 8 \\  
+Eden Hazard & Chelsea & 1.333 & 12 \\  
+Nacho Monreal & Arsenal & 1.282 & 5 \\  
+Bernardo Mota Veiga de Carvalho e Silva & Manchester City & 1.255 & 6 \\  
+Bakary Sako & Crystal Palace & 1.253 & 3 \\  
+Marcus Rashford & Manchester United & 1.21 & 7 \\  
+Dwight Gayle & Newcastle United & 1.2 & 6 \\  
+Mame Biram Diouf & Stoke & 1.176 & 6 \\  
+Marko Arnautovic & West Ham & 1.161 & 11 \\  
+Mohamed Salah & Liverpool & 1.119 & 32 \\  
+Raheem Sterling & Manchester City & 1.086 & 18 \\  
+Anthony Martial & Manchester United & 1.074 & 9 \\  
+Pierre-Emerick Aubameyang & Arsenal & 1.07 & 10 \\  
+Harry Kane & Tottenham & 1.027 & 30 \\  
+James McArthur & Crystal Palace & 1.015 & 5 \\  
+Aaron Mooy & Huddersfield & 1.012 & 4 \\  
+Nemanja Matic & Manchester United & 0.973 & 1 \\  
+Jermain Defoe & Bournemouth & 0.961 & 4 \\  
+Marcos Alonso & Chelsea & 0.949 & 7 \\  
+Sam Clucas & Swansea & 0.943 & 3 \\  
+Alex Oxlade-Chamberlain & Liverpool & 0.929 & 3 \\  
+Chris Wood & Burnley & 0.916 & 10 \\  
+Joshua King & Bournemouth & 0.909 & 8 \\  
+Chris Smalling & Manchester United & 0.907 & 4 \\  
+Mohamed Diamé & Newcastle United & 0.876 & 2 \\  
+Sadio Mané & Liverpool & 0.871 & 10 \\  
+Ben Davies & Tottenham & 0.869 & 2 \\  
+Riyad Mahrez & Leicester & 0.859 & 12 \\  
+Eric Bailly & Manchester United & 0.844 & 1 \\  
+Tom Davies & Everton & 0.827 & 2 \\  
+Peter Crouch & Stoke & 0.796 & 5 \\  
+Tom Cleverley & Watford & 0.788 & 1 \\  
+Mamadou Sakho & Crystal Palace & 0.744 & 1 \\  
+Christian Kabasele & Watford & 0.718 & 2 \\  
+Luciano Narsingh & Swansea & 0.705 & 1 \\  
+Miguel Britos & Watford & 0.703 & 1 \\  
+Pedro Obiang & West Ham & 0.698 & 2 \\  
+Heung-Min Son & Tottenham & 0.684 & 12 \\  
+Andre Gray & Watford & 0.684 & 5 \\  
+Alexandre Lacazette & Arsenal & 0.681 & 14 \\  
+Christian Atsu & Newcastle United & 0.665 & 2 \\  
+Jordan Ayew & Swansea & 0.648 & 7 \\  
+Bamidele Alli & Tottenham & 0.627 & 9 \\  
+James Morrison & West Bromwich Albion & 0.613 & 1 \\  
+Craig Dawson & West Bromwich Albion & 0.599 & 2 \\  
+Jamaal Lascelles & Newcastle United & 0.599 & 3 \\  
+Eric Maxim Choupo-Moting & Stoke & 0.583 & 5 \\  
+Jack Stephens & Southampton & 0.571 & 2 \\  
+Álvaro Morata & Chelsea & 0.57 & 11 \\  
+Glenn Murray & Brighton & 0.564 & 12 \\  
+Lys Mousset & Bournemouth & 0.556 & 2 \\  
+Jamie Vardy & Leicester & 0.556 & 20 \\  
+Tom Ince & Huddersfield & 0.554 & 2 \\  
+Harry Maguire & Leicester & 0.529 & 2 \\  
+André Carrillo & Watford & 0.523 & 1 \\  
+Ben Mee & Burnley & 0.512 & - \\  
+Henri Saivet & Newcastle United & 0.511 & 1 \\  
+Xherdan Shaqiri & Stoke & 0.507 & 8 \\  
+Daryl Janmaat & Watford & 0.507 & 3 \\  
+César Azpilicueta & Chelsea & 0.477 & 2 \\  
+Ahmed El-Sayed Hegazi & West Bromwich Albion & 0.473 & 2 \\  
+Ashley Westwood & Burnley & 0.465 & - \\  
+Steven Defour & Burnley & 0.463 & 1 \\  
+Dejan Lovren & Liverpool & 0.456 & 2 \\  
+Pascal Groß & Brighton & 0.438 & 7 \\  
+Molla Wagué & Watford & 0.438 & 1 \\  
+Marc Albrighton & Leicester & 0.436 & 2 \\  
+Andy Carroll & West Ham & 0.427 & 3 \\  
+Wilfried Bony & Swansea & 0.422 & 2 \\  
+Victor Moses & Chelsea & 0.416 & 3 \\  
+Dominic Calvert-Lewin & Everton & 0.416 & 4 \\  
+Emre Can & Liverpool & 0.401 & 3 \\  
+Elias Kachunga & Huddersfield & 0.397 & 1 \\  
+Tammy Abraham & Swansea & 0.396 & 5 \\  
+Charlie Austin & Southampton & 0.392 & 7 \\  
+Shkodran Mustafi & Arsenal & 0.386 & 3 \\  
+Steven Davis & Southampton & 0.379 & 3 \\  
+Jan Bednarek & Southampton & 0.361 & 1 \\  
+Ilkay Gündogan & Manchester City & 0.335 & 4 \\  
+Jeff Hendrick & Burnley & 0.331 & 2 \\  
+Coutinho & Liverpool & 0.323 & 7 \\  
+Davide Zappacosta & Chelsea & 0.32 & 1 \\  
+Ashley Barnes & Burnley & 0.313 & 9 \\  
+Kenedy & Newcastle United & 0.299 & 2 \\  
+Federico Fernandez & Swansea & 0.294 & 1 \\  
+Jonjoe Kenny & Everton & 0.293 & - \\  
+Leonardo Ulloa & Leicester & 0.289 & - \\  
+N'Golo Kanté & Chelsea & 0.288 & 1 \\  
+Rajiv van La Parra & Huddersfield & 0.287 & 3 \\  
+Saido Berahino & Stoke & 0.286 & - \\  
+Roberto Pereyra & Watford & 0.285 & 5 \\  
+Francisco Femenía Far & Watford & 0.283 & 1 \\  
+Junior Stanislas & Bournemouth & 0.273 & 5 \\  
+Antonio Rüdiger & Chelsea & 0.268 & 2 \\  
+Darren Fletcher & Stoke & 0.265 & 1 \\  
+Alexis Sánchez & Arsenal & 0.264 & 7 \\  
+Andrew Robertson & Liverpool & 0.259 & 1 \\  
+Cesc Fàbregas & Chelsea & 0.257 & 2 \\  
+James Collins & West Ham & 0.251 & 1 \\  
+Mario Lemina & Southampton & 0.249 & 1 \\  
+André Ayew & West Ham & 0.248 & 3 \\  
+Callum Wilson & Bournemouth & 0.228 & 8 \\  
+Sead Kolasinac & Arsenal & 0.227 & 2 \\  
+Joe Allen & Stoke & 0.226 & 2 \\  
+Andy King & Leicester & 0.225 & 1 \\  
+Stefano Okaka & Watford & 0.214 & 1 \\  
+Daniel Drinkwater & Chelsea & 0.214 & 1 \\  
+Manolo Gabbiadini & Southampton & 0.209 & 5 \\  
+João Mário & West Ham & 0.209 & 2 \\  
+Sung-yueng Ki & Swansea & 0.208 & 2 \\  
+Michail Antonio & West Ham & 0.203 & 3 \\  
+Mikel Merino & Newcastle United & 0.201 & 1 \\  
+Maya Yoshida & Southampton & 0.201 & 2 \\  
+Cheikhou Kouyaté & West Ham & 0.192 & 2 \\  
+Ryan Fraser & Bournemouth & 0.192 & 5 \\  
+Scott Arfield & Burnley & 0.185 & 2 \\  
+Michy Batshuayi & Chelsea & 0.184 & 2 \\  
+Jack Wilshere & Arsenal & 0.184 & 1 \\  
+Nacer Chadli & West Bromwich Albion & 0.18 & 1 \\  
+Adam Smith & Bournemouth & 0.177 & 1 \\  
+Adrian Mariappa & Watford & 0.167 & - \\  
+Troy Deeney & Watford & 0.159 & 5 \\  
+Paul Pogba & Manchester United & 0.156 & 6 \\  
+Serge Aurier & Tottenham & 0.156 & 2 \\  
+Oumar Niasse & Everton & 0.156 & 8 \\  
+Lewis Cook & Bournemouth & 0.153 & - \\  
+Danilo & Manchester City & 0.151 & 3 \\  
+Dominic Solanke & Liverpool & 0.137 & 1 \\  
+Yannick Bolasie & Everton & 0.118 & 1 \\  
+Gylfi Sigurdsson & Everton & 0.112 & 4 \\  
+Bruno Martins Indi & Stoke & 0.108 & - \\  
+Ciaran Clark & Newcastle United & 0.105 & 2 \\  
+Fernando Luiz Rosa & Manchester City & 0.103 & 5 \\  
+Nathan Dyer & Swansea & 0.103 & - \\  
+Vicente Iborra & Leicester & 0.103 & 3 \\  
+Aaron Lennon & Everton & 0.1 & - \\  
+Fabian Delph & Manchester City & 0.097 & 1 \\  
+Dusan Tadic & Southampton & 0.096 & 6 \\  
+Grzegorz Krychowiak & West Bromwich Albion & 0.095 & - \\  
+Nikola Vlasic & Everton & 0.091 & - \\  
+Danny Simpson & Leicester & 0.085 & - \\  
+John Stones & Manchester City & 0.084 & - \\  
+Mike van der Hoorn & Swansea & 0.084 & 1 \\  
+Dale Stephens & Brighton & 0.084 & - \\  
+Laurent Koscielny & Arsenal & 0.079 & 2 \\  
+Kieran Trippier & Tottenham & 0.076 & - \\  
+Salomón Rondón & West Bromwich Albion & 0.07 & 7 \\  
+Benik Afobe & Bournemouth & 0.068 & - \\  
+Timothy Fosu-Mensah & Crystal Palace & 0.066 & - \\  
+Patrick van Aanholt & Crystal Palace & 0.064 & 5 \\  
+Joe Lolley & Huddersfield & 0.062 & 1 \\  
+Zlatan Ibrahimovic & Manchester United & 0.062 & - \\  
+Wayne Routledge & Swansea & 0.061 & - \\  
+Will Hughes & Watford & 0.059 & 2 \\  
+Aaron Wan-Bissaka & Crystal Palace & 0.058 & - \\  
+Lucas Rodrigues Moura da Silva & Tottenham & 0.058 & - \\  
+Joseph Willock & Arsenal & 0.057 & - \\  
+Idrissa Gueye & Everton & 0.056 & 2 \\  
+Rob Holding & Arsenal & 0.056 & - \\  
+Theo Walcott & Arsenal & 0.055 & - \\  
+Trent Alexander-Arnold & Liverpool & 0.053 & 1 \\  
+Charlie Daniels & Bournemouth & 0.049 & 1 \\  
+Alberto Moreno & Liverpool & 0.048 & - \\  
+Jordan Pickford & Everton & 0.047 & - \\  
+Aleksandar Mitrovic & Newcastle United & 0.045 & 1 \\  
+Jason Puncheon & Crystal Palace & 0.045 & - \\  
+Callum Hudson-Odoi & Chelsea & 0.042 & - \\  
+Jose Luis Mato Sanmartín & Newcastle United & 0.042 & 4 \\  
+Nathaniel Clyne & Liverpool & 0.04 & - \\  
+Phil Jones & Manchester United & 0.035 & - \\  
+Sandro Ramírez & Everton & 0.033 & - \\  
+Marc Pugh & Bournemouth & 0.029 & - \\  
+Vincent Kompany & Manchester City & 0.027 & 1 \\  
+Oliver McBurnie & Swansea & 0.027 & - \\  
+Gaëtan Bong & Brighton & 0.025 & - \\  
+Ruben Loftus-Cheek & Crystal Palace & 0.025 & 2 \\  
+Yohan Benalouane & Leicester & 0.025 & - \\  
+Henrikh Mkhitaryan & Manchester United & 0.025 & 1 \\  
+Scott Malone & Huddersfield & 0.023 & - \\  
+Ben Watson & Watford & 0.02 & - \\  
+Aymeric Laporte & Manchester City & 0.02 & - \\  
+Martin Kelly & Crystal Palace & 0.019 & - \\  
+Chung-Yong Lee & Crystal Palace & 0.019 & - \\  
+Isaiah Brown & Brighton & 0.019 & - \\  
+Scott McTominay & Manchester United & 0.019 & - \\  
+Dodi Lukebakio & Watford & 0.018 & - \\  
+Jesús Gámez & Newcastle United & 0.017 & - \\  
+Gabriel Fernando de Jesus & Manchester City & 0.016 & 13 \\  
+James McCarthy & Everton & 0.015 & - \\  
+Marvin Zeegelaar & Watford & 0.015 & - \\  
+Edward Nketiah & Arsenal & 0.014 & - \\  
+Levi Lumeka & Crystal Palace & 0.014 & - \\  
+Bojan & Stoke & 0.014 & - \\  
+Beram Kayal & Brighton & 0.011 & - \\  
+Charles Musonda Junior & Chelsea & 0.008 & - \\  
+Davinson Sánchez & Tottenham & 0.007 & - \\  
+Eliaquim Mangala & Everton & 0.006 & - \\  
+Michael Obafemi & Southampton & 0.006 & - \\  
+Matt Targett & Southampton & 0.004 & - \\  
+Chancel Mbemba & Newcastle United & 0.002 & - \\  
+Tyrone Mings & Bournemouth & 0.0 & - \\  
+Kevin Wimmer & Stoke & 0.0 & - \\  
+Beni Baningime & Everton & -0.0 & - \\  
+Fousseni Diabaté & Leicester & -0.0 & - \\  
+Harry Winks & Tottenham & -0.001 & - \\  
+Fernando Llorente & Tottenham & -0.002 & 1 \\  
+Martin Cranie & Huddersfield & -0.002 & - \\  
+Joel Ward & Crystal Palace & -0.002 & - \\  
+Harvey Barnes & Leicester & -0.002 & - \\  
+Nordin Amrabat & Watford & -0.004 & - \\  
+Davy Klaassen & Everton & -0.005 & - \\  
+Gareth McAuley & West Bromwich Albion & -0.006 & - \\  
+Leon Britton & Swansea & -0.006 & - \\  
+Reiss Nelson & Arsenal & -0.009 & - \\  
+Kevin Mirallas & Everton & -0.011 & - \\  
+Daley Blind & Manchester United & -0.011 & - \\  
+Francis Coquelin & Arsenal & -0.012 & - \\  
+Morgan Schneiderlin & Everton & -0.013 & - \\  
+Jairo Riedewald & Crystal Palace & -0.016 & - \\  
+Allan-Roméo Nyom & West Bromwich Albion & -0.017 & - \\  
+Chris Löwe & Huddersfield & -0.018 & - \\  
+Oleksandr Zinchenko & Manchester City & -0.021 & - \\  
+Konstantinos Mavropanos & Arsenal & -0.025 & - \\  
+Daniel Ings & Liverpool & -0.025 & 1 \\  
+José Miguel da Rocha Fonte & West Ham & -0.027 & - \\  
+Daniel Amartey & Leicester & -0.029 & - \\  
+Patrice Evra & West Ham & -0.029 & - \\  
+Sam McQueen & Southampton & -0.029 & - \\  
+Kelechi Iheanacho & Leicester & -0.03 & 3 \\  
+Angelo Ogbonna & West Ham & -0.035 & 1 \\  
+Oliver Burke & West Bromwich Albion & -0.036 & - \\  
+Wesley Hoedt & Southampton & -0.037 & - \\  
+Aleksandar Dragovic & Leicester & -0.038 & - \\  
+Terence Kongolo & Huddersfield & -0.038 & - \\  
+Jérémy Pied & Southampton & -0.038 & - \\  
+Jürgen Locadia & Brighton & -0.038 & 1 \\  
+Hamza Choudhury & Leicester & -0.039 & - \\  
+Chris Brunt & West Bromwich Albion & -0.04 & - \\  
+Islam Slimani & Newcastle United & -0.041 & - \\  
+Marcos Rojo & Manchester United & -0.042 & - \\  
+Pablo Zabaleta & West Ham & -0.044 & - \\  
+Michael Carrick & Manchester United & -0.044 & - \\  
+Ross Barkley & Chelsea & -0.044 & - \\  
+Ezequiel Schelotto & Brighton & -0.046 & - \\  
+Kyle Bartley & Swansea & -0.046 & - \\  
+Aaron Cresswell & West Ham & -0.046 & 1 \\  
+Erik Pieters & Stoke & -0.047 & - \\  
+Younes Kaboul & Watford & -0.049 & - \\  
+Tommy Smith & Huddersfield & -0.049 & - \\  
+Jonathan Walters & Burnley & -0.05 & - \\  
+Thomas Edwards & Stoke & -0.051 & - \\  
+Kasey Palmer & Huddersfield & -0.051 & - \\  
+Nathan Aké & Bournemouth & -0.057 & 2 \\  
+Josh Cullen & West Ham & -0.058 & - \\  
+José Holebas & Watford & -0.06 & - \\  
+Javier Manquillo & Newcastle United & -0.061 & - \\  
+Per Mertesacker & Arsenal & -0.063 & 1 \\  
+Ramiro Funes Mori & Everton & -0.064 & - \\  
+Abdelhamid Sabiri & Huddersfield & -0.064 & - \\  
+Markus Suttner & Brighton & -0.065 & - \\  
+Florent Hadergjonaj & Huddersfield & -0.066 & - \\  
+DeAndre Yedlin & Newcastle United & -0.067 & - \\  
+Moritz Bauer & Stoke & -0.068 & - \\  
+Sam Byram & West Ham & -0.07 & - \\  
+Bruno & Brighton & -0.071 & - \\  
+Damien Delaney & Crystal Palace & -0.072 & - \\  
+Muhamed Besic & Everton & -0.072 & - \\  
+Connor Goldson & Brighton & -0.078 & - \\  
+Mohamed Naser El Sayed Elneny & Arsenal & -0.08 & - \\  
+Adam Lallana & Liverpool & -0.08 & - \\  
+Phil Bardsley & Burnley & -0.081 & - \\  
+Sergio Agüero & Manchester City & -0.082 & 21 \\  
+Jamie Murphy & Brighton & -0.087 & - \\  
+Winston Reid & West Ham & -0.088 & - \\  
+Jordan Henderson & Liverpool & -0.091 & 1 \\  
+Arthur Masuaku & West Ham & -0.092 & - \\  
+Charlie Taylor & Burnley & -0.093 & - \\  
+Sofiane Boufal & Southampton & -0.093 & 2 \\  
+Ragnar Klavan & Liverpool & -0.098 & 1 \\  
+David Luiz & Chelsea & -0.101 & 1 \\  
+Claudio Yacob & West Bromwich Albion & -0.103 & - \\  
+Andrew Surman & Bournemouth & -0.103 & 2 \\  
+Sebastian Prödl & Watford & -0.105 & - \\  
+Liam Rosenior & Brighton & -0.107 & - \\  
+Leroy Sané & Manchester City & -0.108 & 10 \\  
+Ashley Young & Manchester United & -0.109 & 2 \\  
+Glen Johnson & Stoke & -0.112 & - \\  
+Rolando Aarons & Newcastle United & -0.114 & - \\  
+Alexander Sørloth & Crystal Palace & -0.115 & - \\  
+Jesé & Stoke & -0.115 & 1 \\  
+Edimilson Fernandes & West Ham & -0.115 & - \\  
+Sam Field & West Bromwich Albion & -0.116 & 1 \\  
+Seamus Coleman & Everton & -0.116 & - \\  
+Benjamin Mendy & Manchester City & -0.119 & - \\  
+Martin Olsson & Swansea & -0.119 & - \\  
+Florian Lejeune & Newcastle United & -0.119 & - \\  
+Adrien Sebastian Perruchet Silva & Leicester & -0.12 & - \\  
+Manuel Lanzini & West Ham & -0.121 & 5 \\  
+Matteo Darmian & Manchester United & -0.121 & - \\  
+Joseph Gomez & Liverpool & -0.122 & - \\  
+Alfie Mawson & Swansea & -0.124 & 2 \\  
+Mousa Dembélé & Tottenham & -0.125 & - \\  
+Ben Chilwell & Leicester & -0.125 & - \\  
+Antonio Valencia & Manchester United & -0.127 & 3 \\  
+Matthew Lowton & Burnley & -0.128 & - \\  
+Georges-Kévin Nkoudou & Tottenham & -0.133 & - \\  
+Joshua Sims & Southampton & -0.133 & - \\  
+Stephen Ireland & Stoke & -0.134 & - \\  
+Jeffrey Schlupp & Crystal Palace & -0.136 & - \\  
+Luke Shaw & Manchester United & -0.139 & - \\  
+Craig Cathcart & Watford & -0.139 & - \\  
+Moussa Sissoko & Tottenham & -0.14 & 1 \\  
+Alex Pritchard & Huddersfield & -0.143 & 1 \\  
+Emerson & Chelsea & -0.146 & - \\  
+Davy Pröpper & Brighton & -0.147 & - \\  
+Steve Mounie & Huddersfield & -0.149 & 7 \\  
+Cuco Martina & Everton & -0.149 & - \\  
+Gareth Barry & West Bromwich Albion & -0.151 & 1 \\  
+Matty James & Leicester & -0.151 & - \\  
+Tomer Hemed & Brighton & -0.158 & 2 \\  
+Aaron Ramsey & Arsenal & -0.159 & 7 \\  
+Brahim Díaz & Manchester City & -0.161 & - \\  
+Leighton Baines & Everton & -0.161 & 2 \\  
+Nathaniel Chalobah & Watford & -0.162 & - \\  
+Harry Arter & Bournemouth & -0.163 & 1 \\  
+Victor Lindelöf & Manchester United & -0.164 & - \\  
+Kyle Walker & Manchester City & -0.165 & - \\  
+James McClean & West Bromwich Albion & -0.165 & 1 \\  
+Calum Chambers & Arsenal & -0.168 & - \\  
+Christopher Schindler & Huddersfield & -0.174 & - \\  
+Ander Herrera & Manchester United & -0.176 & - \\  
+Philip Billing & Huddersfield & -0.182 & - \\  
+Christian Benteke & Crystal Palace & -0.183 & 3 \\  
+James Ward-Prowse & Southampton & -0.19 & 3 \\  
+Nahki Wells & Burnley & -0.191 & - \\  
+Danny Rose & Tottenham & -0.193 & - \\  
+Dan Gosling & Bournemouth & -0.195 & 2 \\  
+Tyrese Campbell & Stoke & -0.2 & - \\  
+Luka Milivojevic & Crystal Palace & -0.203 & 10 \\  
+Andros Townsend & Crystal Palace & -0.206 & 2 \\  
+Kieran Gibbs & West Bromwich Albion & -0.211 & - \\  
+Gary Cahill & Chelsea & -0.211 & - \\  
+Sam Vokes & Burnley & -0.214 & 4 \\  
+Jack Cork & Burnley & -0.214 & 2 \\  
+Konstantinos Stafylidis & Stoke & -0.217 & - \\  
+Roque Mesa & Swansea & -0.217 & - \\  
+Granit Xhaka & Arsenal & -0.219 & 1 \\  
+James Milner & Liverpool & -0.229 & - \\  
+Toby Alderweireld & Tottenham & -0.229 & - \\  
+Ademola Lookman & Everton & -0.231 & - \\  
+Christian Fuchs & Leicester & -0.232 & - \\  
+Tom Carroll & Swansea & -0.238 & - \\  
+Solomon March & Brighton & -0.247 & 1 \\  
+Ainsley Maitland-Niles & Arsenal & -0.251 & - \\  
+Stephen Ward & Burnley & -0.253 & 1 \\  
+Jan Vertonghen & Tottenham & -0.253 & - \\  
+Kyle Naughton & Swansea & -0.256 & - \\  
+Gerard Deulofeu & Watford & -0.257 & 1 \\  
+Paul Dummett & Newcastle United & -0.265 & - \\  
+Marouane Fellaini & Manchester United & -0.274 & 4 \\  
+Lewis Dunk & Brighton & -0.275 & 1 \\  
+Tiemoué Bakayoko & Chelsea & -0.282 & 2 \\  
+Cenk Tosun & Everton & -0.284 & 5 \\  
+Papa Alioune Ndiaye & Stoke & -0.289 & 2 \\  
+Matt Ritchie & Newcastle United & -0.292 & 3 \\  
+Ramadan Sobhi & Stoke & -0.298 & 2 \\  
+Cédric Ricardo Alves Soares & Southampton & -0.3 & - \\  
+Mason Holgate & Everton & -0.301 & - \\  
+Danny Welbeck & Arsenal & -0.306 & 5 \\  
+Michael Keane & Everton & -0.318 & - \\  
+Ashley Williams & Everton & -0.321 & 1 \\  
+Phil Jagielka & Everton & -0.329 & - \\  
+Charlie Adam & Stoke & -0.33 & - \\  
+Laurent Depoitre & Huddersfield & -0.333 & 6 \\  
+Jake Livermore & West Bromwich Albion & -0.339 & 2 \\  
+Guido Carrillo & Southampton & -0.34 & - \\  
+Simon Francis & Bournemouth & -0.353 & - \\  
+Renato Júnior Luz Sanches & Swansea & -0.357 & - \\  
+Declan Rice & West Ham & -0.36 & - \\  
+Pierre-Emile Højbjerg & Southampton & -0.361 & - \\  
+Jonathan Hogg & Huddersfield & -0.361 & - \\  
+Ryan Bertrand & Southampton & -0.363 & - \\  
+Erik Lamela & Tottenham & -0.364 & 2 \\  
+Scott Dann & Crystal Palace & -0.384 & 1 \\  
+Demarai Gray & Leicester & -0.389 & 3 \\  
+Leroy Fer & Swansea & -0.397 & 1 \\  
+José Izquierdo & Brighton & -0.402 & 5 \\  
+Anthony Knockaert & Brighton & -0.404 & 3 \\  
+Wayne Rooney & Everton & -0.407 & 10 \\  
+Willian & Chelsea & -0.41 & 6 \\  
+Hal Robson-Kanu & West Bromwich Albion & -0.415 & 2 \\  
+Steve Cook & Bournemouth & -0.418 & 2 \\  
+Shane Long & Southampton & -0.418 & 2 \\  
+Kevin Long & Burnley & -0.425 & 1 \\  
+Robbie Brady & Burnley & -0.445 & 1 \\  
+Johann Berg Gudmundsson & Burnley & -0.452 & 2 \\  
+Héctor Bellerín & Arsenal & -0.455 & 2 \\  
+Danny Williams & Huddersfield & -0.457 & - \\  
+Nicolás Otamendi & Manchester City & -0.513 & 4 \\  
+Alex Iwobi & Arsenal & -0.535 & 3 \\  
+Virgil van Dijk & Southampton & -0.536 & - \\  
+Yohan Cabaye & Crystal Palace & -0.536 & - \\  
+James Tarkowski & Burnley & -0.547 & - \\  
+Jesse Lingard & Manchester United & -0.548 & 8 \\  
+Isaac Hayden & Newcastle United & -0.554 & 1 \\  
+Pedro & Chelsea & -0.561 & 4 \\  
+Andreas Christensen & Chelsea & -0.562 & - \\  
+Geoff Cameron & Stoke & -0.566 & - \\  
+Collin Quaner & Huddersfield & -0.569 & - \\  
+Jonny Evans & West Bromwich Albion & -0.574 & 2 \\  
+Eric Dier & Tottenham & -0.576 & - \\  
+Kurt Zouma & Stoke & -0.587 & 1 \\  
+Joel Matip & Liverpool & -0.596 & 1 \\  
+Diafra Sakho & West Ham & -0.607 & 2 \\  
+Daniel Sturridge & West Bromwich Albion & -0.675 & - \\  
+Mathias Jorgensen & Huddersfield & -0.676 & - \\  
+Shinji Okazaki & Leicester & -0.681 & 6 \\  
+Richarlison & Watford & -0.699 & 5 \\  
+Ayoze Pérez & Newcastle United & -0.71 & 8 \\  
+Mesut Özil & Arsenal & -0.722 & 4 \\  
+Victor Wanyama & Tottenham & -0.725 & 1 \\  
+Oriol Romeu & Southampton & -0.725 & 1 \\  
+Jonjo Shelvey & Newcastle United & -0.748 & 1 \\  
+Yaya Touré & Manchester City & -0.789 & - \\  
+Shane Duffy & Brighton & -0.81 & - \\  
+Ryan Shawcross & Stoke & -0.837 & 1 \\  
+Nathan Redmond & Southampton & -0.838 & 1 \\  
+Georginio Wijnaldum & Liverpool & -0.843 & 1 \\  
+Matt Phillips & West Bromwich Albion & -0.858 & 2 \\  
+James Tomkins & Crystal Palace & -0.943 & 3 \\  
+Wilfred Ndidi & Leicester & -0.944 & - \\  
+David Silva & Manchester City & -0.949 & 9 \\  
+Jacob Murphy & Newcastle United & -0.979 & 1 \\  
+Etienne Capoue & Watford & -0.983 & 1 \\  
+Wes Morgan & Leicester & -0.995 & - \\  
+Jordon Ibe & Bournemouth & -1.139 & 2 \\  
+Olivier Giroud & Arsenal & -1.191 & 4 \\  
+Abdoulaye Doucouré & Watford & -1.192 & 7 \\  
+Jay Rodriguez & West Bromwich Albion & -1.254 & 7 \\  
+Mark Noble & West Ham & -1.591 & 4 \\  

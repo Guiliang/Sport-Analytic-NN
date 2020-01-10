@@ -618,6 +618,12 @@ def start_lstm_generate_spatial_simulation(history_action_type, history_action_t
     return simulated_data_all
 
 
+def read_game_league_info(directory, data_path):
+    with open(data_path + str(directory)) as f:
+        data = json.load(f)
+    return data.get('competitionId')
+
+
 def read_feature_within_events(directory, data_path, feature_name):
     with open(data_path + str(directory)) as f:
         data = json.load(f)
@@ -856,9 +862,35 @@ def compute_cv_average_performance(cv_results_record_dir):
     print(np.var(np.asarray(all_results_record), axis=0))
 
 
+def combine_alg_from_events(csv_input_file_dir, csv_output_file_dir):
+    with open(csv_input_file_dir, 'r') as f:
+        event_data_all = f.readlines()
+    item_names = event_data_all[0].split('\t')
+    player_agg_alg_dict = {}
+    for event_data in event_data_all[1:]:
+        item_values = event_data.split('\t')
+        player_id = int(item_values[6])
+        teamId = int(item_values[5])
+        playerName = item_values[18]
+        teamName = item_values[24]
+        alg_value = float(item_values[29].replace('\n', ''))
+        if player_agg_alg_dict.get(player_id) is None:
+            player_agg_alg_dict.update({player_id: [playerName, teamId, teamName, alg_value]})
+        else:
+            player_alg_value = player_agg_alg_dict.get(player_id)[-1]
+            player_agg_alg_dict.update({player_id: [playerName, teamId, teamName, player_alg_value + alg_value]})
+    if csv_output_file_dir is not None:
+        with open(csv_output_file_dir, 'w') as f:
+            for playerId in player_agg_alg_dict.keys():
+                player_agg_alg_items = player_agg_alg_dict.get(playerId)
+                f.write(str(playerId) + ',' + str(player_agg_alg_items[0]) + ',' + str(player_agg_alg_items[1])
+                        + ',' + str(player_agg_alg_items[2]) + ',' + str(player_agg_alg_items[3])+'\n')
+
+    return player_agg_alg_dict
 
 
 if __name__ == '__main__':
+    combine_alg_from_events(csv_input_file_dir='/home/gla68/Downloads/out.csv', csv_output_file_dir='/home/gla68/Downloads/tmp.txt')
     # combine_player_data(player_info_csv='../resource/player_team_id_name_value.csv',
     #                     player_stats='../resource/Soccer_summary.csv',
     #                     player_info_stats='../resource/Soccer_summary_info.csv')
@@ -866,12 +898,12 @@ if __name__ == '__main__':
     # compute_cv_average_performance(
     #     cv_results_record_dir='../regression_tree/dt_record/cv_pass_running_record_leaf100.txt')
 
-    data_path = "/cs/oschulte/soccer-data/sequences_append_goal/"
-    dir_all = os.listdir(data_path)
-    player_id_list = []
-    competitionId = 10
-    for game_name_dir in dir_all:
-        game_name = game_name_dir.split('.')[0]
-        player_id_list = count_players_by_league(data_path, game_name_dir, competitionId, player_id_list)
-    print (player_id_list)
-    print(len(player_id_list))
+    # data_path = "/cs/oschulte/soccer-data/sequences_append_goal/"
+    # dir_all = os.listdir(data_path)
+    # player_id_list = []
+    # competitionId = 10
+    # for game_name_dir in dir_all:
+    #     game_name = game_name_dir.split('.')[0]
+    #     player_id_list = count_players_by_league(data_path, game_name_dir, competitionId, player_id_list)
+    # print (player_id_list)
+    # print(len(player_id_list))
