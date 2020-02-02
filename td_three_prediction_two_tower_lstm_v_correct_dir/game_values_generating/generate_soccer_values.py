@@ -5,7 +5,8 @@ import td_three_prediction_two_tower_lstm_v_correct_dir.support.data_processing_
 
 from td_three_prediction_two_tower_lstm_v_correct_dir.config.tt_lstm_config import TTLSTMCongfig
 from soccer_data_config import interested_compute_features, interested_raw_features, action_all
-from td_three_prediction_two_tower_lstm_v_correct_dir.support.data_processing_tools import get_data_name,handle_trace_length
+from td_three_prediction_two_tower_lstm_v_correct_dir.support.data_processing_tools import get_data_name, \
+    handle_trace_length
 
 
 def gather_values_by_games(model_data_store_dir, dir_game, data_name, game_data_store, write_file, target_action=None):
@@ -68,36 +69,52 @@ def gather_values_by_games(model_data_store_dir, dir_game, data_name, game_data_
         else:
             impact_value = (away_model_value - away_model_value_pre)
 
-        if event_index+1 < len(actions):
-            if 'goal' in actions[event_index+1]:
+        if event_index + 1 < len(actions):
+            if 'goal' in actions[event_index + 1]:
                 print('{0} value is {1}, goal value is {2}, {0} impact is {3}'.format(target_action,
                                                                                       str(model_value['home']),
-                                                                   str(model_data[str(event_index+1)]['home']),
+                                                                                      str(model_data[
+                                                                                              str(event_index + 1)][
+                                                                                              'home']),
                                                                                       str(impact_value)))
 
         write_file.write(str(impact_value))
         write_file.write(',' + str(model_value['home']))
         tl = state_trace_length[event_index] if state_trace_length[event_index] <= 10 else 10
         if tl < 10:
-            for j in range(0, 10-tl):
-                for zero_index in range(0, len(interested_raw_features + interested_compute_features + action_all)):
+            for j in range(0, 10 - tl):
+                for zero_index in range(0, len(interested_raw_features + interested_compute_features + action_all)+2):
                     write_file.write(',0')
         for i in range(0, tl, 1):
-            for state_value in state_input[event_index][i]:
+            for state_value in state_input[event_index][i][
+                               0:len(interested_raw_features) + len(interested_compute_features)]:
                 write_file.write(',' + str(state_value))
+            player_action = actions[event_index - tl + 1 + i]
+            for action_name in action_all:
+                if action_name == player_action:
+                    write_file.write(',1')
+                else:
+                    write_file.write(',0')
+            if home_identifier[event_index - tl + 1 + i]:
+                write_file.write(',1,0')
+            else:
+                write_file.write(',0,1')
 
         write_file.write('\n')
 
 
 def gather_all_values(data_path, model_data_store_dir, data_name, target_action):
     soccer_dir_all = os.listdir(data_path)
-    with open('./generated_values_store/{0}_impact_Q_states_features_history_soccer.csv'.format(target_action), 'w') as write_file:
+    with open('./generated_values_store/{0}_impact_Q_states_features_history_soccer.csv'.format(target_action),
+              'w') as write_file:
         items_name_all = interested_raw_features + interested_compute_features + action_all
         write_file.write('impact')
         write_file.write(',Q')
         for i in range(9, -1, -1):
             for item in items_name_all:
                 write_file.write(',' + item + str(i))
+            write_file.write(',' + 'home' + str(i))
+            write_file.write(',' + 'away' + str(i))
         write_file.write('\n')
         for game_name_dir in soccer_dir_all:
             print('working on game {0}'.format(game_name_dir))
@@ -106,11 +123,17 @@ def gather_all_values(data_path, model_data_store_dir, data_name, target_action)
 
 
 if __name__ == '__main__':
-    data_path = "/cs/oschulte/soccer-data/sequences_append_goal/"
-    soccer_data_store_dir = "/cs/oschulte/Galen/Soccer-data/"
+    test_flag = True
+    if not test_flag:
+        data_path = "/cs/oschulte/soccer-data/sequences_append_goal/"
+        model_data_save_dir = "/cs/oschulte/Galen/Soccer-data/"
+    else:
+        data_path = "/Users/liu/Desktop/soccer-data-sample/sequences_append_goal/"
+        model_data_save_dir = "/Users/liu/Desktop/soccer-data-sample/Soccer-data/"
+
     player_id_name_pair_dir = '/Local-Scratch/PycharmProjects/Sport-Analytic-NN/' \
                               'td_three_prediction_two_tower_lstm_v_correct_dir/resource/soccer_id_name_pair.json'
-    model_data_save_dir = "/cs/oschulte/Galen/Soccer-data/"
+
     # tt_lstm_config_path = '../icehockey-config.yaml'
     tt_lstm_config_path = "../soccer-config-v5.yaml"
     # difference_type = 'back_difference_'
