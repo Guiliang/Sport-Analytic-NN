@@ -95,7 +95,7 @@ if __name__ == '__main__':
                     pickle.dump([testing_input_list, testing_impact_list], f)
 
     else:
-        min_sample_leaf = 80
+        min_sample_leaf = 90
         mae, var_mae, mse, var_mse = TR.train_cart_validation_model(np.asarray(all_input_list),
                                                                     np.asarray(all_impact_list),
                                                                     np.asarray(all_input_list),
@@ -105,4 +105,4 @@ if __name__ == '__main__':
                                                                     running_number='all',
                                                                     min_sample_leaf=min_sample_leaf)
         TR.read_cart_model(cart_model_name=cart_model_name + '_rn_all' + '_msf_' + str(min_sample_leaf))
-        # TR.print_decision_path()
+        TR.print_decision_path()
