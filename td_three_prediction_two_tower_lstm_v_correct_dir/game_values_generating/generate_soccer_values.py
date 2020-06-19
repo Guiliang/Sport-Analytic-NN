@@ -1,3 +1,7 @@
+import sys
+
+print sys.path
+sys.path.append('/Local-Scratch/PycharmProjects/Sport-Analytic-NN/')
 import json
 import os
 import scipy.io as sio
@@ -56,7 +60,7 @@ def gather_values_by_games(model_data_store_dir, dir_game, data_name, game_data_
         #         model_value_nex = model_data[str(event_index + 1)]
         # else:
         #     model_value_nex = model_data[str(event_index)]
-        ishome = home_identifier[event_index]
+        # ishome = home_identifier[event_index]
         home_model_value = model_value['home']
         away_model_value = model_value['away']
         # end_model_value = abs(model_value[2])
@@ -71,12 +75,15 @@ def gather_values_by_games(model_data_store_dir, dir_game, data_name, game_data_
 
         if event_index + 1 < len(actions):
             if 'goal' in actions[event_index + 1]:
-                print('{0} value is {1}, goal value is {2}, {0} impact is {3}'.format(target_action,
+                print(event_index)
+                print('{0} value is {1}, {4} value is {2}, {0} impact is {3}'.format(target_action,
                                                                                       str(model_value['home']),
                                                                                       str(model_data[
                                                                                               str(event_index + 1)][
                                                                                               'home']),
-                                                                                      str(impact_value)))
+                                                                                      str(impact_value),
+                                                                                     actions[event_index + 1]
+                                                                                     ))
 
         write_file.write(str(impact_value))
         write_file.write(',' + str(model_value['home']))
@@ -123,7 +130,7 @@ def gather_all_values(data_path, model_data_store_dir, data_name, target_action)
 
 
 if __name__ == '__main__':
-    test_flag = True
+    test_flag = False
     if not test_flag:
         data_path = "/cs/oschulte/soccer-data/sequences_append_goal/"
         model_data_save_dir = "/cs/oschulte/Galen/Soccer-data/"
@@ -137,7 +144,7 @@ if __name__ == '__main__':
     # tt_lstm_config_path = '../icehockey-config.yaml'
     tt_lstm_config_path = "../soccer-config-v5.yaml"
     # difference_type = 'back_difference_'
-    target_action = 'shot'
+    target_action = 'pass'
     soccer_dir_all = os.listdir(data_path)
     fine_tune_flag = False
 

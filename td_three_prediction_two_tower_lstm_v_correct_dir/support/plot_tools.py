@@ -162,7 +162,7 @@ def nn_simulation(simulate_data,
 
     print "heat map"
     plt.figure(figsize=(12, 6))
-    sns.set(font_scale=1.6)
+    sns.set(font_scale=3)
     ax = sns.heatmap(value_spatial, xticklabels=False, yticklabels=False,
                      cmap="RdYlBu_r",
                      vmin=vmin_set,
@@ -174,7 +174,7 @@ def nn_simulation(simulate_data,
         plt.title("{2} for {0}\n with history:{1}"
                   .format(action_type, str(history_action_type), draw_target), fontsize=30)
     elif len(history_action_type) == 0:
-        plt.title("{1} for {0}".format(action_type, draw_target), fontsize=20)
+        plt.title("{1} for {0}".format(action_type, draw_target), fontsize=30)
     else:
         raise ValueError("undefined HIS_ACTION_TYPE{0}:".format(history_action_type))
 

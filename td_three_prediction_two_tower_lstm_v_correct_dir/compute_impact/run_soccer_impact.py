@@ -20,7 +20,10 @@ from td_three_prediction_two_tower_lstm_v_correct_dir.support.data_processing_to
     get_network_dir
 
 
-def compute_values_for_all_games(config, data_store_dir, dir_all, model_number=None, league_name=None):
+def compute_values_for_all_games(config, data_store_dir, dir_all,
+                                 model_number=None,
+                                 league_name=None,
+                                 write_values=True):
     sess_nn = tf.InteractiveSession()
 
     model_nn = td_prediction_tt_embed(
@@ -59,18 +62,21 @@ def compute_values_for_all_games(config, data_store_dir, dir_all, model_number=N
                                           dir_game=game_name,
                                           config=tt_lstm_config,
                                           sport='Soccer')
-        model_value_json = {}
-        for value_index in range(0, len(model_value)):
-            model_value_json.update({value_index: {'home': float(model_value[value_index][0]),
-                                                   'away': float(model_value[value_index][1]),
-                                                   'end': float(model_value[value_index][2])}})
 
-        game_store_dir = game_name_dir.split('.')[0]
-        with open(data_store_dir + "/" + game_store_dir + "/" + data_name, 'w') as outfile:
-            json.dump(model_value_json, outfile)
+        if write_values:
+            model_value_json = {}
+            for value_index in range(0, len(model_value)):
+                model_value_json.update({value_index: {'home': float(model_value[value_index][0]),
+                                                       'away': float(model_value[value_index][1]),
+                                                       'end': float(model_value[value_index][2])}})
+
+            game_store_dir = game_name_dir.split('.')[0]
+            with open(data_store_dir + "/" + game_store_dir + "/" + data_name, 'w') as outfile:
+                json.dump(model_value_json, outfile)
 
             # sio.savemat(data_store_dir + "/" + game_name_dir + "/" + data_name,
             #             {'model_value': np.asarray(model_value)})
+
     return data_name
 
 
@@ -99,7 +105,7 @@ if __name__ == '__main__':
     tt_lstm_config_path = "../soccer-config-v5.yaml"
     difference_type = 'back_difference_'
     soccer_dir_all = os.listdir(data_path)
-    fine_tune_flag = True
+    fine_tune_flag = False
 
     tt_lstm_config = TTLSTMCongfig.load(tt_lstm_config_path)
     learning_rate = tt_lstm_config.learn.learning_rate
@@ -124,6 +130,6 @@ if __name__ == '__main__':
     #     data_name = get_data_name(config=tt_lstm_config, league_name=league_name)
     # else:
     #     data_name = get_data_name(config=tt_lstm_config, league_name=league_name)
-    # compute_impact(data_name=data_name, game_data_dir=data_path, soccer_data_store_dir=soccer_data_store_dir,
-    #                player_id_name_pair_dir=player_id_name_pair_dir, difference_type=difference_type,
-    #                league_name=league_name)
+    compute_impact(data_name=data_name, game_data_dir=data_path, soccer_data_store_dir=soccer_data_store_dir,
+                   player_id_name_pair_dir=player_id_name_pair_dir, difference_type=difference_type,
+                   league_name=league_name)

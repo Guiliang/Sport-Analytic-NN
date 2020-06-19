@@ -1,3 +1,8 @@
+import sys
+
+print sys.path
+sys.path.append('/Local-Scratch/PycharmProjects/Sport-Analytic-NN/')
+
 import numpy as np
 import matplotlib.pyplot as plt
 import os
@@ -40,11 +45,11 @@ def plot_2d_soccer_goals(soccer_data_store_dir, save_plot_dir):
         'score position summation is top: {0} and bottom: {1}'.format(str(top_score_number), str(bottom_score_number)))
     print('mean coordinate is {0}'.format(str(np.mean(goal_shot_position, axis=0))))
 
-    plt.figure(figsize=(9, 6))
-    plt.xticks(size=15)
-    plt.yticks(size=15)
-    plt.xlabel('X Coordinate', fontsize=15)
-    plt.ylabel('Y Coordinate', fontsize=15)
+    plt.figure(figsize=(10, 6))
+    plt.xticks(size=20)
+    plt.yticks(size=20)
+    plt.xlabel('X Coordinate', fontsize=20)
+    plt.ylabel('Y Coordinate', fontsize=20)
     plt.scatter(goal_shot_position[:, 0], goal_shot_position[:, 1], s=8)
     plt.xlim([0, 100])
     plt.ylim([0, 100])

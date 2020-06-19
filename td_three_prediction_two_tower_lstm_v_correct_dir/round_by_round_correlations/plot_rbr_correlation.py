@@ -62,7 +62,7 @@ class DrawRoundCorrelation:
 
         for field in self.field_dict.keys():
 
-            plt.figure(figsize=(11, 7))
+            plt.figure(figsize=(8, 7))
 
             for method in self.metric_names_all:
                 # field_name = method if field == 'auto' else field
@@ -99,7 +99,7 @@ class DrawRoundCorrelation:
 
 
 if __name__ == "__main__":
-    league = None
+    league = 'champion'
     if league is not None:
         rbr_results_dir = './rbr_correlations_{0}'.format(league)
     else:

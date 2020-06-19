@@ -1,3 +1,8 @@
+import sys
+
+print sys.path
+sys.path.append('/Local-Scratch/PycharmProjects/Sport-Analytic-NN/')
+
 import numpy as np
 import os
 import csv
@@ -94,6 +99,18 @@ def count_players_by_league(data_path, directory, competitionId, player_id_list)
             if playerId not in player_id_list:
                 player_id_list.append(playerId)
         return player_id_list
+
+
+def count_events_by_league(data_path, directory, competitionId, event_numbers):
+    with open(data_path + str(directory)) as f:
+        data = json.load(f)
+    game_competition_id = data.get('competitionId')
+    if competitionId != game_competition_id:
+        return event_numbers
+    else:
+        events = data.get('events')
+        event_numbers += len(events)
+        return event_numbers
 
 
 def get_game_time(data_path, directory):
@@ -884,13 +901,23 @@ def combine_alg_from_events(csv_input_file_dir, csv_output_file_dir):
             for playerId in player_agg_alg_dict.keys():
                 player_agg_alg_items = player_agg_alg_dict.get(playerId)
                 f.write(str(playerId) + ',' + str(player_agg_alg_items[0]) + ',' + str(player_agg_alg_items[1])
-                        + ',' + str(player_agg_alg_items[2]) + ',' + str(player_agg_alg_items[3])+'\n')
+                        + ',' + str(player_agg_alg_items[2]) + ',' + str(player_agg_alg_items[3]) + '\n')
 
     return player_agg_alg_dict
 
 
 if __name__ == '__main__':
-    combine_alg_from_events(csv_input_file_dir='/home/gla68/Downloads/out.csv', csv_output_file_dir='/home/gla68/Downloads/tmp.txt')
+    data_path = "/cs/oschulte/soccer-data/sequences_append_goal/"
+    dir_all = os.listdir(data_path)
+    competitionId = 10
+    event_numbers = 0
+    for game_name_dir in dir_all:
+        game_name = game_name_dir.split('.')[0]
+        event_numbers = count_events_by_league(data_path, game_name_dir, competitionId, event_numbers)
+    print(event_numbers)
+
+    # combine_alg_from_events(csv_input_file_dir='/home/gla68/Downloads/out.csv',
+    #                         csv_output_file_dir='/home/gla68/Downloads/tmp.txt')
     # combine_player_data(player_info_csv='../resource/player_team_id_name_value.csv',
     #                     player_stats='../resource/Soccer_summary.csv',
     #                     player_info_stats='../resource/Soccer_summary_info.csv')

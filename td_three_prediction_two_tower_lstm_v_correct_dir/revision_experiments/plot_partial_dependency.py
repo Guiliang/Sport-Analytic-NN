@@ -75,13 +75,13 @@ def gather_impact_values(soccer_data_store_path, tt_lstm_config, game_data_path,
 
 
 def plot_impact_partial_dependency(impact_features_array):
-    plt.figure(figsize=(9, 6))
+    plt.figure(figsize=(12, 7))
     plt.scatter(impact_features_array[:, 1], impact_features_array[:, 0])
     # plt.figure(figsize=(9, 6))
-    plt.xticks(size=12)
-    plt.yticks(size=12)
-    plt.xlabel('Game Time Remain', fontsize=15)
-    plt.ylabel('Impact Values', fontsize=15)
+    plt.xticks(size=20)
+    plt.yticks(size=20)
+    plt.xlabel('Game Time Remain', fontsize=20)
+    plt.ylabel('Impact Values', fontsize=20)
     plt.ylim([-0.10, 0.10])
     plt.show()
 

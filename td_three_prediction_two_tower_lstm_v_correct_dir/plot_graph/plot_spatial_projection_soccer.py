@@ -13,7 +13,7 @@ from td_three_prediction_two_tower_lstm_v_correct_dir.config.soccer_feature_sett
 
 if __name__ == '__main__':
     features_train, features_mean_dic, features_scale_dic, actions = select_feature_setting(5)
-    tt_lstm_config_path = "../soccer-config-v5.yaml"
+    tt_lstm_config_path = "../soccer-config-v3.yaml"
     tt_lstm_config = TTLSTMCongfig.load(tt_lstm_config_path)
     # history_action_type = ['reception', 'pass', 'reception']
     # history_action_type_coord = [{'xAdjCoord': 0, 'yAdjCoord': 0},
